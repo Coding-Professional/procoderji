@@ -1,0 +1,10 @@
+/* apply to reader container */
+.nocopy {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.nocopy *::selection { background: transparent; color: inherit; }
+
+.nocopy input, .nocopy textarea { user-select: text !important; }

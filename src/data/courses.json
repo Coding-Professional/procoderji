@@ -1,0 +1,102 @@
+{
+  "courses": [
+    {
+      "slug": "btech",
+      "title": "B.Tech",
+      "branches": [
+        {
+          "slug": "cse",
+          "title": "Computer Science Engineering",
+          "semesters": [
+            {
+              "slug": "sem1",
+              "title": "Semester 1",
+              "subjects": []
+            },
+            {
+              "slug": "sem2",
+              "title": "Semester 2",
+              "subjects": []
+            },
+            {
+              "slug": "sem3",
+              "title": "Semester 3",
+              "subjects": []
+            },
+            {
+              "slug": "sem4",
+              "title": "Semester 4",
+              "subjects": []
+            },
+            {
+              "slug": "sem5",
+              "title": "Semester 5",
+              "subjects": []
+            },
+            {
+              "slug": "sem6",
+              "title": "Semester 6",
+              "subjects": []
+            },
+            {
+              "slug": "sem7",
+              "title": "Semester 7",
+              "subjects": []
+            },
+            {
+              "slug": "sem8",
+              "title": "Semester 8",
+              "subjects": []
+            }
+          ]
+        },
+        {
+          "slug": "aiml",
+          "title": "Artificial Intelligence and Machine Learning",
+          "semesters": [
+            {
+              "slug": "sem1",
+              "title": "Semester 1",
+              "subjects": []
+            },
+            {
+              "slug": "sem2",
+              "title": "Semester 2",
+              "subjects": []
+            },
+            {
+              "slug": "sem3",
+              "title": "Semester 3",
+              "subjects": []
+            },
+            {
+              "slug": "sem4",
+              "title": "Semester 4",
+              "subjects": []
+            },
+            {
+              "slug": "sem5",
+              "title": "Semester 5",
+              "subjects": []
+            },
+            {
+              "slug": "sem6",
+              "title": "Semester 6",
+              "subjects": []
+            },
+            {
+              "slug": "sem7",
+              "title": "Semester 7",
+              "subjects": []
+            },
+            {
+              "slug": "sem8",
+              "title": "Semester 8",
+              "subjects": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
