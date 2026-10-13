@@ -1,161 +1,106 @@
-# Uni Notes — Notes & previous year papers Platform
+# ProCoderJii Notes
 
-A structured web platform designed to help students access university notes, syllabus, and previous year papers with a clean and distraction-free reading experience. Built with Next.js 15, the platform uses MDX for content delivery, features a Notion-style interface, secure reading capabilities, and includes a comprehensive admin panel for managing academic content.
+A small Next.js site that goes with the ProCoderJii YouTube channel. Visitors pick a
+branch and semester and read unit-wise notes online.
 
+> **Status:** the browsing structure (B.Tech → CSE / AIML → Semesters 1-8) is in place,
+> but no subjects or notes are published yet. Empty semesters show a "Notes coming soon"
+> page. The two sample MDX files under `src/content` are placeholders and are
+> intentionally **not** registered in the catalogue.
 
-<img width="1344" height="637" alt="Gemini_Generated_Image_z9mrkmz9mrkmz9mr 1" src="https://github.com/user-attachments/assets/0eb5e373-eb23-44f9-ad3f-e733c1b4c7df" />
+## What it is (and is not)
 
-## Features
+- A statically-built reading site: Next.js App Router, React 19, Tailwind CSS 4,
+  Framer Motion, `next-mdx-remote` for rendering notes.
+- Content lives in the repository (MDX files + `src/data/courses.json`).
+- There is **no database, no user accounts, no admin panel, no PDF downloads, no search
+  and no chatbot.** Older versions of this README described those; they do not exist.
+- The contact form opens the visitor's email app with a pre-filled message to the team
+  address. Nothing is stored or sent by the server.
 
-### Core Features
+## Requirements
 
-- **MDX-based notes system** for rich content formatting
-- **Syllabus and previous year paper viewer**
-- **Notion-style split-screen reader layout** for enhanced navigation
-- **Fullscreen reading mode** for distraction-free study sessions
-- **Advanced search functionality** powered by Fuse.js
-- **Flexible theme system** supporting light, dark, and system preferences
+- Node.js **20.9 or newer** (required by Next.js 16). Node 22 or 24 LTS is recommended.
+- npm (a `package-lock.json` is committed; use `npm ci`).
 
-### Student Productivity Tools
+## Getting started
 
-- **Bookmarks** to save important notes
-- **Reading progress tracking** to monitor study advancement
-- **Integrated To-Do list** for task management
-- **User profile section** for personalized experience
-- **Optional subject-based study chatbot** for interactive learning
-
-### Content Protection
-
-- Right-click prevention
-- Text selection blocking
-- Copy event interception
-- Watermark overlay system
-- Optional pseudo-element text rendering for enhanced security
-
-### Admin Panel
-
-- Course management interface
-- Semester organization tools
-- Subject administration
-- Unit management with MDX file upload
-- Syllabus manager
-- Previous year question paper (PYQ) manager
-- File upload support via Cloudinary or local storage
-- User management system
-
-## Tech Stack
-
-### Frontend
-
-- **Next.js 15** with App Router
-- **React 19**
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **shadcn/ui** component library
-- **Framer Motion** for animations
-- **Lenis** for smooth scrolling
-- **React Hook Form** with **Zod** validation
-
-### Backend
-
-- **Next.js API Routes** for server-side logic
-- **PostgreSQL** database (Supabase recommended)
-- **NextAuth** or **Clerk** for authentication
-- **Cloudinary** for media storage
-
-### Content & Search
-
-- **MDX** for content rendering
-- Automatic table of contents generation
-- **Fuse.js** for client-side fuzzy search
-
-## Installation
-
-### Prerequisites
-
-- Node.js 18+ or Bun
-- PostgreSQL database
-- Cloudinary account (for media uploads)
-
-### Setup Instructions
-
-**1. Clone the repository**
 ```bash
-git clone https://github.com/NishulDhakar/Uni-notes
-cd Uni-notes
+npm ci
+npm run dev        # http://localhost:3000
 ```
 
-**2. Install dependencies**
-```bash
-npm install
-# or
-bun install
-```
+### Scripts
 
-**3. Configure environment variables**
+| Script              | What it does                                         |
+| ------------------- | ---------------------------------------------------- |
+| `npm run dev`       | Start the dev server                                 |
+| `npm run build`     | Production build                                     |
+| `npm start`         | Serve the production build                           |
+| `npm run lint`      | ESLint                                               |
+| `npm run typecheck` | TypeScript (`tsc --noEmit`)                          |
+| `npm test`          | Unit tests (Node's built-in test runner, no extra deps) |
 
-Create a `.env.local` file in the root directory:
-```env
-# Database
-DATABASE_URL="your_postgresql_connection_string"
+Run `npm run lint && npm run typecheck && npm test && npm run build` before opening a PR.
 
-# Authentication
-NEXTAUTH_SECRET="your_nextauth_secret"
-NEXTAUTH_URL="http://localhost:3000"
+### Configuration
 
-# Cloudinary
-CLOUD_NAME="your_cloudinary_cloud_name"
-CLOUDINARY_API_KEY="your_cloudinary_api_key"
-CLOUDINARY_API_SECRET="your_cloudinary_api_secret"
+| Variable               | Purpose                                                                 |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site origin, e.g. `https://your-domain.example`. Optional.    |
 
-# Optional: AI Features
-OPENAI_API_KEY="your_openai_api_key"
-```
+Until `NEXT_PUBLIC_SITE_URL` is set, `sitemap.xml` is empty, `robots.txt` has no `Sitemap:`
+line and no canonical / Open Graph URLs are emitted. This is deliberate: the canonical
+domain has to be confirmed by the site owner. Set it in your hosting provider's
+environment settings (or a local, git-ignored `.env.local`); do not commit it.
 
-**4. Run database migrations**
-```bash
-npm run db:migrate
-```
+## Adding notes
 
-**5. Start the development server**
-```bash
-npm run dev
-```
+1. Write the unit as an MDX/Markdown file under `src/content/courses/...`.
+2. Register it in `src/data/courses.json` under the right branch → semester:
 
-The application will be available at `http://localhost:3000`
+   ```json
+   {
+     "slug": "intro-to-web",
+     "title": "Introduction to Web",
+     "units": [
+       {
+         "slug": "unit-1",
+         "title": "Unit 1 - Introduction",
+         "path": "content/courses/btech/cse/sem1/intro-to-web/unit-1.mdx"
+       }
+     ]
+   }
+   ```
 
-## Project Structure
+   (`path` is relative to `src/` and must stay inside `src/content`.)
+3. Only publish reviewed, genuine content. The catalogue drives the sidebar, hero,
+   dashboard, `generateMetadata` and the sitemap, so a registered subject appears
+   everywhere automatically.
+
+Notes may use standard Markdown. JavaScript expressions in MDX are blocked. Links are
+restricted to `http`, `https`, `mailto` and relative URLs.
+
+## Project structure
+
 ```
 src/
-├── app/                          # Next.js App Router
-│   ├── (site)/                   # Public-facing pages
-│   ├── (user)/                   # User dashboard routes
-│   ├── (admin)/                  # Admin dashboard routes
-│   ├── api/                      # API endpoints
-│   └── global.css                # Global styles
-│
-├── components/                   # React components
-│   ├── navigation/               # Sidebar, navbar components
-│   ├── reader/                   # MDX reader components
-│   ├── admin/                    # Admin panel components
-│   └── ui/                       # shadcn/ui components
-│
-├── content/                      # MDX notes organized hierarchically
-│   └── [course]/[semester]/[subject]/[unit].mdx
-│
-├── hooks/                        # Custom React hooks
-│
-├── lib/                          # Utility libraries
-│   ├── auth/                     # Authentication utilities
-│   ├── db/                       # Database utilities
-│   ├── search/                   # Search implementation
-│   ├── mdx/                      # MDX processing helpers
-│   └── security/                 # Content protection utilities
-│
-└── types/                        # TypeScript type definitions
+├── app/
+│   ├── page.tsx              # landing page
+│   ├── dashboard/            # reader: branch → semester → subject → ?note=unit
+│   ├── courses/              # plain duplicate reader (noindex)
+│   ├── robots.ts, sitemap.ts # driven by NEXT_PUBLIC_SITE_URL + the catalogue
+├── components/               # landing sections, sidebar, cards, empty state
+├── content/                  # MDX notes (placeholders only for now)
+├── data/courses.json         # catalogue: the single source of truth
+└── lib/                      # catalogue helpers, markdown parser, mailto, SEO (tested)
 ```
 
-## Support
+## Contributing
 
-For issues, questions, or feature requests, please open an issue on the [GitHub repository](https://github.com/NishulDhakar/Uni-notes/issues).
+Issues and pull requests are welcome. Keep changes focused, add or update a test where
+practical, and don't add placeholder or invented study content.
 
+## License
+
+MIT - see [LICENSE](LICENSE).
