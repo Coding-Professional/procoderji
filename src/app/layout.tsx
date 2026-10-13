@@ -1,10 +1,24 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { getSiteUrl } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "ProCoderJii Notes | Free Engineering Notes & Study Material",
-  description:
-    "Free notes, PYQs, and study material for engineering students from the ProCoderJii community.",
+  // metadataBase / social image are only set once the canonical domain is configured.
+  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
+  title: {
+    default: "ProCoderJii Notes | Free Engineering Notes & Study Material",
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    siteName: SITE_NAME,
+    type: "website",
+    ...(siteUrl ? { images: [{ url: "/og.png" }] } : {}),
+  },
+  twitter: { card: siteUrl ? "summary_large_image" : "summary" },
 };
 
 export default function RootLayout({

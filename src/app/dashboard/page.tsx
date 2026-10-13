@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { NoteCard } from "@/components/note-card";
 import { EmptyState } from "@/components/empty-state";
+import { pageMetadata } from "@/lib/seo";
 import { getCourses } from "@/lib/courses";
 import { countSubjects, dashboardHref } from "@/lib/catalog";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
     title: "Browse Notes",
     description: "Browse ProCoderJii notes by course, branch and semester.",
-};
+    path: "/dashboard",
+});
 
 export default function DashboardPage() {
     const courses = getCourses();

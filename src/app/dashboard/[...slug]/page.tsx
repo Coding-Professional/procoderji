@@ -1,5 +1,7 @@
 import * as React from "react";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { MDXComponents } from "mdx/types";
@@ -30,6 +32,46 @@ interface PageProps {
 }
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+export async function generateMetadata({ params }: Pick<PageProps, "params">): Promise<Metadata> {
+    const { slug } = await params;
+    const node = resolveSlugs(slug);
+    if (!node || node.type === "root") return { title: "Not found", robots: { index: false } };
+
+    const path = dashboardHref(slug);
+    switch (node.type) {
+        case "course":
+            return pageMetadata({
+                title: node.course.title,
+                description: `Browse ${node.course.title} notes by branch and semester.`,
+                path,
+                noindex: countSubjects(node.course) === 0,
+            });
+        case "branch":
+            return pageMetadata({
+                title: node.branch.title,
+                description: `${node.branch.title} notes by semester from the ProCoderJii community.`,
+                path,
+                noindex: countSubjects(node.branch) === 0,
+            });
+        case "semester":
+            return pageMetadata({
+                title: `${node.branch.short ?? node.branch.title} ${node.semester.title}`,
+                description: `${node.branch.title} ${node.semester.title} notes and subjects.`,
+                path,
+                noindex: node.semester.subjects.length === 0,
+            });
+        case "subject":
+            return pageMetadata({
+                title: `${node.subject.title} - ${node.branch.short ?? node.branch.title} ${node.semester.title}`,
+                description: `${node.subject.title} notes for ${node.branch.title}, ${node.semester.title}${
+                    node.subject.units.length ? `: ${plural(node.subject.units.length, "unit")}` : ""
+                }.`,
+                path,
+                noindex: node.subject.units.length === 0,
+            });
+    }
+}
 
 export default async function CoursePage(props: PageProps) {
     const { slug } = await props.params;

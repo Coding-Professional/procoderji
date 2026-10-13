@@ -1,4 +1,8 @@
 import React from 'react';
+import type { Metadata } from 'next';
+
+// Placeholder page: keep it out of search results until it has real content.
+export const metadata: Metadata = { title: 'About', robots: { index: false, follow: true } };
 
 export default function AboutPage() {
 	return (
