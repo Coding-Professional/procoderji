@@ -10,12 +10,12 @@ export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <nav className="sticky top-0 z-50 border-b border-gray-100">
+        <nav aria-label="Main" className="sticky top-0 z-50 border-b border-gray-100">
             <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
                 <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900">
                     <Image
                         src="/logo.svg"
-                        alt="ProCoderJii"
+                        alt=""
                         width={32}
                         height={32}
                         className="rounded-lg"
@@ -29,7 +29,7 @@ export function Navbar() {
                     <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
                     <Link
                         href="https://procoderji.xyz"
-                        target="_blank"
+                        target="_blank" rel="noopener noreferrer"
                         className="hover:text-primary transition-colors"
                     >
                         Website
@@ -44,10 +44,14 @@ export function Navbar() {
 
                 {/* Mobile Menu Button */}
                 <button
+                    type="button"
                     className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
                     onClick={() => setIsOpen(!isOpen)}
+                    aria-label={isOpen ? "Close menu" : "Open menu"}
+                    aria-expanded={isOpen}
+                    aria-controls="mobile-menu"
                 >
-                    {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    {isOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
                 </button>
             </div>
 
@@ -55,6 +59,7 @@ export function Navbar() {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
+                        id="mobile-menu"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
@@ -77,7 +82,7 @@ export function Navbar() {
                             </a>
                             <Link
                                 href="https://procoderji.xyz"
-                                target="_blank"
+                                target="_blank" rel="noopener noreferrer"
                                 className="hover:text-primary transition-colors"
                                 onClick={() => setIsOpen(false)}
                             >

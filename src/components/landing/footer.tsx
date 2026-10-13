@@ -102,7 +102,7 @@ export function Footer() {
                                             </a>
                                         </li>
                                         <li>
-                                            <Link href="https://procoderji.xyz" target="_blank" className="hover:text-gray-500 transition-colors">
+                                            <Link href="https://procoderji.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-gray-500 transition-colors">
                                                 Website
                                             </Link>
                                         </li>
@@ -119,8 +119,8 @@ export function Footer() {
 
                     <div className="relative z-10 md:mt-2 mt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                         <p>Copyright {new Date().getFullYear()} ProCoderJii. All rights reserved.</p>
-                        <Link target="_blank" href="https://procoderji.xyz" className="hover:text-gray-700 transition-colors p-2 hover:bg-white/50 rounded-full">
-                            <Globe className="w-4 h-4" />
+                        <Link target="_blank" rel="noopener noreferrer" href="https://procoderji.xyz" aria-label="ProCoderJii website (opens in a new tab)" className="hover:text-gray-700 transition-colors p-2 hover:bg-white/50 rounded-full">
+                            <Globe className="w-4 h-4" aria-hidden="true" />
                         </Link>
                     </div>
                 </motion.div>
