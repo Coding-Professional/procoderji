@@ -7,6 +7,7 @@
         {
           "slug": "cse",
           "title": "Computer Science Engineering",
+          "short": "CSE",
           "semesters": [
             {
               "slug": "sem1",
@@ -53,6 +54,7 @@
         {
           "slug": "aiml",
           "title": "Artificial Intelligence and Machine Learning",
+          "short": "AIML",
           "semesters": [
             {
               "slug": "sem1",

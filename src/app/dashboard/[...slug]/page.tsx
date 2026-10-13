@@ -1,167 +1,176 @@
 import * as React from "react";
-import { NoteCard } from "@/components/note-card";
-import { ResizableSplitView } from "@/components/resizable-split-view";
-import { ChevronRight, FileText, Folder, Lock } from "lucide-react";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { getCourseData, getNoteContent, Unit, Subject, Semester, Branch, Course } from "@/lib/course-utils";
-
-import { redirect } from "next/navigation";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import type { MDXComponents } from "mdx/types";
+import { ChevronRight, FileText, Folder } from "lucide-react";
+import { NoteCard } from "@/components/note-card";
+import { EmptyState } from "@/components/empty-state";
+import { resolveSlugs } from "@/lib/courses";
+import { countSubjects, dashboardHref, findUnit } from "@/lib/catalog";
+import { readNote } from "@/lib/notes";
 import { ClientSplitViewWrapper } from "./client-wrapper";
-import { MDXRemote } from 'next-mdx-remote/rsc';
 
-// Components for MDX
-const components = {
-    h1: (props: any) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
-    h2: (props: any) => <h2 className="text-2xl font-semibold mt-6 mb-3" {...props} />,
-    p: (props: any) => <p className="leading-7 mb-4" {...props} />,
-    ul: (props: any) => <ul className="list-disc list-inside mb-4" {...props} />,
-    li: (props: any) => <li className="mb-1" {...props} />,
-    pre: (props: any) => <pre className="bg-muted p-4 rounded-lg overflow-x-auto mb-4" {...props} />,
-    code: (props: any) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props} />,
+// Notes are trusted repo content, but never allow JS expressions in them.
+const MDX_OPTIONS = { blockJS: true, blockDangerousJS: true } as const;
+
+const components: MDXComponents = {
+    h1: (props) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
+    h2: (props) => <h2 className="text-2xl font-semibold mt-6 mb-3" {...props} />,
+    p: (props) => <p className="leading-7 mb-4" {...props} />,
+    ul: (props) => <ul className="list-disc list-inside mb-4" {...props} />,
+    li: (props) => <li className="mb-1" {...props} />,
+    pre: (props) => <pre className="bg-muted p-4 rounded-lg overflow-x-auto mb-4" {...props} />,
+    code: (props) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props} />,
 };
 
 interface PageProps {
     params: Promise<{ slug: string[] }>;
-    searchParams: Promise<{ note?: string }>;
+    searchParams: Promise<{ note?: string | string[] }>;
 }
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
 export default async function CoursePage(props: PageProps) {
-    const params = await props.params;
-    const searchParams = await props.searchParams;
-    const slug = params.slug;
-    const activeNoteSlug = searchParams.note;
+    const { slug } = await props.params;
+    const { note } = await props.searchParams;
+    const activeNoteSlug = typeof note === "string" ? note : undefined;
 
-    const courseData = getCourseData(slug);
+    const node = resolveSlugs(slug);
+    if (!node || node.type === "root") notFound();
 
-    if (!courseData) {
-        return (
-            <div className="flex flex-col items-center justify-center h-[50vh]">
-                <h1 className="text-2xl font-bold mb-2">Page Not Found</h1>
-                <p className="text-muted-foreground mb-4">The requested course or section does not exist.</p>
-                <Link href="/dashboard" className="text-primary hover:underline">
-                    Return to Dashboard
-                </Link>
-            </div>
+    const basePath = dashboardHref(slug);
+
+    // Note content (sliding pane) - only for subject pages with a valid ?note=
+    let noteContent: React.ReactNode = null;
+    let hasActiveNote = false;
+
+    if (node.type === "subject" && activeNoteSlug) {
+        const unit = findUnit(node.subject, activeNoteSlug);
+        if (!unit) notFound();
+        hasActiveNote = true;
+        const source = readNote(unit.path);
+        noteContent = source ? (
+            <article className="space-y-6 animate-in fade-in duration-500">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-medium">UNIT</span>
+                    <span>{unit.title}</span>
+                </div>
+                <h1 className="text-3xl font-bold tracking-tight mb-8">{unit.title}</h1>
+                <div className="prose prose-lg dark:prose-invert max-w-none">
+                    <MDXRemote source={source} components={components} options={MDX_OPTIONS} />
+                </div>
+            </article>
+        ) : (
+            <EmptyState
+                title="This note is not available yet"
+                description="The content for this unit could not be loaded. Please try again later."
+            />
         );
     }
 
-    const { type, data } = courseData;
-    const title = data.title;
-    const depth = slug.length;
+    // Title, description, children for each level
+    let title: string;
+    let gridItems: React.ReactNode = null;
+    let empty: React.ReactNode = null;
 
-    // Handle Note Content (Sliding Pane)
-    let noteContent = null;
-    let activeUnitTitle = "Untitled Note";
-
-    if (activeNoteSlug && type === 'subject') {
-        const subject = data as Subject;
-        const unit = subject.units.find(u => u.slug === activeNoteSlug);
-
-        if (unit) {
-            activeUnitTitle = unit.title;
-            const mdxSource = await getNoteContent(unit.path);
-
-            if (mdxSource) {
-                noteContent = (
-                    <div className="space-y-6 animate-in fade-in duration-500">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-medium">UNIT</span>
-                            <span>{unit.title}</span>
-                        </div>
-
-                        <h1 className="text-3xl font-bold tracking-tight mb-8">
-                            {unit.title}
-                        </h1>
-
-                        {/* Copy Protection Wrapper */}
-                        <div className="relative group select-none">
-                            <div className="prose prose-lg dark:prose-invert max-w-none">
-                                <MDXRemote source={mdxSource} components={components} />
-                            </div>
-                        </div>
-                    </div>
-                );
-            } else {
-                noteContent = <div className="p-4 text-red-500">Error loading content. File not found at {unit.path}</div>;
-            }
-        }
-    }
-
-    // Main Content Logic
-    let gridItems = null;
-
-    if (type === 'stream') {
-        const stream = data as Course;
-        gridItems = stream.branches.map((branch, i) => (
+    if (node.type === "course") {
+        title = node.course.title;
+        gridItems = node.course.branches.map((branch) => (
             <NoteCard
-                key={i}
+                key={branch.slug}
                 title={branch.title}
-                description={`Access ${branch.title} semesters`}
-                href={`/dashboard/${slug.join("/")}/${branch.slug}`}
+                description={`Browse ${branch.title} semesters`}
+                meta={countSubjects(branch) ? plural(countSubjects(branch), "subject") : "Coming soon"}
+                href={dashboardHref([...slug, branch.slug])}
                 tag="Branch"
                 color="blue"
             />
         ));
-    } else if (type === 'branch') {
-        const branch = data as Branch;
-        gridItems = branch.semesters.map((sem, i) => (
+    } else if (node.type === "branch") {
+        title = node.branch.title;
+        gridItems = node.branch.semesters.map((sem) => (
             <NoteCard
-                key={i}
+                key={sem.slug}
                 title={sem.title}
-                description={`${sem.subjects.length} Subjects`}
-                href={`/dashboard/${slug.join("/")}/${sem.slug}`}
+                description={sem.subjects.length ? `${plural(sem.subjects.length, "subject")} available` : "Notes for this semester are coming soon."}
+                meta={sem.subjects.length ? undefined : "Coming soon"}
+                href={dashboardHref([...slug, sem.slug])}
                 tag="Semester"
                 color="green"
             />
         ));
-    } else if (type === 'semester') {
-        const semester = data as Semester;
-        gridItems = semester.subjects.map((sub, i) => (
-            <NoteCard
-                key={i}
-                title={sub.title}
-                description={`${sub.units.length} Units`}
-                href={`/dashboard/${slug.join("/")}/${sub.slug}`}
-                tag="Subject"
-                color="orange"
-            />
-        ));
-    } else if (type === 'subject') {
-        const subject = data as Subject;
-        gridItems = subject.units.map((unit, i) => (
-            // We need a client component wrapper to handle the onClick router push
-            // For now, we'll use a Link with a query param which works with server components too
-            // But to match the "Notion style" sliding pane without full reload, we ideally want client side navigation
-            // Since this is a server component, we can pass data to a client wrapper
-            <NoteCard
-                key={i}
-                title={unit.title}
-                description={unit.desc || "View Unit Details"}
-                href={`/dashboard/${slug.join("/")}?note=${unit.slug}`}
-                tag="Unit"
-                color="purple"
-                scroll={false}
-            />
-        ));
+    } else if (node.type === "semester") {
+        title = `${node.branch.short ?? node.branch.title} - ${node.semester.title}`;
+        if (node.semester.subjects.length === 0) {
+            empty = (
+                <EmptyState
+                    title="Notes coming soon"
+                    description={`We have not published subjects for ${node.semester.title} yet. Check back soon, or tell us which subject you need.`}
+                    backHref={dashboardHref(slug.slice(0, 2))}
+                    backLabel="Back to semesters"
+                />
+            );
+        } else {
+            gridItems = node.semester.subjects.map((sub) => (
+                <NoteCard
+                    key={sub.slug}
+                    title={sub.title}
+                    description={sub.units.length ? `${plural(sub.units.length, "unit")}` : "Units coming soon."}
+                    meta={sub.units.length ? undefined : "Coming soon"}
+                    href={dashboardHref([...slug, sub.slug])}
+                    tag="Subject"
+                    color="orange"
+                />
+            ));
+        }
+    } else {
+        // subject
+        title = node.subject.title;
+        if (node.subject.units.length === 0) {
+            empty = (
+                <EmptyState
+                    title="Units coming soon"
+                    description="Notes for this subject are not published yet."
+                    backHref={dashboardHref(slug.slice(0, 3))}
+                    backLabel="Back to subjects"
+                />
+            );
+        } else {
+            gridItems = node.subject.units.map((unit) => (
+                <NoteCard
+                    key={unit.slug}
+                    title={unit.title}
+                    description={unit.desc || "Open this unit"}
+                    href={`${basePath}?note=${unit.slug}`}
+                    tag="Unit"
+                    color="purple"
+                    scroll={false}
+                />
+            ));
+        }
     }
 
-    // Breadcrumbs
     const breadcrumbs = (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 flex-wrap">
-            <Link href="/dashboard" className="hover:text-primary">Dashboard</Link>
-            {slug.map((s, i) => (
-                <React.Fragment key={i}>
-                    <ChevronRight className="w-4 h-4" />
-                    <Link
-                        href={`/dashboard/${slug.slice(0, i + 1).join("/")}`}
-                        className="hover:text-primary capitalize"
-                    >
-                        {s.replace(/-/g, " ")}
-                    </Link>
-                </React.Fragment>
-            ))}
-        </div>
+        <nav aria-label="Breadcrumb" className="mb-6">
+            <ol className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+                <li>
+                    <Link href="/dashboard" className="hover:text-primary">Dashboard</Link>
+                </li>
+                {slug.map((s, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                        <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                        <Link
+                            href={dashboardHref(slug.slice(0, i + 1))}
+                            aria-current={i === slug.length - 1 ? "page" : undefined}
+                            className="hover:text-primary capitalize"
+                        >
+                            {s.replace(/-/g, " ")}
+                        </Link>
+                    </li>
+                ))}
+            </ol>
+        </nav>
     );
 
     const MainView = (
@@ -170,34 +179,27 @@ export default async function CoursePage(props: PageProps) {
 
             <div className="flex items-center gap-4 mb-8">
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                    {type === 'subject' ? <FileText className="w-6 h-6" /> : <Folder className="w-6 h-6" />}
+                    {node.type === "subject" ? <FileText className="w-6 h-6" aria-hidden="true" /> : <Folder className="w-6 h-6" aria-hidden="true" />}
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold capitalize">{title}</h1>
-                    <p className="text-muted-foreground">
-                        {type === 'subject' ? "Select a unit to view details" : `Select a item to continue`}
-                    </p>
+                    <h1 className="text-3xl font-bold">{title}</h1>
+                    {gridItems && (
+                        <p className="text-muted-foreground">
+                            {node.type === "subject" ? "Select a unit to read" : "Select an item to continue"}
+                        </p>
+                    )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gridItems}
-            </div>
+            {empty ?? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{gridItems}</div>
+            )}
         </div>
     );
 
-    if (type === 'subject') {
-        // We need a client component to handle the ResizableSplitView state
-        // But ResizableSplitView is already a client component.
-        // We can pass the server-rendered content as children.
-        // However, the "onClose" logic needs router.
-
+    if (node.type === "subject") {
         return (
-            <ClientSplitViewWrapper
-                isOpen={!!activeNoteSlug}
-                sideContent={noteContent}
-                basePath={`/dashboard/${slug.join("/")}`}
-            >
+            <ClientSplitViewWrapper isOpen={hasActiveNote} sideContent={noteContent} basePath={basePath}>
                 {MainView}
             </ClientSplitViewWrapper>
         );
@@ -205,5 +207,3 @@ export default async function CoursePage(props: PageProps) {
 
     return MainView;
 }
-
-// Client Wrapper for Split View

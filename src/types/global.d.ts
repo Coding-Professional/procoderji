@@ -11,6 +11,8 @@ export interface Course {
 export interface Branch {
   slug: string;
   title: string;
+  /** Short label for compact UI (e.g. "CSE"). Falls back to title. */
+  short?: string;
   semesters: Semester[];
 }
 
@@ -29,7 +31,8 @@ export interface Subject {
 export interface Unit {
   slug: string;
   title: string;
-  path: string; // MDX file path
+  path: string; // MDX file path, relative to src/content
+  desc?: string;
 }
 
 export {};
