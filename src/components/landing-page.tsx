@@ -18,9 +18,7 @@ export function LandingPage() {
 
             <main className="relative z-10 flex flex-col min-h-screen">
                 <Navbar />
-                <React.Suspense fallback={null}>
-                    <Hero />
-                </React.Suspense>
+                <Hero />
                 <About />
                 <WhyUs />
                 {/* <Services /> */}
