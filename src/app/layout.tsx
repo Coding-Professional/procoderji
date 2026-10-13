@@ -32,9 +32,9 @@ export default function RootLayout({
           />
 
           {/* Main Content */}
-          <main className="relative z-10">
+          <div className="relative z-10">
             {children}
-          </main>
+          </div>
         </div>
       </body>
     </html>
