@@ -25,7 +25,7 @@ export function About() {
                             ProCoderJii Notes is a student-first learning platform connected with the ProCoderJii YouTube channel. We organize notes, PYQs, practical files, and exam material so you can revise faster and study with clarity.
                         </p>
                         <p>
-                            Every resource is designed for quick access. You can open or download material in one click, follow video explanations, and prepare unit by unit without wasting time searching in multiple groups or drives.
+                            Every resource is designed for quick access. You can open notes in one click, follow video explanations, and prepare unit by unit without wasting time searching in multiple groups or drives.
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-6 pt-4">
