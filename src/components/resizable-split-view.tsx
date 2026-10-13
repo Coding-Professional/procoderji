@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, GripVertical, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ResizableSplitViewProps {
@@ -38,6 +38,16 @@ export function ResizableSplitView({
         window.addEventListener("resize", checkMobile);
         return () => window.removeEventListener("resize", checkMobile);
     }, []);
+
+    // Escape closes the panel.
+    React.useEffect(() => {
+        if (!isOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+        };
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, [isOpen, onClose]);
 
     const startResizing = React.useCallback(() => {
         if (isMobile) return;
@@ -98,6 +108,8 @@ export function ResizableSplitView({
                 {isOpen && (
                     <motion.div
                         ref={sidebarRef}
+                        role="complementary"
+                        aria-label="Note content"
                         initial={{ x: "100%", boxShadow: "none" }}
                         animate={{ x: 0, boxShadow: "-10px 0 40px -10px rgba(0,0,0,0.1)" }}
                         exit={{ x: "100%", boxShadow: "none" }}
@@ -124,6 +136,7 @@ export function ResizableSplitView({
                                 <button
                                     onClick={onClose}
                                     className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500 hover:text-gray-900"
+                                    aria-label="Close note panel"
                                     title="Close panel"
                                 >
                                     <ChevronRight className="w-5 h-5" />
