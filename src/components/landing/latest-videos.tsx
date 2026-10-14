@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ExternalLink, Youtube } from "lucide-react";
-import { channelUrl, fetchLatestVideos, getYoutubeChannelId } from "@/lib/youtube";
+import { MOBILE_VIDEO_COUNT, channelUrl, fetchLatestVideos, getYoutubeChannelId, videoItemClass } from "@/lib/youtube";
 import { formatIsoDate } from "@/lib/reading";
 
 /**
@@ -43,10 +43,10 @@ export async function LatestVideos() {
                     </p>
                 ) : (
                     <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {videos.map((v) => {
+                        {videos.map((v, i) => {
                             const date = formatIsoDate(v.publishedAt.slice(0, 10));
                             return (
-                                <li key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm focus-within:ring-2 focus-within:ring-gray-900">
+                                <li key={v.id} className={`group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm focus-within:ring-2 focus-within:ring-gray-900 ${videoItemClass(i)}`}>
                                     <Image
                                         src={v.thumbnail}
                                         alt=""
@@ -77,6 +77,20 @@ export async function LatestVideos() {
                             );
                         })}
                     </ul>
+                )}
+                {videos.length > MOBILE_VIDEO_COUNT && (
+                    // Phones show only the first few cards, so point them at the rest.
+                    <p className="mt-6 sm:hidden">
+                        <a
+                            href={channel}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900 underline underline-offset-4"
+                        >
+                            <Youtube className="w-4 h-4" aria-hidden="true" /> See more videos on YouTube
+                            <span className="sr-only">(opens in a new tab)</span>
+                        </a>
+                    </p>
                 )}
             </div>
         </section>

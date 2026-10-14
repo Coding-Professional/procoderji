@@ -286,6 +286,37 @@ await interaction("hero headline is never covered by the floating logo (several 
 });
 
 
+// Needs the live channel feed, so it only runs when YOUTUBE_CHANNEL_ID is set (otherwise the section is hidden by design).
+const videosEnabled = /^UC[A-Za-z0-9_-]{22}$/.test(process.env.YOUTUBE_CHANNEL_ID ?? "");
+if (!videosEnabled) console.log("SKIP  latest videos responsive checks (set YOUTUBE_CHANNEL_ID to run them)");
+const videoState = async (page) =>
+  page.evaluate(() => {
+    const cards = [...document.querySelectorAll("#videos ul > li")];
+    const visible = cards.filter((li) => li.checkVisibility());
+    const hiddenLinks = cards.filter((li) => !li.checkVisibility()).flatMap((li) => [...li.querySelectorAll("a")]);
+    // A display:none link must not be focusable (so keyboard and screen-reader users never land on it).
+    const focusable = hiddenLinks.filter((a) => { a.focus(); return document.activeElement === a; }).length;
+    const more = [...document.querySelectorAll("#videos a")].find((a) => /See more videos/i.test(a.textContent));
+    return { total: cards.length, visible: visible.length, hidden: hiddenLinks.length, focusableHidden: focusable, moreLinkVisible: !!more && more.checkVisibility(), noOverflowX: document.documentElement.scrollWidth <= document.documentElement.clientWidth };
+  });
+if (videosEnabled) {
+  await interaction("latest videos: three on phones (rest out of the tab order), all six on desktop", "mobile", async (page) => {
+    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    const s = await videoState(page);
+    expectTrue(s.total === 6, `expected 6 cards in the page, found ${s.total}`);
+    expectTrue(s.visible === 3, `phones should show 3 videos, showing ${s.visible}`);
+    expectTrue(s.hidden === 3 && s.focusableHidden === 0, `the 3 extra cards must not be focusable (focusable hidden links: ${s.focusableHidden})`);
+    expectTrue(s.moreLinkVisible, "phones should get a 'See more videos on YouTube' link");
+    expectTrue(s.noOverflowX, "no horizontal scrolling on phones");
+  });
+  await interaction("latest videos: desktop keeps all six and hides the phone-only link", "desktop", async (page) => {
+    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    const s = await videoState(page);
+    expectTrue(s.total === 6 && s.visible === 6, `desktop should show all 6 videos, showing ${s.visible} of ${s.total}`);
+    expectTrue(!s.moreLinkVisible, "the phone-only 'See more' link should be hidden on desktop");
+  });
+}
+
 await interaction("privacy page discloses every third-party host the site contacts", "desktop", async (page) => {
   // Every external host that these pages request must be named on the Privacy page.
   const DISCLOSED_AS = { "lottie.host": "lottie.host", "cdn.jsdelivr.net": "jsdelivr", "i.ytimg.com": "i.ytimg.com" };

@@ -96,3 +96,15 @@ export async function fetchLatestVideos(
 		return [];
 	}
 }
+
+/** Videos shown on phones (below the `sm` breakpoint); larger screens show them all. */
+export const MOBILE_VIDEO_COUNT = 3;
+
+/**
+ * Responsive class for the video at `index`. Cards past MOBILE_VIDEO_COUNT use display:none on
+ * phones, so they are removed from the accessibility tree and the tab order (not just hidden
+ * visually), and their lazy images are never fetched. They are still in the HTML for crawlers.
+ */
+export function videoItemClass(index: number): string {
+	return index >= MOBILE_VIDEO_COUNT ? "hidden sm:block" : "";
+}

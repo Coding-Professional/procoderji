@@ -127,3 +127,17 @@ test("fetchLatestVideos gives up after the timeout", async () => {
 	assert.deepEqual(await fetchLatestVideos(CHANNEL, { fetchImpl, timeoutMs: 50 }), []);
 	assert.ok(Date.now() - started < 2000);
 });
+
+test("only the first three videos are shown on phones, and the rest use display:none", async () => {
+	const { MOBILE_VIDEO_COUNT, videoItemClass } = await import("./youtube.ts");
+	assert.equal(MOBILE_VIDEO_COUNT, 3);
+	assert.deepEqual([0, 1, 2, 3, 4, 5].map(videoItemClass), ["", "", "", "hidden sm:block", "hidden sm:block", "hidden sm:block"]);
+});
+
+test("the mobile limit hides cards with display:none (out of the accessibility tree), not just visually", async () => {
+	const { videoItemClass } = await import("./youtube.ts");
+	const hidden = videoItemClass(5).split(" ");
+	assert.ok(hidden.includes("hidden"), "must use Tailwind's `hidden` (display:none)");
+	assert.ok(hidden.includes("sm:block"), "must show again from the sm breakpoint so desktop keeps all videos");
+	assert.ok(!/opacity|sr-only|invisible|h-0|overflow-hidden/.test(videoItemClass(5)), "must not rely on visual-only hiding");
+});
