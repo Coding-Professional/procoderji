@@ -45,9 +45,10 @@ export default function PrivacyPage() {
 
             <H2>3. Third-party content</H2>
             <P>
-                The &ldquo;About&rdquo; section of the home page displays an animation that is loaded from
-                lottie.host (LottieFiles). When it loads, that service receives your IP address and browser
-                information, as any website you visit would.{" "}
+                The &ldquo;About&rdquo; section of the home page displays an animation. The animation file is
+                loaded from lottie.host (LottieFiles) and the player&apos;s WebAssembly file is loaded from the
+                jsDelivr content-delivery network (cdn.jsdelivr.net). When they load, those services receive your
+                IP address and browser information, as any website you visit would.{" "}
                 {getYoutubeChannelId() &&
                     "The home page also shows thumbnails of our latest YouTube videos, which are loaded from YouTube's image servers (i.ytimg.com, operated by Google); that service receives your IP address and browser information when they load. Clicking a video takes you to YouTube, which has its own privacy policy. "}
                 Links on this site (for example to YouTube or to

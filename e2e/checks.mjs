@@ -240,6 +240,29 @@ await interaction("legal pages: draft banner, markers, no index", "desktop", asy
   expectTrue(((await page.locator('meta[name=robots]').getAttribute("content")) ?? "").includes("noindex"), "noindex");
 });
 
+await interaction("privacy page discloses every third-party host the site contacts", "desktop", async (page) => {
+  // Every external host that these pages request must be named on the Privacy page.
+  const DISCLOSED_AS = { "lottie.host": "lottie.host", "cdn.jsdelivr.net": "jsdelivr", "i.ytimg.com": "i.ytimg.com" };
+  const base = new URL(BASE);
+  const hosts = new Set();
+  page.on("request", (r) => {
+    const u = new URL(r.url());
+    if (/^https?:$/.test(u.protocol) && u.host !== base.host) hosts.add(u.host);
+  });
+  for (const url of ["/", "/dashboard", "/guides/qa-guide", "/jobs", "/dashboard/btech/cse/sem1/qa-subject/unit-a"]) {
+    await page.goto(BASE + url, { waitUntil: "networkidle" });
+    for (let y = 0; y < 5000; y += 700) {
+      await page.evaluate((yy) => window.scrollTo(0, yy), y);
+      await page.waitForTimeout(120);
+    }
+  }
+  expectTrue(hosts.size > 0, "expected the home page to contact at least the animation hosts");
+  await page.goto(BASE + "/privacy", { waitUntil: "networkidle" });
+  const text = (await page.locator("main").innerText()).toLowerCase();
+  const missing = [...hosts].filter((h) => !text.includes((DISCLOSED_AS[h] ?? h).toLowerCase()));
+  expectTrue(missing.length === 0, "undisclosed third-party host(s): " + missing.join(", "));
+});
+
 await browser.close();
 
 console.log("\n========== FINDINGS ==========");
