@@ -14,6 +14,8 @@ interface NoteCardProps {
     tag?: string;
     color?: "blue" | "green" | "purple" | "orange";
     scroll?: boolean;
+    /** Heading level of the card title; use 2 when the page has no section heading above the cards. */
+    headingLevel?: 2 | 3;
 }
 
 const colorStyles = {
@@ -31,7 +33,9 @@ export function NoteCard({
     tag = "Note",
     color = "blue",
     scroll = true,
+    headingLevel = 3,
 }: NoteCardProps) {
+    const Heading = headingLevel === 2 ? "h2" : "h3";
     return (
         <motion.div
             whileHover={{ y: -4 }}
@@ -47,12 +51,12 @@ export function NoteCard({
                     </span>
                 </div>
 
-                <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                <Heading className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
                     {/* One link per card; the pseudo-element stretches it over the whole card. */}
                     <Link href={href} scroll={scroll} className="focus:outline-none after:absolute after:inset-0 after:content-['']">
                         {title}
                     </Link>
-                </h3>
+                </Heading>
                 <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{description}</p>
 
                 <div className="flex items-center justify-between pt-4 border-t border-border/50 text-xs">

@@ -1,5 +1,11 @@
+import { createElement } from "react";
 import type { MDXComponents } from "mdx/types";
 import { sanitizeUrl } from "@/lib/markdown";
+import { demoteHeading } from "@/lib/headings";
+
+function Heading({ level, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6 } & React.ComponentPropsWithoutRef<"h2">) {
+    return createElement(demoteHeading(level), props);
+}
 
 /**
  * Element styles for rendered notes. Raw HTML/JSX is removed before compilation
@@ -8,9 +14,13 @@ import { sanitizeUrl } from "@/lib/markdown";
  * rendered as plain text / omitted.
  */
 export const mdxComponents: MDXComponents = {
-    h1: (props) => <h1 className="text-3xl font-bold mt-8 mb-4" {...props} />,
-    h2: (props) => <h2 className="text-2xl font-semibold mt-8 mb-3" {...props} />,
-    h3: (props) => <h3 className="text-xl font-semibold mt-6 mb-2" {...props} />,
+    // The page supplies the only <h1> (the note title); see lib/headings.ts.
+    h1: (props) => <Heading level={1} className="text-3xl font-bold mt-8 mb-4" {...props} />,
+    h2: (props) => <Heading level={2} className="text-2xl font-semibold mt-8 mb-3" {...props} />,
+    h3: (props) => <Heading level={3} className="text-xl font-semibold mt-6 mb-2" {...props} />,
+    h4: (props) => <Heading level={4} className="text-lg font-semibold mt-5 mb-2" {...props} />,
+    h5: (props) => <Heading level={5} className="font-semibold mt-4 mb-2" {...props} />,
+    h6: (props) => <Heading level={6} className="text-sm font-semibold mt-4 mb-2" {...props} />,
     p: (props) => <p className="leading-7 mb-4" {...props} />,
     ul: (props) => <ul className="list-disc pl-6 mb-4 space-y-1" {...props} />,
     ol: (props) => <ol className="list-decimal pl-6 mb-4 space-y-1" {...props} />,

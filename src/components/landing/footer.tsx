@@ -80,7 +80,7 @@ export function Footer() {
                                 className="grid grid-cols-2 gap-12 lg:pl-20"
                             >
                                 <div>
-                                    <h4 className="font-bold mb-6 uppercase tracking-wider text-sm">Platform</h4>
+                                    <h3 className="font-bold mb-6 uppercase tracking-wider text-sm">Platform</h3>
                                     <ul className="space-y-4 text-sm font-medium">
                                         <li>
                                             <Link href="/dashboard" className="hover:text-gray-500 transition-colors">
@@ -109,7 +109,7 @@ export function Footer() {
                                     </ul>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold mb-6 uppercase tracking-wider text-sm">Connect</h4>
+                                    <h3 className="font-bold mb-6 uppercase tracking-wider text-sm">Connect</h3>
                                     <ul className="space-y-4 text-sm font-medium ">
                                         <li>
                                             <a href="mailto:procoderji@gmail.com" className="hover:text-gray-500 transition-colors">

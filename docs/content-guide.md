@@ -56,14 +56,18 @@ Create the file at the `path` you registered. Standard Markdown is supported: he
 paragraphs, lists, links, images, block quotes, and fenced code blocks.
 
 ```md
-# Unit 1 - Arrays and Linked Lists
-
 ## Arrays
 An array stores elements in contiguous memory...
 
+### Why it matters
 - Fast index access
 - Costly insertion in the middle
 ```
+
+**Do not repeat the unit title.** The page already shows the `title` from the catalogue as its
+main heading, so start the note with its first section. Headings inside a note are shown one
+level lower than written (`#` appears as a second-level heading, `##` as third-level) so each
+page keeps a single main heading.
 
 Notes are **Markdown only**. For safety, raw HTML or JSX tags (`<script>`, `<iframe>`,
 `<div>`...), `{JavaScript expressions}` and `import`/`export` lines are removed when the

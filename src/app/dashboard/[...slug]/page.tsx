@@ -114,6 +114,7 @@ export default async function CoursePage(props: PageProps) {
         title = node.course.title;
         gridItems = node.course.branches.map((branch) => (
             <NoteCard
+                headingLevel={2}
                 key={branch.slug}
                 title={branch.title}
                 description={`Browse ${branch.title} semesters`}
@@ -127,6 +128,7 @@ export default async function CoursePage(props: PageProps) {
         title = node.branch.title;
         gridItems = node.branch.semesters.map((sem) => (
             <NoteCard
+                headingLevel={2}
                 key={sem.slug}
                 title={sem.title}
                 description={sem.subjects.length ? `${plural(sem.subjects.length, "subject")} available` : "Notes for this semester are coming soon."}
@@ -150,6 +152,7 @@ export default async function CoursePage(props: PageProps) {
         } else {
             gridItems = node.semester.subjects.map((sub) => (
                 <NoteCard
+                    headingLevel={2}
                     key={sub.slug}
                     title={sub.title}
                     description={sub.desc ?? (sub.units.length ? plural(sub.units.length, "unit") : "Units coming soon.")}
@@ -176,6 +179,7 @@ export default async function CoursePage(props: PageProps) {
         } else {
             gridItems = node.subject.units.map((unit, i) => (
                 <NoteCard
+                    headingLevel={2}
                     key={unit.slug}
                     title={unit.title}
                     description={unit.desc || "Open this unit"}

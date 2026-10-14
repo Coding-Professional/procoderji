@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function CoursesLayout({ children }: { children: React.ReactNode }) {
-	return children;
+	return <main id="main-content">{children}</main>;
 }
