@@ -89,7 +89,7 @@ src/
 ├── app/
 │   ├── page.tsx              # landing page
 │   ├── dashboard/            # reader: branch → semester → subject → ?note=unit
-│   ├── courses/              # plain duplicate reader (noindex)
+│   ├── courses/              # legacy reader, unreachable: /courses/* redirects to /dashboard/*
 │   ├── robots.ts, sitemap.ts # use the site URL + the catalogue
 ├── components/               # landing sections, sidebar, cards, empty state
 ├── content/                  # note files (only placeholders for now, not registered)

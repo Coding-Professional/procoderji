@@ -157,11 +157,18 @@ try {
 	}
 
 	// ---------- empty content stays hidden ----------
-	const mustBeNoindex = ["/dashboard/btech/cse/sem1", "/dashboard/btech/cse/sem8", "/dashboard/btech/aiml/sem3", "/courses"];
+	const mustBeNoindex = ["/dashboard/btech/cse/sem1", "/dashboard/btech/cse/sem8", "/dashboard/btech/aiml/sem3"];
 	for (const p of mustBeNoindex) {
 		const res = await get(p);
-		if (res.status === 200 && !/noindex/i.test(analyse(res.text).robots ?? "")) bad(p, "empty/duplicate page is indexable (should be noindex)");
-		if (sitemapPaths.has(p)) bad(p, "empty/duplicate page is in the sitemap");
+		if (res.status === 200 && !/noindex/i.test(analyse(res.text).robots ?? "")) bad(p, "empty page is indexable (should be noindex)");
+		if (sitemapPaths.has(p)) bad(p, "empty page is in the sitemap");
+	}
+	// The old duplicate /courses reader must not be served: it permanently redirects to the dashboard.
+	for (const [from, to] of [["/courses", "/dashboard"], ["/courses/btech/cse/sem1", "/dashboard/btech/cse/sem1"]]) {
+		const res = await get(from);
+		if (res.status !== 308) bad(from, `expected a 308 redirect, got ${res.status}`);
+		else if (new URL(res.location, BASE).pathname !== to) bad(from, `redirects to ${res.location} (expected ${to})`);
+		if (sitemapPaths.has(from)) bad(from, "redirected URL is in the sitemap");
 	}
 	for (const p of ["/guides", "/jobs"]) {
 		const res = await get(p);
@@ -212,6 +219,11 @@ try {
 	const home = await get("/");
 	for (const h of ["x-content-type-options", "x-frame-options", "referrer-policy", "permissions-policy"]) {
 		if (!home.headers.get(h)) bad("/", `missing response header ${h}`);
+	}
+	if (home.headers.get("x-powered-by")) bad("/", `framework header is still sent: X-Powered-By: ${home.headers.get("x-powered-by")}`);
+	// Removed template/unused files must not be served any more.
+	for (const p of ["/next.svg", "/vercel.svg", "/file.svg", "/globe.svg", "/window.svg", "/bg.png"]) {
+		if ((await fetch(BASE + p)).status !== 404) bad(p, "unused file is still being served");
 	}
 
 	console.log(`\nCrawled ${[...seen.values()].filter(Boolean).length} pages; sitemap lists ${sitemapPaths.size}; ${linkTargets.size} distinct internal link targets.`);

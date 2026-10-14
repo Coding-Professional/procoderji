@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // The old plain /courses/... reader duplicated the dashboard (same URL structure, no styling).
+  // Send visitors and any old links to the real pages instead of serving duplicate content.
+  async redirects() {
+    return [
+      { source: "/courses", destination: "/dashboard", permanent: true },
+      { source: "/courses/:path*", destination: "/dashboard/:path*", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

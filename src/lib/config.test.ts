@@ -20,3 +20,11 @@ test("the expected baseline headers are present", () => {
 test("the framework is not advertised in an X-Powered-By header", () => {
 	assert.equal(nextConfig.poweredByHeader, false);
 });
+
+test("the old /courses reader permanently redirects to the matching dashboard page", async () => {
+	const rules = (await nextConfig.redirects?.()) ?? [];
+	assert.deepEqual(rules, [
+		{ source: "/courses", destination: "/dashboard", permanent: true },
+		{ source: "/courses/:path*", destination: "/dashboard/:path*", permanent: true },
+	]);
+});

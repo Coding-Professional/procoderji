@@ -12,7 +12,7 @@ const PAGES = [
   "/dashboard/btech/cse/sem2", "/dashboard/btech/cse/sem1/qa-subject",
   "/dashboard/btech/cse/sem1/qa-subject/unit-a", "/dashboard/btech/cse/sem1/qa-subject/unit-b",
   "/guides", "/guides/qa-guide", "/jobs", "/about", "/privacy", "/terms", "/disclaimer", "/copyright",
-  "/courses", "/nope/zzz", "/dashboard/btech/year3/sem5/ml",
+  "/nope/zzz", "/dashboard/btech/year3/sem5/ml",
 ];
 
 const VIEWPORTS = {
@@ -209,6 +209,18 @@ await interaction("unit page: prev/next, breadcrumbs, safe content", "desktop", 
   expectTrue((await page.locator("a[href^=javascript]").count()) === 0, "no javascript: links");
   await page.getByRole("link", { name: /QA Unit B/ }).click();
   await page.waitForURL(/unit-b$/);
+});
+
+await interaction("old /courses URLs redirect to the matching dashboard pages", "desktop", async (page) => {
+  for (const [from, to] of [
+    ["/courses", "/dashboard"],
+    ["/courses/btech/cse/sem1", "/dashboard/btech/cse/sem1"],
+    ["/courses/btech/cse/sem1/qa-subject/unit-a", "/dashboard/btech/cse/sem1/qa-subject/unit-a"],
+  ]) {
+    const r = await page.goto(BASE + from, { waitUntil: "networkidle" });
+    expectTrue(r.status() === 200, from + " should end on a 200 page, got " + r.status());
+    expectTrue(new URL(page.url()).pathname === to, from + " should land on " + to + ", landed on " + new URL(page.url()).pathname);
+  }
 });
 
 await interaction("legacy ?note redirects to unit page", "desktop", async (page) => {
