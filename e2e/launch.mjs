@@ -53,8 +53,14 @@ function analyse(html) {
 
 let code = 1;
 try {
-	const build = spawnSync(process.execPath, [NEXT, "build"], { cwd: ROOT, stdio: "inherit" });
+	const build = spawnSync(process.execPath, [NEXT, "build"], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+	const buildLog = `${build.stdout ?? ""}${build.stderr ?? ""}`;
+	process.stdout.write(buildLog);
 	if (build.status !== 0) throw new Error("next build failed");
+	// A clean build has no warnings (for example the "whole project is traced" file-system warning).
+	if (/encountered \d+ warning|Static analysis determined|metadataBase property/i.test(buildLog)) {
+		bad("next build", "the production build printed warnings (see output above)");
+	}
 	server = spawn(process.execPath, [NEXT, "start", "-p", PORT], { cwd: ROOT, stdio: "ignore" });
 	for (let i = 0; i < 40; i++) {
 		try { if ((await fetch(BASE)).ok) break; } catch {}

@@ -25,8 +25,10 @@ export function resolveWithinReal(root: string, relative: string): string | null
 	const full = resolveWithin(root, relative);
 	if (!full) return null;
 	try {
-		const realRoot = fs.realpathSync(root);
-		const realFull = fs.realpathSync(full);
+		// Both paths are confined to the content folder by resolveWithin above; the comments stop
+		// the bundler from tracing the whole project for this runtime lookup.
+		const realRoot = fs.realpathSync(/*turbopackIgnore: true*/ root);
+		const realFull = fs.realpathSync(/*turbopackIgnore: true*/ full);
 		const rel = path.relative(realRoot, realFull);
 		if (rel === "" || rel.startsWith("..") || path.isAbsolute(rel)) return null;
 		return realFull;
