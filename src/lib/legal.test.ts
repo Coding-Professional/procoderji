@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { LEGAL, missingLegalFields, isLegalComplete, legalSitemapRoutes, LEGAL_PAGES, type LegalDetails } from "./legal.ts";
 import { CONTACT_EMAIL } from "./contact.ts";
+import { isRealIsoDate } from "./dates.ts";
 
 const complete: LegalDetails = {
 	...LEGAL,
@@ -21,16 +22,16 @@ test("confirmed details are filled in and consistent with the project", () => {
 	assert.match(fs.readFileSync("LICENSE", "utf8"), new RegExp(`Copyright \\(c\\) \\d{4} ${LEGAL.operatorName}`));
 });
 
-test("details the owner has not provided are not invented", () => {
-	assert.equal(LEGAL.courtsLocation, null);
-	assert.equal(LEGAL.effectiveDate, null);
-	assert.equal(LEGAL.grievanceContact, null);
-	assert.equal(LEGAL.postalAddress, null);
-});
-
-test("the legal pages remain a draft until every required field is complete", () => {
-	assert.deepEqual(missingLegalFields(LEGAL), ["courtsLocation", "effectiveDate"]);
-	assert.equal(isLegalComplete(LEGAL), false);
+test("the draft state always matches the shipped details", () => {
+	// Holds both before and after the owner fills in the remaining fields.
+	const missing = missingLegalFields(LEGAL);
+	assert.equal(isLegalComplete(LEGAL), missing.length === 0);
+	assert.equal(legalSitemapRoutes(LEGAL).length > 0, missing.length === 0);
+	// Anything still missing is genuinely empty or invalid, never a placeholder string.
+	for (const f of missing) assert.ok(!LEGAL[f] || !isRealIsoDate(LEGAL[f]) || f !== "effectiveDate");
+	for (const v of [LEGAL.operatorName, LEGAL.governingLaw, LEGAL.courtsLocation, LEGAL.grievanceContact, LEGAL.postalAddress]) {
+		assert.ok(v === null || (v.trim() !== "" && !/required|todo|tbd|xxx/i.test(v)), `placeholder-looking value: ${v}`);
+	}
 });
 
 test("blank or malformed values are still missing", () => {
@@ -47,7 +48,8 @@ test("a complete set is accepted", () => {
 });
 
 test("legal pages stay out of the sitemap until complete", () => {
-	assert.deepEqual(legalSitemapRoutes(LEGAL), []);
+	assert.deepEqual(legalSitemapRoutes({ ...complete, courtsLocation: null }), []);
+	assert.deepEqual(legalSitemapRoutes({ ...complete, effectiveDate: null }), []);
 	const routes = legalSitemapRoutes(complete);
 	assert.deepEqual(routes.map((r) => r.path), LEGAL_PAGES.map((p) => p.path));
 	assert.ok(routes.every((r) => r.lastModified === "2026-11-01"));

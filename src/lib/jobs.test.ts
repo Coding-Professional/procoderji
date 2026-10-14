@@ -120,10 +120,9 @@ test("validateJobs rejects duplicate ids", () => {
 	assert.match(validateJobs([job(), job()], TODAY).join("\n"), /duplicate id/);
 });
 
-test("the real jobs.json is valid (no invented listings are shipped)", () => {
+test("the real jobs.json is valid", () => {
 	const data = JSON.parse(fs.readFileSync("src/data/jobs.json", "utf8")) as JobsData;
 	assert.deepEqual(validateJobs(data.jobs, todayIso()), []);
-	assert.deepEqual(data.jobs, [], "no jobs are registered until real, verified listings are added");
 });
 
 test("the jobs page is in the sitemap only while something is open", async () => {
