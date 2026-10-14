@@ -39,7 +39,7 @@ const faqs = [
     {
         question: "Can I contribute my own notes?",
         answer:
-            "Yes. High-quality student notes can be reviewed and added to help the wider community.",
+            "Not at the moment. Notes here are written and reviewed by the ProCoderJii team. If you spot a mistake or want a topic covered, email us.",
     },
     {
         question: "Where can I contact the team?",

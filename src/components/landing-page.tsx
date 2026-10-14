@@ -6,7 +6,6 @@ import { Hero } from "@/components/landing/hero";
 import { About } from "@/components/landing/about";
 import { WhyUs } from "@/components/landing/why-us";
 
-import { Testimonials } from "@/components/landing/testimonials";
 import { FAQ } from "@/components/landing/faq";
 import { Contact } from "@/components/landing/contact";
 import { Footer } from "@/components/landing/footer";
@@ -22,7 +21,6 @@ export function LandingPage() {
                 <About />
                 <WhyUs />
                 {/* <Services /> */}
-                <Testimonials />
                 <FAQ />
                 <Contact />
                 <Footer />
