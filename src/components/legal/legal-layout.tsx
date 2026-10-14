@@ -73,7 +73,7 @@ export function LegalLayout({ title, children }: { title: string; children: Reac
                     </Link>
                 </header>
 
-                <main className="rounded-3xl border border-gray-200 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-10">
+                <main id="main-content" className="rounded-3xl border border-gray-200 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-10">
                     {missing.length > 0 && (
                         <div role="note" className="mb-8 rounded-xl border border-yellow-400 bg-yellow-50 p-4 text-sm text-gray-900">
                             <p className="font-bold">Draft - not yet reviewed or published by the site owner.</p>

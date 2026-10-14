@@ -1,7 +1,21 @@
 import type { NextConfig } from "next";
 
+/**
+ * Conservative response headers. No Content-Security-Policy yet: the site loads
+ * an animation from lottie.host and Next.js inline scripts, so a CSP needs its
+ * own careful rollout.
+ */
+export const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+];
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
 };
 
 export default nextConfig;

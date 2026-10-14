@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { getSiteUrl } from "@/lib/site";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
+import { MotionProvider } from "@/components/motion-provider";
 
 const siteUrl = getSiteUrl();
 
@@ -29,6 +30,13 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`antialiased font-sans`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-gray-900 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        >
+          Skip to main content
+        </a>
+        <MotionProvider>
         {/* Background Layer */}
         <div className="min-h-screen w-full  relative overflow-hidden">
           <div
@@ -49,6 +57,7 @@ export default function RootLayout({
             {children}
           </div>
         </div>
+        </MotionProvider>
       </body>
     </html>
   );

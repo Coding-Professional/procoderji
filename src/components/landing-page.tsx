@@ -15,7 +15,7 @@ export function LandingPage() {
         <div className="min-h-screen text-gray-900 selection:bg-primary selection:text-white font-sans">
 
 
-            <main className="relative z-10 flex flex-col min-h-screen">
+            <main id="main-content" className="relative z-10 flex flex-col min-h-screen">
                 <Navbar />
                 <Hero />
                 <About />
