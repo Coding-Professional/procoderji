@@ -1,4 +1,5 @@
 import { CONTACT_EMAIL } from "./contact.ts";
+import { isRealIsoDate } from "./dates.ts";
 
 /**
  * Details that the legal pages need from the site owner.
@@ -60,14 +61,12 @@ export const LEGAL_FIELD_LABELS: Record<RequiredLegalField, string> = {
 
 const blank = (v: string | null | undefined) => v === null || v === undefined || v.trim() === "";
 
-const validIsoDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));
-
 /** Required fields that are still missing or invalid. */
 export function missingLegalFields(details: LegalDetails = LEGAL): RequiredLegalField[] {
 	return REQUIRED_LEGAL_FIELDS.filter((f) => {
 		const v = details[f];
 		if (blank(v)) return true;
-		return f === "effectiveDate" && !validIsoDate(v as string);
+		return f === "effectiveDate" && !isRealIsoDate(v as string);
 	});
 }
 

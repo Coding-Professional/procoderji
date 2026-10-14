@@ -3,6 +3,7 @@
 // for the bound versions used by the app.
 import type { Branch, Course, CoursesData, Semester, Subject, Unit } from "../types/global";
 import type { SitemapRoute } from "./site";
+import { isRealIsoDate } from "./dates.ts";
 
 export type CatalogNode =
 	| { type: "root"; courses: Course[] }
@@ -117,9 +118,7 @@ export function sitemapRoutes(data: CoursesData, hasNote: (unit: Unit) => boolea
 }
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-
-const validDate = (d: string) => ISO_DATE_RE.test(d) && !Number.isNaN(Date.parse(d));
+const validDate = isRealIsoDate;
 
 /**
  * Structural checks for courses.json. Returns a list of human-readable problems

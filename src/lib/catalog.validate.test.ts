@@ -77,3 +77,9 @@ test("sitemapRoutes skips units whose note cannot be read, and subjects with non
 	assert.equal(onlyU1[0].lastModified, "2026-09-01");
 	assert.deepEqual(sitemapRoutes(data, () => false), []);
 });
+
+test("validateCatalog rejects impossible calendar dates such as 30 February", () => {
+	const problems = validateCatalog(sample([unit("u1", { addedAt: "2026-02-30" }), unit("u2", { updatedAt: "2026-04-31" })]), () => true).join("\n");
+	assert.match(problems, /u1: addedAt must be a real/);
+	assert.match(problems, /u2: updatedAt must be a real/);
+});

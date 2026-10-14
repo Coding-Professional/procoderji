@@ -52,3 +52,7 @@ test("legal pages stay out of the sitemap until complete", () => {
 	assert.deepEqual(routes.map((r) => r.path), LEGAL_PAGES.map((p) => p.path));
 	assert.ok(routes.every((r) => r.lastModified === "2026-11-01"));
 });
+
+test("an impossible effective date such as 30 February is still missing", () => {
+	assert.deepEqual(missingLegalFields({ ...complete, effectiveDate: "2026-02-30" }), ["effectiveDate"]);
+});
