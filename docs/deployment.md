@@ -77,6 +77,17 @@ npm run launch-check        # builds the real site and crawls it
 npm run e2e                 # real-Chrome browser tests (needs Chrome installed)
 ```
 
+To also run the latest-videos checks (three cards on phones, six on desktop), set the channel for that
+run, for example `YOUTUBE_CHANNEL_ID=UC74q2pzSGuoaikYwnavcGMg npm run e2e` (they need internet access
+to YouTube's feed and are reported as skipped otherwise).
+
+**Decide before launch: the dashboard background image.** `public/bg.jpg` (9.8 MB, used faintly behind
+the dashboard) is a stock illustration from Rawpixel Ltd. ("Graduating in the time of covid-19
+background", 2020). Its embedded metadata marks it copyright-protected and links
+`rawpixel.com/services/licenses`; nothing in the repository shows a licence for it. Unless you can show a
+Rawpixel licence that covers this use, replace it (for example with a plain CSS background, which also
+removes 9.8 MB of page weight) or delete it, and note that it already exists in the repository history.
+
 Then merge the branch via a pull request and let Vercel build it. Review the preview deployment
 first (Vercel normally keeps preview URLs out of search results, but confirm in your project settings).
 

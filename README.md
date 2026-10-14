@@ -52,7 +52,8 @@ Run `npm run lint && npm run typecheck && npm test && npm run build` before open
 drive Google Chrome (`E2E_CHANNEL=msedge` for Edge) over every page at desktop and phone size, check
 navigation, menus, forms, 404s, heading structure, landmarks, accessible names, overflow, SEO tags
 and that hostile note content is neutralised, then restore your data. It refuses to run if
-`src/data` or `src/content` has uncommitted changes, so it cannot overwrite real content.
+`src/data` or `src/content` has uncommitted changes, so it cannot overwrite real content. The
+latest-videos checks run only when `YOUTUBE_CHANNEL_ID` is set (they need the live feed).
 
 ### Configuration
 
