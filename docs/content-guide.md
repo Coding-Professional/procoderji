@@ -155,3 +155,10 @@ The home page can show the latest uploads from the channel using YouTube's publi
 key). Set the server-side environment variable `YOUTUBE_CHANNEL_ID` (the channel's `UC...` id,
 24 characters) in your hosting settings and redeploy. Until it is set the section is hidden. The
 Privacy page mentions the YouTube thumbnail requests automatically when it is enabled.
+
+**Channel ID for @Pro_coder_ji:** `UC74q2pzSGuoaikYwnavcGMg`. It was read from the channel page
+(canonical link, identifier metadata, RSS link and embedded ids all agree) and confirmed against
+the channel's feed, whose title is "Pro coder jii" and whose author URL is
+`https://www.youtube.com/channel/UC74q2pzSGuoaikYwnavcGMg` (checked 2026-10-14). To re-check it
+yourself: open the channel page, choose View Source, and search for `channel_id=`; or open
+YouTube Studio, then Settings, then Channel, then Advanced settings, where the Channel ID is shown.
