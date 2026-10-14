@@ -1,10 +1,10 @@
 // Temporary SYNTHETIC content for browser tests. Never committed to the real data files:
 // run.mjs applies these, runs the checks, and always restores the originals.
-const fs = require("node:fs");
-const path = require("node:path");
-const { execFileSync } = require("node:child_process");
+import fs from "node:fs";
+import path from "node:path";
+import { execFileSync } from "node:child_process";
 
-const ROOT = path.resolve(__dirname, "..");
+const ROOT = path.resolve(import.meta.dirname, "..");
 const DATA_FILES = ["src/data/courses.json", "src/data/guides.json", "src/data/jobs.json"];
 const FIXTURE_DIRS = ["src/content/__qa__"];
 const FIXTURE_FILES = ["src/content/guides/qa-guide.mdx"];
@@ -28,12 +28,12 @@ const aVeryLongLineOfCode = "this line is deliberately long so that the code blo
 `;
 
 /** Refuse to run if real content has uncommitted changes (so nothing of yours can be overwritten). */
-function assertClean() {
+export function assertClean() {
 	const out = execFileSync("git", ["status", "--porcelain", "--", "src/data", "src/content"], { cwd: ROOT }).toString().trim();
 	if (out) throw new Error("Refusing to run: src/data or src/content has uncommitted changes:\n" + out);
 }
 
-function apply() {
+export function apply() {
 	assertClean();
 	fs.mkdirSync(path.join(ROOT, "src/content/__qa__"), { recursive: true });
 	fs.mkdirSync(path.join(ROOT, "src/content/guides"), { recursive: true });
@@ -74,7 +74,7 @@ function apply() {
 	);
 }
 
-function restore() {
+export function restore() {
 	execFileSync("git", ["checkout", "--", ...DATA_FILES], { cwd: ROOT });
 	for (const d of FIXTURE_DIRS) fs.rmSync(path.join(ROOT, d), { recursive: true, force: true });
 	for (const f of FIXTURE_FILES) fs.rmSync(path.join(ROOT, f), { force: true });
@@ -82,5 +82,3 @@ function restore() {
 	const guidesDir = path.join(ROOT, "src/content/guides");
 	if (fs.existsSync(guidesDir) && fs.readdirSync(guidesDir).length === 0) fs.rmdirSync(guidesDir);
 }
-
-module.exports = { apply, restore, assertClean };

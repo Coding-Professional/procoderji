@@ -2,12 +2,10 @@
 // page on desktop and mobile, then restores the real data. Usage: npm run e2e
 // Needs Google Chrome installed (set E2E_CHANNEL=msedge to use Edge instead).
 import { spawn, spawnSync } from "node:child_process";
-import { createRequire } from "node:module";
 import path from "node:path";
 import process from "node:process";
 
-const require = createRequire(import.meta.url);
-const fixtures = require("./fixtures.cjs");
+import * as fixtures from "./fixtures.mjs";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const PORT = process.env.E2E_PORT || "3150";
 const NEXT = path.join(ROOT, "node_modules", "next", "dist", "bin", "next");
