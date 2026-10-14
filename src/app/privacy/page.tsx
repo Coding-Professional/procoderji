@@ -1,5 +1,6 @@
 import { EmailLink, H2, LegalLayout, Operator, P, UL, legalMetadata } from "@/components/legal/legal-layout";
 import { LEGAL } from "@/lib/legal";
+import { getYoutubeChannelId } from "@/lib/youtube";
 
 export const metadata = legalMetadata(
     "Privacy Policy",
@@ -46,7 +47,10 @@ export default function PrivacyPage() {
             <P>
                 The &ldquo;About&rdquo; section of the home page displays an animation that is loaded from
                 lottie.host (LottieFiles). When it loads, that service receives your IP address and browser
-                information, as any website you visit would. Links on this site (for example to YouTube or to
+                information, as any website you visit would.{" "}
+                {getYoutubeChannelId() &&
+                    "The home page also shows thumbnails of our latest YouTube videos, which are loaded from YouTube's image servers (i.ytimg.com, operated by Google); that service receives your IP address and browser information when they load. Clicking a video takes you to YouTube, which has its own privacy policy. "}
+                Links on this site (for example to YouTube or to
                 university websites) lead to other sites that have their own privacy practices.
             </P>
 

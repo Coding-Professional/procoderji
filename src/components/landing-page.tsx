@@ -10,7 +10,7 @@ import { FAQ } from "@/components/landing/faq";
 import { Contact } from "@/components/landing/contact";
 import { Footer } from "@/components/landing/footer";
 
-export function LandingPage() {
+export function LandingPage({ latestVideos }: { latestVideos?: React.ReactNode }) {
     return (
         <div className="min-h-screen text-gray-900 selection:bg-primary selection:text-white font-sans">
 
@@ -20,6 +20,7 @@ export function LandingPage() {
                 <Hero />
                 <About />
                 <WhyUs />
+                {latestVideos}
                 {/* <Services /> */}
                 <FAQ />
                 <Contact />
