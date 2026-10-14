@@ -48,3 +48,12 @@ __pycache__/
 
 # browser test output
 /e2e/.out/
+/playwright-report/
+/test-results/
+
+# local tooling and editor files (personal, never shared)
+.claude/settings.local.json
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
