@@ -59,12 +59,17 @@ and that hostile note content is neutralised, then restore your data. It refuses
 | Variable               | Purpose                                                                 |
 | ---------------------- | ----------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical site origin. Optional; defaults to `https://procoderji.com`.  |
+| `YOUTUBE_CHANNEL_ID`   | Public channel id for the "Latest videos" section. Optional; the section is hidden while unset. See `.env.example`. |
 
 The primary domain is `https://procoderji.com`. Canonical links, Open Graph URLs,
 `sitemap.xml` and `robots.txt` all use it. Set `NEXT_PUBLIC_SITE_URL` only to override
 it (for example on a staging build) in your hosting provider's environment settings or a
 local, git-ignored `.env.local`. An unset or malformed value falls back to the default.
 The value is inlined at build time, so redeploy after changing it.
+
+**Launching?** See [docs/deployment.md](docs/deployment.md) for the exact manual steps: environment
+variables, making the apex domain primary and redirecting `www` to it, completing the legal pages, and
+the post-deploy checklist.
 
 ## Adding notes
 

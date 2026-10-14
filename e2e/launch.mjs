@@ -174,6 +174,26 @@ try {
 	const notFound = await get("/this/page/does/not/exist");
 	if (notFound.status !== 404) bad("/this/page/does/not/exist", `expected 404, got ${notFound.status}`);
 
+	// ---------- latest videos: visible only when YOUTUBE_CHANNEL_ID is set ----------
+	{
+		const channelId = process.env.YOUTUBE_CHANNEL_ID ?? "";
+		const enabled = /^UC[A-Za-z0-9_-]{22}$/.test(channelId);
+		const homeHtml = (await get("/")).text;
+		const privacyText = (await get("/privacy")).text;
+		const hasSection = homeHtml.includes('id="videos"');
+		const cards = new Set([...homeHtml.matchAll(/href="https:\/\/www\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})"/g)].map((m) => m[1])).size;
+		if (enabled) {
+			if (!hasSection) bad("/", "YOUTUBE_CHANNEL_ID is set but the Latest videos section is missing");
+			if (!privacyText.includes("i.ytimg.com")) bad("/privacy", "videos are enabled but the Privacy page does not disclose YouTube thumbnails");
+			if (!homeHtml.includes(`youtube.com/channel/${channelId}`)) bad("/", "the Watch on YouTube link does not point at the configured channel");
+			console.log(`Latest videos: ENABLED for ${channelId}; ${cards} video card(s) rendered${cards === 0 ? " (feed unavailable: fallback link shown)" : ""}.`);
+		} else {
+			if (hasSection) bad("/", "Latest videos section is visible although YOUTUBE_CHANNEL_ID is not set");
+			if (privacyText.includes("i.ytimg.com")) bad("/privacy", "Privacy page mentions YouTube thumbnails although the feature is off");
+			console.log("Latest videos: hidden (YOUTUBE_CHANNEL_ID not set).");
+		}
+	}
+
 	// ---------- assets ----------
 	for (const p of ["/favicon.ico", "/logo.png", "/og.png", "/brand/procoderji-logo.png"]) {
 		const r = await fetch(BASE + p);
