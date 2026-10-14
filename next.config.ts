@@ -13,6 +13,8 @@ export const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Do not announce the framework in an "X-Powered-By: Next.js" response header.
+  poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

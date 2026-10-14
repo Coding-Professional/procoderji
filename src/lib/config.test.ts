@@ -16,3 +16,7 @@ test("the expected baseline headers are present", () => {
 	assert.equal(map["Referrer-Policy"], "strict-origin-when-cross-origin");
 	assert.match(map["Permissions-Policy"], /camera=\(\)/);
 });
+
+test("the framework is not advertised in an X-Powered-By header", () => {
+	assert.equal(nextConfig.poweredByHeader, false);
+});
