@@ -41,6 +41,7 @@ npm run dev        # http://localhost:3000
 | `npm run typecheck` | TypeScript (`tsc --noEmit`)                          |
 | `npm test`          | Unit tests (Node's built-in test runner, no extra deps) |
 | `npm run e2e`       | Browser tests in real Chrome (desktop + mobile); see below |
+| `npm run launch-check` | Builds the real site and crawls it: links, anchors, sitemap, robots, canonicals, noindex rules |
 
 Run `npm run lint && npm run typecheck && npm test && npm run build` before opening a PR.
 
