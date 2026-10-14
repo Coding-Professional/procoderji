@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { MDXRemote } from "next-mdx-remote/rsc";
 import { ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { mdxComponents } from "@/components/mdx-components";
+import { NoteBody } from "@/components/note-body";
 import { breadcrumbsFor, dashboardHref, siblingUnits, type CatalogNode } from "@/lib/catalog";
 import { articleJsonLd, breadcrumbJsonLd, jsonLdString } from "@/lib/jsonld";
 import { LEGAL } from "@/lib/legal";
-import { SAFE_MDX_OPTIONS } from "@/lib/mdx-safe";
 import { formatIsoDate, readingTimeMinutes } from "@/lib/reading";
 import { getSiteUrl } from "@/lib/site";
 
@@ -51,9 +49,7 @@ export function UnitView({ node, slug, source }: { node: UnitNode; slug: string[
                     </p>
                 </header>
 
-                <div className="rounded-2xl border border-border bg-white/90 p-6 sm:p-10">
-                    <MDXRemote source={source} components={mdxComponents} options={SAFE_MDX_OPTIONS} />
-                </div>
+                <NoteBody source={source} />
             </article>
 
             <nav aria-label="Unit navigation" className="mt-8 grid gap-4 sm:grid-cols-2">

@@ -5,9 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getGuides, getJobs } from "@/lib/content-data";
 
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    // Only link sections that have content.
+    const sections = [
+        ...(getGuides().length > 0 ? [{ href: "/guides", label: "Guides" }] : []),
+        ...(getJobs().length > 0 ? [{ href: "/jobs", label: "Jobs" }] : []),
+    ];
 
     return (
         <nav aria-label="Main" className="sticky top-0 z-50 border-b border-gray-100">
@@ -27,6 +33,9 @@ export function Navbar() {
                 <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
                     <a href="#about" className="hover:text-primary transition-colors">About</a>
                     <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
+                    {sections.map((s) => (
+                        <Link key={s.href} href={s.href} className="hover:text-primary transition-colors">{s.label}</Link>
+                    ))}
                     <Link
                         href="/dashboard"
                         className="px-5 py-2.5 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl font-semibold"
@@ -73,6 +82,16 @@ export function Navbar() {
                             >
                                 Contact
                             </a>
+                            {sections.map((s) => (
+                                <Link
+                                    key={s.href}
+                                    href={s.href}
+                                    className="hover:text-primary transition-colors"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    {s.label}
+                                </Link>
+                            ))}
                             <Link
                                 href="/dashboard"
                                 className="px-5 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all shadow-lg text-center"

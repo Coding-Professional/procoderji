@@ -4,9 +4,14 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 import { LEGAL_PAGES } from "@/lib/legal";
+import { getGuides, getJobs } from "@/lib/content-data";
 import { motion } from "framer-motion";
 
 export function Footer() {
+    // Only link sections that have content.
+    const hasGuides = getGuides().length > 0;
+    const hasJobs = getJobs().length > 0;
+
     return (
         <footer className="py-8 px-4 sm:px-6 bg-white overflow-hidden">
             <div className="max-w-8xl mx-auto">
@@ -82,11 +87,20 @@ export function Footer() {
                                                 Browse Notes
                                             </Link>
                                         </li>
-                                        <li>
-                                            <Link href="/dashboard" className="hover:text-gray-500 transition-colors">
-                                                Question Papers
-                                            </Link>
-                                        </li>
+                                        {hasGuides && (
+                                            <li>
+                                                <Link href="/guides" className="hover:text-gray-500 transition-colors">
+                                                    Guides
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {hasJobs && (
+                                            <li>
+                                                <Link href="/jobs" className="hover:text-gray-500 transition-colors">
+                                                    Jobs
+                                                </Link>
+                                            </li>
+                                        )}
                                         <li>
                                             <a href="#faq" className="hover:text-gray-500 transition-colors">
                                                 FAQs

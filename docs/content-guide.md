@@ -86,3 +86,67 @@ every registered note exists inside `src/content`).
 - **404** - the slugs in the URL must match the catalogue exactly.
 - **"This note is not available yet"** - the `path` does not point to a readable file.
 - **Build fails on a note** - the file contains invalid MDX (for example an unclosed tag).
+
+## Guides
+
+Original guides (interview prep, DSA roadmaps, system design, resumes, GitHub, tools) are
+registered in `src/data/guides.json` and written as Markdown under `src/content/guides/`.
+
+```json
+{
+  "slug": "dsa-roadmap",
+  "title": "A DSA roadmap",
+  "description": "One or two original sentences, used on the card and in search results.",
+  "category": "dsa",
+  "level": "beginner",
+  "path": "content/guides/dsa-roadmap.mdx",
+  "addedAt": "2026-11-01"
+}
+```
+
+`category` is one of `interview-prep`, `dsa`, `system-design`, `resume`, `github`, `tools`;
+`level` is `beginner`, `intermediate` or `advanced`. `updatedAt` is optional. The same Markdown
+safety rules as notes apply. The `/guides` section only appears in the navigation and the
+sitemap once at least one guide is registered, and `npm test` validates the file.
+
+## Jobs and internships (hand-curated)
+
+Listings live in `src/data/jobs.json`. There is no scraping and no feed: every entry is added
+by hand after checking the employer's own careers page.
+
+```json
+{
+  "id": "company-role-2026",
+  "company": "Company name",
+  "title": "Role title",
+  "category": "fresher",
+  "employmentType": "full-time",
+  "location": { "city": "City", "country": "India", "remote": false },
+  "eligibility": { "degrees": ["B.Tech"], "batches": [2026], "skills": ["..."] },
+  "summary": "Short summary in YOUR OWN words (max 400 characters).",
+  "applyUrl": "https://the-employer.example/careers/123",
+  "postedAt": "2026-11-01",
+  "deadline": "2026-11-30",
+  "lastVerifiedAt": "2026-11-02"
+}
+```
+
+Rules enforced by `npm test` and the page:
+
+- `applyUrl` must be `https` and the employer's **official** page (no link shorteners, no
+  credentials in the URL). Do not use referral or affiliate links.
+- Do **not** paste job descriptions: write a short original summary.
+- Set `lastVerifiedAt` every time you re-check a listing. After 30 days without a re-check it is
+  flagged "Not recently verified".
+- After the `deadline` the listing shows as **Closed** (no apply link) and is archived (hidden)
+  60 days later. Listings without a deadline are archived 90 days after `lastVerifiedAt`.
+- Dates must be real `YYYY-MM-DD` dates and not in the future. Never invent a listing or a date.
+- The `/jobs` page refreshes daily, so status changes without a redeploy. It is `noindex` and
+  left out of the sitemap while nothing is open.
+
+## Latest videos
+
+The home page can show the latest uploads from the channel using YouTube's public feed (no API
+key). Set the server-side environment variable `YOUTUBE_CHANNEL_ID` (the channel's `UC...` id,
+24 characters) in your hosting settings and redeploy. Until it is set the section is hidden. The
+Privacy page mentions the YouTube thumbnail requests automatically when it is enabled.
