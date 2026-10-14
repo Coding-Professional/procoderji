@@ -25,6 +25,8 @@ export interface Semester {
 export interface Subject {
   slug: string;
   title: string;
+  /** Short original description of the subject (used on the page and in search results). */
+  desc?: string;
   units: Unit[];
 }
 

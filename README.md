@@ -57,30 +57,14 @@ The value is inlined at build time, so redeploy after changing it.
 
 ## Adding notes
 
-1. Write the unit as an MDX/Markdown file under `src/content/courses/...`.
-2. Register it in `src/data/courses.json` under the right branch → semester:
+Notes are Markdown files registered in `src/data/courses.json`. Each registered unit gets
+its own indexable page at `/dashboard/<course>/<branch>/<semester>/<subject>/<unit>`, with
+breadcrumbs, previous/next links, reading time, an optional "updated" date and structured
+data. Only publish reviewed, original content, and never register placeholders.
 
-   ```json
-   {
-     "slug": "intro-to-web",
-     "title": "Introduction to Web",
-     "units": [
-       {
-         "slug": "unit-1",
-         "title": "Unit 1 - Introduction",
-         "path": "content/courses/btech/cse/sem1/intro-to-web/unit-1.mdx"
-       }
-     ]
-   }
-   ```
-
-   (`path` is relative to `src/` and must stay inside `src/content`.)
-3. Only publish reviewed, genuine content. The catalogue drives the sidebar, hero,
-   dashboard, `generateMetadata` and the sitemap, so a registered subject appears
-   everywhere automatically.
-
-Notes may use standard Markdown. JavaScript expressions in MDX are blocked. Links are
-restricted to `http`, `https`, `mailto` and relative URLs.
+See **[docs/content-guide.md](docs/content-guide.md)** for the catalogue fields, the rules
+for notes (Markdown only: raw HTML/JSX, expressions and imports are removed for safety) and
+the checks to run.
 
 ## Project structure
 
@@ -92,7 +76,7 @@ src/
 │   ├── courses/              # plain duplicate reader (noindex)
 │   ├── robots.ts, sitemap.ts # use the site URL + the catalogue
 ├── components/               # landing sections, sidebar, cards, empty state
-├── content/                  # MDX notes (placeholders only for now)
+├── content/                  # note files (only placeholders for now, not registered)
 ├── data/courses.json         # catalogue: the single source of truth
 └── lib/                      # catalogue helpers, markdown parser, mailto, SEO (tested)
 ```

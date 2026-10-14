@@ -26,10 +26,14 @@ const sample = (units: ReturnType<typeof unit>[]): CoursesData => ({
 
 test("sitemapRoutes uses real unit dates and never invents a lastModified", () => {
 	const dated = sitemapRoutes(sample([unit("u1", { addedAt: "2026-09-01" }), unit("u2", { addedAt: "2026-09-02", updatedAt: "2026-10-05" })]));
-	assert.deepEqual(dated, [{ path: "/dashboard/btech/cse/sem1/web", lastModified: "2026-10-05" }]);
+	assert.deepEqual(dated, [
+		{ path: "/dashboard/btech/cse/sem1/web", lastModified: "2026-10-05" },
+		{ path: "/dashboard/btech/cse/sem1/web/u1", lastModified: "2026-09-01" },
+		{ path: "/dashboard/btech/cse/sem1/web/u2", lastModified: "2026-10-05" },
+	]);
 
 	const undated = sitemapRoutes(sample([unit("u1")]));
-	assert.deepEqual(undated, [{ path: "/dashboard/btech/cse/sem1/web" }]);
+	assert.deepEqual(undated, [{ path: "/dashboard/btech/cse/sem1/web" }, { path: "/dashboard/btech/cse/sem1/web/u1" }]);
 });
 
 test("validateCatalog accepts a well-formed catalogue", () => {
@@ -64,4 +68,12 @@ test("the real courses.json is valid and every registered note file exists insid
 		return !!full && fs.existsSync(full);
 	});
 	assert.deepEqual(problems, []);
+});
+
+test("sitemapRoutes skips units whose note cannot be read, and subjects with none left", () => {
+	const data = sample([unit("u1", { addedAt: "2026-09-01" }), unit("u2", { addedAt: "2026-09-02" })]);
+	const onlyU1 = sitemapRoutes(data, (u) => u.slug === "u1");
+	assert.deepEqual(onlyU1.map((r) => r.path), ["/dashboard/btech/cse/sem1/web", "/dashboard/btech/cse/sem1/web/u1"]);
+	assert.equal(onlyU1[0].lastModified, "2026-09-01");
+	assert.deepEqual(sitemapRoutes(data, () => false), []);
 });
