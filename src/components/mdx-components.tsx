@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import type { MDXComponents } from "mdx/types";
-import { sanitizeUrl } from "@/lib/markdown";
+import { sanitizeImageUrl, sanitizeUrl } from "@/lib/markdown";
 import { demoteHeading } from "@/lib/headings";
 
 function Heading({ level, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6 } & React.ComponentPropsWithoutRef<"h2">) {
@@ -8,10 +8,9 @@ function Heading({ level, ...props }: { level: 1 | 2 | 3 | 4 | 5 | 6 } & React.C
 }
 
 /**
- * Element styles for rendered notes. Raw HTML/JSX is removed before compilation
- * (see lib/mdx-safe.ts). Links and images go through the same URL allow-list as
- * the custom markdown renderer: javascript:, data: and similar destinations are
- * rendered as plain text / omitted.
+ * Element styles for rendered notes. Raw HTML/JSX and {expressions} are rejected before
+ * compilation (see lib/mdx-safe.ts). Links go through the same URL allow-list as the custom markdown
+ * renderer (javascript:, data: and similar become plain text); images must be same-site paths.
  */
 export const mdxComponents: MDXComponents = {
     // The page supplies the only <h1> (the note title); see lib/headings.ts.
@@ -30,7 +29,7 @@ export const mdxComponents: MDXComponents = {
     pre: (props) => <pre className="bg-muted p-4 rounded-lg overflow-x-auto mb-4 text-sm" {...props} />,
     code: (props) => <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props} />,
     img: ({ src, alt }) => {
-        const safe = typeof src === "string" ? sanitizeUrl(src) : null;
+        const safe = typeof src === "string" ? sanitizeImageUrl(src) : null; // same-site images only
         // eslint-disable-next-line @next/next/no-img-element
         return safe ? <img src={safe} alt={alt ?? ""} loading="lazy" className="max-w-full h-auto rounded-lg my-4" /> : null;
     },

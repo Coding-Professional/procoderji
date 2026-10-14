@@ -15,8 +15,6 @@ const NOTE = `# A long section
 
 Fixture paragraph with a [good link](https://example.org/page) and a [bad link](javascript:alert(1)).
 
-<script>window.__qapwned = 1</script>
-
 VeryLongUnbrokenTokenToTestOverflowVeryLongUnbrokenTokenToTestOverflowVeryLongUnbrokenTokenToTestOverflow
 
 \`\`\`js

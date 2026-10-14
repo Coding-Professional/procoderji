@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 
 /**
@@ -13,4 +14,23 @@ export function resolveWithin(root: string, relative: string): string | null {
 	const rel = path.relative(base, full);
 	if (rel === "" || rel.startsWith("..") || path.isAbsolute(rel)) return null;
 	return full;
+}
+
+/**
+ * Like resolveWithin, but also follows symlinks: the file must exist and its REAL location
+ * must be inside the real `root`. A symlink committed inside the content folder that points
+ * elsewhere (for example at a .env file) is therefore refused. Returns the real path or null.
+ */
+export function resolveWithinReal(root: string, relative: string): string | null {
+	const full = resolveWithin(root, relative);
+	if (!full) return null;
+	try {
+		const realRoot = fs.realpathSync(root);
+		const realFull = fs.realpathSync(full);
+		const rel = path.relative(realRoot, realFull);
+		if (rel === "" || rel.startsWith("..") || path.isAbsolute(rel)) return null;
+		return realFull;
+	} catch {
+		return null; // missing file or broken link
+	}
 }

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { sanitizeUrl, parseInline, parseBlocks, extractHeadings } from "./markdown.ts";
+import { sanitizeUrl, sanitizeImageUrl, parseInline, parseBlocks, extractHeadings } from "./markdown.ts";
 
 test("sanitizeUrl allows http, https, mailto and relative URLs", () => {
 	assert.equal(sanitizeUrl("https://example.com/a?b=1"), "https://example.com/a?b=1");
@@ -80,4 +80,20 @@ test("lists and paragraphs", () => {
 	assert.deepEqual(blocks.map((b) => b.type), ["list", "list", "paragraph"]);
 	assert.equal((blocks[0] as { ordered: boolean }).ordered, false);
 	assert.equal((blocks[1] as { ordered: boolean }).ordered, true);
+});
+
+test("sanitizeImageUrl allows only same-site absolute paths", () => {
+	assert.equal(sanitizeImageUrl("/images/diagram.png"), "/images/diagram.png");
+	for (const bad of [
+		"https://tracker.example/pixel.gif",
+		"http://example.com/a.png",
+		"//evil.example/a.png",
+		"data:image/svg+xml;base64,PHN2Zz4=",
+		"javascript:alert(1)",
+		"images/relative.png",
+		"./relative.png",
+		"",
+	]) {
+		assert.equal(sanitizeImageUrl(bad), null, JSON.stringify(bad));
+	}
 });

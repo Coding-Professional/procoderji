@@ -151,3 +151,14 @@ export function extractHeadings(source: string) {
 		b.type === "heading" ? [{ level: b.level, text: b.text, id: b.id }] : []
 	);
 }
+
+/**
+ * Images in notes must be served from this site (an absolute path such as "/images/diagram.png"
+ * from the public/ folder). Remote images are refused: they would send every reader's IP address
+ * to a third party and can be used as tracking pixels. Returns the path, or null if not allowed.
+ */
+export function sanitizeImageUrl(raw: string): string | null {
+	const safe = sanitizeUrl(raw);
+	if (safe === null) return null;
+	return safe.startsWith("/") && !safe.startsWith("//") ? safe : null;
+}

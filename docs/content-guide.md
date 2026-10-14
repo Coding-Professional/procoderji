@@ -70,11 +70,30 @@ and `##` for subsections: headings in a note are shown one level lower than writ
 as a second-level heading under the page title, `##` as third-level), so every page keeps a
 single main heading and no skipped levels.
 
-Notes are **Markdown only**. For safety, raw HTML or JSX tags (`<script>`, `<iframe>`,
-`<div>`...), `{JavaScript expressions}` and `import`/`export` lines are removed when the
-page is built, and a note that is not valid MDX fails the build instead of being published.
-Links are limited to `http`, `https`, `mailto` and relative URLs. Tables need a plugin that
-is not installed yet, so avoid them for now.
+Notes are **Markdown only**. Raw HTML or JSX tags (`<script>`, `<div>`...), `{curly-brace
+expressions}` and `import`/`export` lines are **rejected**: the build fails with a message
+naming the line, so nothing is ever dropped silently and nothing unsafe is published.
+
+This matters for computer-science notes, where these characters are common:
+
+| You want to write            | Write it like this                                  |
+| ---------------------------- | --------------------------------------------------- |
+| code or symbols such as `List<int>` or `{a, b}` | in backticks: `` `List<int>` ``, `` `{a, b}` `` |
+| a less-than sign in prose    | `&lt;` (for example `List&lt;int&gt;`)             |
+| literal braces in prose      | put a backslash before each: `\{1, 2, 3\}`          |
+| an automatic link            | `[text](https://...)`, not `<https://...>`          |
+| an HTML comment              | not supported; remove it                            |
+
+Rules for links and images:
+
+- Links may use `https`, `http`, `mailto` or relative URLs; anything else (such as `javascript:`)
+  is shown as plain text.
+- **Images must live in this repository's `public/` folder** and be referenced by absolute path,
+  for example `![Diagram of a stack](/images/stack.png)`. Remote images are not shown, so readers'
+  IP addresses are never sent to a third party. Always write meaningful alt text.
+- Note files must be real files inside `src/content`; links (symlinks) that point elsewhere are
+  refused.
+- Tables need a plugin that is not installed yet, so avoid them for now.
 
 ## Check your work
 
