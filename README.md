@@ -40,8 +40,15 @@ npm run dev        # http://localhost:3000
 | `npm run lint`      | ESLint                                               |
 | `npm run typecheck` | TypeScript (`tsc --noEmit`)                          |
 | `npm test`          | Unit tests (Node's built-in test runner, no extra deps) |
+| `npm run e2e`       | Browser tests in real Chrome (desktop + mobile); see below |
 
 Run `npm run lint && npm run typecheck && npm test && npm run build` before opening a PR.
+
+**Browser tests (`npm run e2e`)** build the site with temporary *synthetic* notes, guides and jobs,
+drive Google Chrome (`E2E_CHANNEL=msedge` for Edge) over every page at desktop and phone size, check
+navigation, menus, forms, 404s, heading structure, landmarks, accessible names, overflow, SEO tags
+and that hostile note content is neutralised, then restore your data. It refuses to run if
+`src/data` or `src/content` has uncommitted changes, so it cannot overwrite real content.
 
 ### Configuration
 

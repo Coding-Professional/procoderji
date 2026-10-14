@@ -1,0 +1,256 @@
+import { chromium, devices } from "playwright-core";
+import fs from "node:fs";
+import path from "node:path";
+
+const BASE = process.env.BASE || "http://localhost:3150";
+const CHANNEL = process.env.E2E_CHANNEL || "chrome";
+const OUT = path.resolve("e2e/.out");
+fs.mkdirSync(OUT, { recursive: true });
+
+const PAGES = [
+  "/", "/dashboard", "/dashboard/btech", "/dashboard/btech/cse", "/dashboard/btech/cse/sem1",
+  "/dashboard/btech/cse/sem2", "/dashboard/btech/cse/sem1/qa-subject",
+  "/dashboard/btech/cse/sem1/qa-subject/unit-a", "/dashboard/btech/cse/sem1/qa-subject/unit-b",
+  "/guides", "/guides/qa-guide", "/jobs", "/about", "/privacy", "/terms", "/disclaimer", "/copyright",
+  "/courses", "/nope/zzz", "/dashboard/btech/year3/sem5/ml",
+];
+
+const VIEWPORTS = {
+  desktop: { viewport: { width: 1280, height: 800 } },
+  mobile: { ...devices["Pixel 7"] },
+};
+
+const findings = [];
+const NOISE = (kind, detail) =>
+  (kind === "CONSOLE-ERRORS" && /status of 404/.test(detail)) ||
+  (kind === "ELEMENT-OVERFLOW" && /^DIV:$/.test(detail));
+const note = (vp, url, kind, detail) => { if (!NOISE(kind, String(detail))) findings.push({ vp, url, kind, detail }); };
+
+const browser = await chromium.launch({ channel: CHANNEL, headless: true });
+
+for (const [vpName, opts] of Object.entries(VIEWPORTS)) {
+  const context = await browser.newContext(opts);
+  for (const url of PAGES) {
+    const page = await context.newPage();
+    const errors = [];
+    const failed = [];
+    page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+    page.on("pageerror", (e) => errors.push("PAGEERROR " + e.message));
+    // Next cancels in-flight link prefetches (?_rsc=) when the page changes; that is not a failure.
+    page.on("requestfailed", (r) => { const err = r.failure()?.errorText ?? ""; if (/_rsc=/.test(r.url()) && err.includes("ERR_ABORTED")) return; failed.push(r.url() + " " + err); });
+    // A 404 for the page itself is expected on the not-found pages; any other 4xx/5xx is a failure.
+    page.on("response", (r) => { if (r.status() >= 400 && !(r.status() === 404 && r.url() === BASE + url)) failed.push(r.status() + " " + r.url()); });
+
+    const resp = await page.goto(BASE + url, { waitUntil: "networkidle", timeout: 30000 }).catch((e) => { note(vpName, url, "NAV-ERROR", e.message); return null; });
+    if (!resp) { await page.close(); continue; }
+    await page.waitForTimeout(600);
+
+    const info = await page.evaluate(() => {
+      const vis = (el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+      const nameOf = (el) => (el.getAttribute("aria-label") || el.getAttribute("aria-labelledby") && document.getElementById(el.getAttribute("aria-labelledby"))?.textContent || el.textContent || el.getAttribute("title") || el.querySelector("img[alt]")?.getAttribute("alt") || "").trim();
+      const unnamed = [...document.querySelectorAll("a[href],button,[role=button],input:not([type=hidden]),textarea,select")].filter(vis).filter((el) => {
+        if (el.matches("input,textarea,select")) {
+          const id = el.id; return !(el.getAttribute("aria-label") || (id && document.querySelector(`label[for="${id}"]`)) || el.closest("label"));
+        }
+        return !nameOf(el);
+      }).map((el) => el.outerHTML.slice(0, 120));
+      const imgsNoAlt = [...document.querySelectorAll("img")].filter((i) => !i.hasAttribute("alt")).map((i) => i.src);
+      const headings = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")].filter(vis).map((h) => Number(h.tagName[1]));
+      const skips = headings.some((h, i) => i > 0 && h - headings[i - 1] > 1);
+      const meta = (n, a = "name") => document.querySelector(`meta[${a}="${n}"]`)?.getAttribute("content") ?? null;
+      return {
+        title: document.title,
+        lang: document.documentElement.lang,
+        h1: [...document.querySelectorAll("h1")].filter(vis).length,
+        mains: document.querySelectorAll("main").length,
+        overflowX: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        clipped: [...document.querySelectorAll('main *')].filter((el) => !el.closest('pre') && vis(el) && el.getBoundingClientRect().right > window.innerWidth + 1).slice(0, 3).map((el) => el.tagName + ':' + (el.textContent || '').trim().slice(0, 40)),
+        unnamed, imgsNoAlt, skips, headings: headings.join(""),
+        canonical: document.querySelector('link[rel="canonical"]')?.getAttribute("href") ?? null,
+        robots: meta("robots"), description: meta("description"), ogUrl: meta("og:url", "property"),
+        pwned: typeof window.__qapwned !== "undefined", jsLinks: document.querySelectorAll('a[href^="javascript:"]').length,
+        scripts: [...document.querySelectorAll("main script:not([type='application/ld+json']),article script:not([type='application/ld+json'])")].length,
+      };
+    });
+
+    const status = resp.status();
+    const line = `${vpName.padEnd(7)} ${String(status).padEnd(3)} ${url.padEnd(48)} h1=${info.h1} main=${info.mains} ovfX=${info.overflowX} robots=${info.robots ?? "-"} canon=${info.canonical ? "y" : "-"}`;
+    console.log(line);
+    if (info.clipped.length) note(vpName, url, "ELEMENT-OVERFLOW", info.clipped.join(" | "));
+    if (info.overflowX > 0) note(vpName, url, "HORIZONTAL-OVERFLOW", info.overflowX + "px");
+    if (errors.length) note(vpName, url, "CONSOLE-ERRORS", errors.slice(0, 3).join(" | "));
+    if (failed.length) note(vpName, url, "FAILED-REQUESTS", failed.slice(0, 3).join(" | "));
+    if (info.unnamed.length) note(vpName, url, "UNNAMED-CONTROLS", info.unnamed.slice(0, 3).join(" | "));
+    if (info.imgsNoAlt.length) note(vpName, url, "IMG-NO-ALT", info.imgsNoAlt.slice(0, 2).join(", "));
+    if (status === 200 && info.h1 !== 1) note(vpName, url, "H1-COUNT", String(info.h1));
+    if (info.mains !== 1) note(vpName, url, "MAIN-COUNT", String(info.mains));
+    if (info.skips) note(vpName, url, "HEADING-SKIP", info.headings);
+    if (info.lang !== "en") note(vpName, url, "LANG", info.lang);
+    if (info.pwned || info.jsLinks || info.scripts) note(vpName, url, "CONTENT-SECURITY", JSON.stringify({ pwned: info.pwned, jsLinks: info.jsLinks, scripts: info.scripts }));
+    if (status === 200 && !info.description) note(vpName, url, "NO-DESCRIPTION", "");
+
+    const safe = url.replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") || "home";
+    await page.screenshot({ path: path.join(OUT, `${vpName}-${safe}.png`), fullPage: true });
+    await page.close();
+  }
+  await context.close();
+}
+
+// ---------- interactions ----------
+async function interaction(name, vpName, fn) {
+  const context = await browser.newContext(VIEWPORTS[vpName]);
+  const page = await context.newPage();
+  const errs = [];
+  page.on("pageerror", (e) => errs.push(e.message));
+  try {
+    await fn(page);
+    console.log(`PASS  ${vpName.padEnd(7)} ${name}`);
+  } catch (e) {
+    console.log(`FAIL  ${vpName.padEnd(7)} ${name}: ${e.message.split("\n")[0]}`);
+    note(vpName, name, "INTERACTION-FAIL", e.message.split("\n")[0]);
+    await page.screenshot({ path: path.join(OUT, `FAIL-${vpName}-${name.replace(/\W+/g, "_")}.png`), fullPage: true }).catch(() => {});
+  }
+  if (errs.length) note(vpName, name, "PAGEERROR", errs[0]);
+  await context.close();
+}
+const expectTrue = (v, msg) => { if (!v) throw new Error(msg); };
+
+await interaction("home: mobile menu opens, lists links, closes", "mobile", async (page) => {
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  const btn = page.getByRole("button", { name: /open menu/i });
+  await btn.waitFor({ state: "visible" });
+  expectTrue((await btn.getAttribute("aria-expanded")) === "false", "aria-expanded should start false");
+  await btn.click();
+  await page.locator("#mobile-menu").waitFor({ state: "visible" });
+  expectTrue((await page.getByRole("button", { name: /close menu/i }).getAttribute("aria-expanded")) === "true", "aria-expanded should be true when open");
+  for (const t of ["About", "Contact", "Guides", "Jobs", "Browse Notes"]) {
+    expectTrue(await page.locator("#mobile-menu").getByText(t, { exact: true }).isVisible(), `menu should list ${t}`);
+  }
+  await page.getByRole("button", { name: /close menu/i }).click();
+  await page.locator("#mobile-menu").waitFor({ state: "hidden" });
+});
+
+await interaction("home: desktop nav has working links", "desktop", async (page) => {
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  for (const [t, href] of [["Guides", "/guides"], ["Jobs", "/jobs"], ["Browse Notes", "/dashboard"]]) {
+    const a = page.locator("nav").getByRole("link", { name: t, exact: true }).first();
+    expectTrue((await a.getAttribute("href")) === href, `${t} should link to ${href}`);
+  }
+  expectTrue((await page.locator("a[href*='procoderji.xyz']").count()) === 0, "no .xyz links");
+});
+
+for (const vp of ["desktop", "mobile"]) {
+  await interaction("hero: pick branch then semester", vp, async (page) => {
+    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "CSE", exact: true }).click();
+    await page.waitForURL(/\?branch=cse/);
+    const sem = page.getByRole("link", { name: /Semester/ }).first();
+    await sem.waitFor({ state: "visible" });
+    expectTrue((await page.getByRole("link", { name: /Semester/ }).count()) === 8, "should show 8 semesters");
+    await page.getByRole("link", { name: /Semester/ }).first().click();
+    await page.waitForURL(/\/dashboard\/btech\/cse\/sem1$/);
+    expectTrue(await page.getByRole("heading", { level: 1 }).isVisible(), "semester page has h1");
+  });
+}
+
+await interaction("hero: invalid ?branch ignored", "desktop", async (page) => {
+  await page.goto(BASE + "/?branch=mechanical", { waitUntil: "networkidle" });
+  expectTrue(await page.getByRole("button", { name: "CSE", exact: true }).isVisible(), "falls back to branch list");
+});
+
+await interaction("skip link is first tab stop and works", "desktop", async (page) => {
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  await page.keyboard.press("Tab");
+  const focused = await page.evaluate(() => document.activeElement?.textContent?.trim());
+  expectTrue(/skip to main content/i.test(focused ?? ""), "first tab stop is the skip link, got: " + focused);
+  expectTrue(await page.getByText("Skip to main content").isVisible(), "skip link visible on focus");
+  await page.keyboard.press("Enter");
+  expectTrue(page.url().endsWith("#main-content"), "skip link jumps to main");
+});
+
+await interaction("contact form: required validation, labels, mailto target", "desktop", async (page) => {
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  const form = page.locator("form").first();
+  expectTrue(!(await form.evaluate((f) => f.checkValidity())), "empty form should be invalid");
+  for (const id of ["contact-name", "contact-email", "contact-subject", "contact-message"]) {
+    expectTrue((await page.locator(`label[for=${id}]`).count()) === 1, `label for ${id}`);
+  }
+  await page.fill("#contact-name", "QA"); await page.fill("#contact-email", "qa@example.com");
+  await page.fill("#contact-subject", "Hi"); await page.fill("#contact-message", "Hello");
+  expectTrue(await form.evaluate((f) => f.checkValidity()), "filled form valid");
+});
+
+await interaction("dashboard: mobile drawer opens, Escape closes", "mobile", async (page) => {
+  await page.goto(BASE + "/dashboard", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /open navigation menu/i }).click();
+  const dlg = page.getByRole("dialog");
+  await dlg.waitFor({ state: "visible" });
+  expectTrue(await dlg.getByRole("link", { name: /Browse Notes/ }).isVisible(), "drawer has Browse Notes");
+  await page.keyboard.press("Escape");
+  await dlg.waitFor({ state: "hidden" });
+});
+
+await interaction("dashboard: sidebar expands to semester and navigates (desktop)", "desktop", async (page) => {
+  await page.goto(BASE + "/dashboard", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /B\.Tech/ }).click();
+  await page.getByRole("button", { name: "CSE" }).click();
+  await page.locator("aside").getByRole("link", { name: "Semester 1" }).click();
+  await page.waitForURL(/\/dashboard\/btech\/cse\/sem1$/);
+  expectTrue((await page.locator("aside").getByRole("link", { name: "Semester 1", exact: true }).getAttribute("aria-current")) === "page", "active sidebar link has aria-current");
+});
+
+await interaction("unit page: prev/next, breadcrumbs, safe content", "desktop", async (page) => {
+  await page.goto(BASE + "/dashboard/btech/cse/sem1/qa-subject/unit-a", { waitUntil: "networkidle" });
+  expectTrue(await page.getByRole("link", { name: /QA Unit B/ }).isVisible(), "next link");
+  expectTrue((await page.locator("nav[aria-label=Breadcrumb] a").count()) >= 5, "breadcrumbs");
+  expectTrue(await page.getByText("1 min read").isVisible(), "reading time");
+  expectTrue(await page.getByText("Updated 5 Oct 2026").isVisible(), "updated date");
+  expectTrue(!(await page.evaluate(() => typeof window.__qapwned !== "undefined")), "note script did not run");
+  expectTrue((await page.locator("a[href^=javascript]").count()) === 0, "no javascript: links");
+  await page.getByRole("link", { name: /QA Unit B/ }).click();
+  await page.waitForURL(/unit-b$/);
+});
+
+await interaction("legacy ?note redirects to unit page", "desktop", async (page) => {
+  await page.goto(BASE + "/dashboard/btech/cse/sem1/qa-subject?note=unit-a", { waitUntil: "networkidle" });
+  expectTrue(page.url().endsWith("/qa-subject/unit-a"), "redirected to " + page.url());
+});
+
+await interaction("404 page is branded with working links", "mobile", async (page) => {
+  const r = await page.goto(BASE + "/no/such/page", { waitUntil: "networkidle" });
+  expectTrue(r.status() === 404, "status 404");
+  expectTrue(await page.getByRole("heading", { name: /could not find/i }).isVisible(), "branded heading");
+  await page.getByRole("link", { name: "Browse notes" }).click();
+  await page.waitForURL(/\/dashboard$/);
+});
+
+await interaction("jobs: statuses and apply links", "mobile", async (page) => {
+  await page.goto(BASE + "/jobs", { waitUntil: "networkidle" });
+  expectTrue(await page.getByText("Closing soon").first().isVisible(), "closing soon badge");
+  expectTrue((await page.locator("a[href^='https://careers.example.com/']").count()) === 2, "apply links only for active jobs");
+  expectTrue(await page.getByText("Applications have closed.").isVisible(), "closed job note");
+  expectTrue((await page.getByText("Role archived-job").count()) === 0, "archived hidden");
+  expectTrue((await page.locator("a[target=_blank]:not([rel*=noopener])").count()) === 0, "external links have noopener");
+});
+
+await interaction("legal pages: draft banner, markers, no index", "desktop", async (page) => {
+  await page.goto(BASE + "/terms", { waitUntil: "networkidle" });
+  expectTrue(await page.getByText(/Draft - not yet reviewed/).isVisible(), "draft banner");
+  expectTrue((await page.getByText("[REQUIRED:", { exact: false }).count()) >= 1, "required markers visible");
+  expectTrue(((await page.locator('meta[name=robots]').getAttribute("content")) ?? "").includes("noindex"), "noindex");
+});
+
+await browser.close();
+
+console.log("\n========== FINDINGS ==========");
+if (!findings.length) console.log("none");
+const grouped = {};
+for (const f of findings) (grouped[f.kind] ??= []).push(f);
+for (const [k, list] of Object.entries(grouped)) {
+  console.log(`\n[${k}] x${list.length}`);
+  for (const f of list.slice(0, 8)) console.log(`  ${f.vp.padEnd(7)} ${f.url}  ${f.detail}`);
+}
+
+console.log(`
+${findings.length} finding(s)`);
+process.exit(findings.length ? 1 : 0);
