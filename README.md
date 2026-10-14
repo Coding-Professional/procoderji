@@ -5,7 +5,7 @@ branch and semester and read unit-wise notes online.
 
 > **Status:** the browsing structure (B.Tech → CSE / AIML → Semesters 1-8) is in place,
 > but no subjects or notes are published yet. Empty semesters show a "Notes coming soon"
-> page. The two sample MDX files under `src/content` are placeholders and are
+> page. The sample MDX files under `src/content` are placeholders and are
 > intentionally **not** registered in the catalogue.
 
 ## What it is (and is not)
@@ -20,7 +20,10 @@ branch and semester and read unit-wise notes online.
 
 ## Requirements
 
-- Node.js **20.9 or newer** (required by Next.js 16). Node 22 or 24 LTS is recommended.
+- Node.js **20.9 or newer** to run and build the site (required by Next.js 16).
+- Node.js **22.18 or newer** (24 recommended) to run `npm test`, `npm run e2e` and
+  `npm run launch-check`: the tests import TypeScript directly through Node's built-in type
+  stripping, which older versions do not have.
 - npm (a `package-lock.json` is committed; use `npm ci`).
 
 ## Getting started
