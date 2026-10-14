@@ -46,8 +46,8 @@ export function Contact() {
                                 </div>
                                 <div>
                                     <div className="text-sm font-medium text-gray-500 mb-0.5">Website</div>
-                                    <Link className="text-lg font-semibold text-gray-900" href="https://procoderji.xyz" target="_blank" rel="noopener noreferrer">
-                                        procoderji.xyz
+                                    <Link className="text-lg font-semibold text-gray-900" href="/">
+                                        procoderji.com
                                     </Link>
                                 </div>
                             </div>

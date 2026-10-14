@@ -28,13 +28,6 @@ export function Navbar() {
                     <a href="#about" className="hover:text-primary transition-colors">About</a>
                     <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
                     <Link
-                        href="https://procoderji.xyz"
-                        target="_blank" rel="noopener noreferrer"
-                        className="hover:text-primary transition-colors"
-                    >
-                        Website
-                    </Link>
-                    <Link
                         href="/dashboard"
                         className="px-5 py-2.5 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl font-semibold"
                     >
@@ -80,14 +73,6 @@ export function Navbar() {
                             >
                                 Contact
                             </a>
-                            <Link
-                                href="https://procoderji.xyz"
-                                target="_blank" rel="noopener noreferrer"
-                                className="hover:text-primary transition-colors"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                Website
-                            </Link>
                             <Link
                                 href="/dashboard"
                                 className="px-5 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all shadow-lg text-center"

@@ -1,6 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseSiteUrl, buildSitemapEntries } from "./site.ts";
+import { parseSiteUrl, resolveSiteUrl, buildSitemapEntries, DEFAULT_SITE_URL } from "./site.ts";
+
+test("the default canonical domain is https://procoderji.com", () => {
+	assert.equal(DEFAULT_SITE_URL, "https://procoderji.com");
+});
 
 test("parseSiteUrl normalises to a bare origin", () => {
 	assert.equal(parseSiteUrl("https://example.org"), "https://example.org");
@@ -18,22 +22,28 @@ test("parseSiteUrl rejects unset, malformed and unsafe values", () => {
 	assert.equal(parseSiteUrl("https://user:pw@example.org"), null);
 });
 
-test("sitemap is empty until the canonical domain is configured", () => {
-	assert.deepEqual(buildSitemapEntries(null, ["/dashboard/btech/cse/sem1/web"]), []);
+test("resolveSiteUrl uses the env value when valid and the default otherwise", () => {
+	assert.equal(resolveSiteUrl("https://staging.example.org/"), "https://staging.example.org");
+	assert.equal(resolveSiteUrl(undefined), "https://procoderji.com");
+	assert.equal(resolveSiteUrl(""), "https://procoderji.com");
+	assert.equal(resolveSiteUrl("not a url"), "https://procoderji.com");
+	assert.equal(resolveSiteUrl("javascript:alert(1)"), "https://procoderji.com");
 });
 
-test("sitemap lists static pages and content pages, without query URLs or duplicates", () => {
-	const entries = buildSitemapEntries("https://example.org", [
-		"/dashboard/btech/cse/sem1/web",
-		"/dashboard/btech/cse/sem1/web?note=u1",
-		"/dashboard",
+test("sitemap lists static and content pages without query URLs or duplicates", () => {
+	const entries = buildSitemapEntries("https://procoderji.com", [
+		{ path: "/dashboard/btech/cse/sem1/web", lastModified: "2026-10-01" },
+		{ path: "/dashboard/btech/cse/sem1/web?note=u1" },
+		{ path: "/dashboard" },
 	]);
-	assert.deepEqual(
-		entries.map((e) => e.url),
-		[
-			"https://example.org",
-			"https://example.org/dashboard",
-			"https://example.org/dashboard/btech/cse/sem1/web",
-		]
-	);
+	assert.deepEqual(entries, [
+		{ url: "https://procoderji.com" },
+		{ url: "https://procoderji.com/dashboard" },
+		{ url: "https://procoderji.com/dashboard/btech/cse/sem1/web", lastModified: "2026-10-01" },
+	]);
+});
+
+test("no sitemap URL mentions the retired .xyz domain", () => {
+	const urls = buildSitemapEntries(resolveSiteUrl(undefined), []).map((e) => e.url);
+	assert.ok(urls.every((u) => !u.includes("procoderji.xyz")));
 });

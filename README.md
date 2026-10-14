@@ -47,12 +47,13 @@ Run `npm run lint && npm run typecheck && npm test && npm run build` before open
 
 | Variable               | Purpose                                                                 |
 | ---------------------- | ----------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | Canonical site origin, e.g. `https://your-domain.example`. Optional.    |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site origin. Optional; defaults to `https://procoderji.com`.  |
 
-Until `NEXT_PUBLIC_SITE_URL` is set, `sitemap.xml` is empty, `robots.txt` has no `Sitemap:`
-line and no canonical / Open Graph URLs are emitted. This is deliberate: the canonical
-domain has to be confirmed by the site owner. Set it in your hosting provider's
-environment settings (or a local, git-ignored `.env.local`); do not commit it.
+The primary domain is `https://procoderji.com`. Canonical links, Open Graph URLs,
+`sitemap.xml` and `robots.txt` all use it. Set `NEXT_PUBLIC_SITE_URL` only to override
+it (for example on a staging build) in your hosting provider's environment settings or a
+local, git-ignored `.env.local`. An unset or malformed value falls back to the default.
+The value is inlined at build time, so redeploy after changing it.
 
 ## Adding notes
 
@@ -89,7 +90,7 @@ src/
 │   ├── page.tsx              # landing page
 │   ├── dashboard/            # reader: branch → semester → subject → ?note=unit
 │   ├── courses/              # plain duplicate reader (noindex)
-│   ├── robots.ts, sitemap.ts # driven by NEXT_PUBLIC_SITE_URL + the catalogue
+│   ├── robots.ts, sitemap.ts # use the site URL + the catalogue
 ├── components/               # landing sections, sidebar, cards, empty state
 ├── content/                  # MDX notes (placeholders only for now)
 ├── data/courses.json         # catalogue: the single source of truth

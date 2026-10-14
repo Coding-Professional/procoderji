@@ -6,8 +6,7 @@ import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  // metadataBase / social image are only set once the canonical domain is configured.
-  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "ProCoderJii Notes | Free Engineering Notes & Study Material",
     template: `%s | ${SITE_NAME}`,
@@ -16,9 +15,9 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: SITE_NAME,
     type: "website",
-    ...(siteUrl ? { images: [{ url: "/og.png" }] } : {}),
+    images: [{ url: "/og.png" }],
   },
-  twitter: { card: siteUrl ? "summary_large_image" : "summary" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({

@@ -33,6 +33,10 @@ export interface Unit {
   title: string;
   path: string; // MDX file path, relative to src/content
   desc?: string;
+  /** ISO date (YYYY-MM-DD) the unit was first published. */
+  addedAt?: string;
+  /** ISO date (YYYY-MM-DD) of the last substantive edit. */
+  updatedAt?: string;
 }
 
 export {};

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { getSiteUrl } from "./site";
 
 export const SITE_NAME = "ProCoderJii Notes";
 export const SITE_DESCRIPTION =
@@ -15,21 +14,18 @@ interface PageMetaInput {
 }
 
 /**
- * Per-page metadata. Canonical/Open Graph URLs are only emitted once the
- * canonical domain is configured (NEXT_PUBLIC_SITE_URL); until then they are
- * omitted rather than guessed.
+ * Per-page metadata. Relative canonical / Open Graph URLs are resolved against
+ * metadataBase (the site origin, set in the root layout).
  */
 export function pageMetadata({ title, description, path, noindex }: PageMetaInput): Metadata {
-  const siteUrl = getSiteUrl();
   return {
     title,
     description,
-    ...(noindex ? { robots: { index: false, follow: true } } : {}),
-    ...(siteUrl && !noindex
-      ? {
+    ...(noindex
+      ? { robots: { index: false, follow: true } }
+      : {
           alternates: { canonical: path },
           openGraph: { title, description, url: path, siteName: SITE_NAME, type: "website" },
-        }
-      : {}),
+        }),
   };
 }
