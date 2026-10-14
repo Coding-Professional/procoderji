@@ -1,46 +1,60 @@
+import { CONTACT_EMAIL } from "./contact.ts";
+
 /**
  * Details that the legal pages need from the site owner.
  *
- * Nothing here is invented: every field the owner has not supplied is `null`.
- * While any REQUIRED field is `null` the legal pages show a "draft" banner,
- * render visible [REQUIRED] markers, are marked noindex and stay out of the
- * sitemap. Fill the values in, then review the page text with a qualified
- * legal adviser before relying on it.
+ * Only values the owner has confirmed or that the project already establishes
+ * are filled in; everything else is `null`. While any REQUIRED field is `null`
+ * the legal pages show a "draft" banner and visible [REQUIRED] markers, are
+ * marked noindex and stay out of the sitemap. The text must be reviewed by a
+ * qualified legal adviser before it is relied on.
  */
 export interface LegalDetails {
-	/** Person or organisation that operates the site, as it should appear publicly. REQUIRED. */
+	/** Person or organisation that operates the site, as it appears publicly. REQUIRED. */
 	operatorName: string | null;
-	/** Place whose law governs the Terms and whose courts have jurisdiction (e.g. a state and country). REQUIRED. */
-	jurisdiction: string | null;
-	/** Date these documents take effect, YYYY-MM-DD. REQUIRED. */
+	/** Whether the operator is an individual or a registered organisation. */
+	operatorType: "individual" | "organisation";
+	/** Law that governs the Terms of Use. REQUIRED. */
+	governingLaw: string | null;
+	/** City/state whose courts have jurisdiction over disputes. REQUIRED. Never guessed. */
+	courtsLocation: string | null;
+	/** Date these documents take effect, YYYY-MM-DD (the actual publication date). REQUIRED. */
 	effectiveDate: string | null;
-	/** Public contact address (already published on the site). */
+	/** Public contact address; the same one the site already publishes. */
 	contactEmail: string;
 	/**
 	 * Name / email of a grievance or copyright contact, if different from contactEmail.
-	 * Some jurisdictions require one for websites that host user content or run ads:
-	 * confirm with an adviser. Optional.
+	 * India's IT Rules, 2021 require one only from "intermediaries"; whether this site is
+	 * one is a question for a legal adviser. Optional.
 	 */
 	grievanceContact: string | null;
-	/** Postal address, if you want to publish one. Optional. */
+	/** Postal address, if you want to publish one. Optional; not published by default. */
 	postalAddress: string | null;
 }
 
 export const LEGAL: LegalDetails = {
-	operatorName: null,
-	jurisdiction: null,
+	// Confirmed by the owner; matches the LICENSE copyright holder (checked in tests).
+	operatorName: "Satyam Yadav",
+	operatorType: "individual",
+	// Confirmed by the owner: Indian law.
+	governingLaw: "India",
+	// NOT YET PROVIDED: the city and state whose courts should have jurisdiction.
+	courtsLocation: null,
+	// NOT YET PROVIDED: the planned publication date.
 	effectiveDate: null,
-	contactEmail: "procoderji@gmail.com",
+	// Single source of truth shared with the contact form.
+	contactEmail: CONTACT_EMAIL,
 	grievanceContact: null,
 	postalAddress: null,
 };
 
-export const REQUIRED_LEGAL_FIELDS = ["operatorName", "jurisdiction", "effectiveDate"] as const;
+export const REQUIRED_LEGAL_FIELDS = ["operatorName", "governingLaw", "courtsLocation", "effectiveDate"] as const;
 export type RequiredLegalField = (typeof REQUIRED_LEGAL_FIELDS)[number];
 
 export const LEGAL_FIELD_LABELS: Record<RequiredLegalField, string> = {
 	operatorName: "Operator name (person or organisation)",
-	jurisdiction: "Governing law / jurisdiction",
+	governingLaw: "Governing law",
+	courtsLocation: "City and state whose courts have jurisdiction",
 	effectiveDate: "Effective date (YYYY-MM-DD)",
 };
 

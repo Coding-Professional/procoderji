@@ -1,4 +1,4 @@
-import { EmailLink, Fill, H2, LegalLayout, P, UL, legalMetadata } from "@/components/legal/legal-layout";
+import { EmailLink, H2, LegalLayout, Operator, P, UL, legalMetadata } from "@/components/legal/legal-layout";
 import { LEGAL } from "@/lib/legal";
 
 export const metadata = legalMetadata(
@@ -12,7 +12,7 @@ export default function PrivacyPage() {
         <LegalLayout title="Privacy Policy">
             <P>
                 This policy explains what information is handled when you visit ProCoderJii Notes (procoderji.com).
-                The site is operated by <Fill field="operatorName" />. You can reach us at <EmailLink />.
+                The site is operated by <Operator />. You can reach us at <EmailLink />.
             </P>
 
             <H2>1. What we collect</H2>
@@ -60,8 +60,9 @@ export default function PrivacyPage() {
             <H2>5. Your choices and rights</H2>
             <P>
                 Depending on where you live, you may have the right to ask what personal data we hold about you, to
-                have it corrected or deleted, and to object to its use. To make a request, email <EmailLink />. We
-                will respond within a reasonable time.
+                have it corrected or deleted, and to object to its use. We handle personal data in line with
+                applicable Indian law, including the Digital Personal Data Protection Act, 2023 as it comes into
+                force. To make a request, email <EmailLink />. We will respond within a reasonable time.
             </P>
 
             <H2>6. Children</H2>

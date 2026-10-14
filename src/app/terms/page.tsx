@@ -1,4 +1,4 @@
-import { EmailLink, Fill, H2, LegalLayout, P, UL, legalMetadata } from "@/components/legal/legal-layout";
+import { EmailLink, Fill, H2, LegalLayout, Operator, P, UL, legalMetadata } from "@/components/legal/legal-layout";
 
 export const metadata = legalMetadata(
     "Terms of Use",
@@ -10,7 +10,7 @@ export default function TermsPage() {
     return (
         <LegalLayout title="Terms of Use">
             <P>
-                By using ProCoderJii Notes (procoderji.com), operated by <Fill field="operatorName" />, you agree to
+                By using ProCoderJii Notes (procoderji.com), operated by <Operator />, you agree to
                 these terms. If you do not agree, please do not use the site.
             </P>
 
@@ -67,8 +67,9 @@ export default function TermsPage() {
             <H2>8. Changes and governing law</H2>
             <P>
                 We may change these terms; the effective date at the top shows the current version. These terms are
-                governed by the laws of <Fill field="jurisdiction" />, and the courts of that place have jurisdiction,
-                except where the law of your country gives you rights that cannot be limited.
+                governed by the laws of <Fill field="governingLaw" />. Subject to any rights you have under law that
+                cannot be limited, the courts at <Fill field="courtsLocation" /> will have jurisdiction over any
+                dispute arising from them.
             </P>
 
             <H2>9. Contact</H2>

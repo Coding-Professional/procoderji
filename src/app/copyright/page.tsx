@@ -38,8 +38,9 @@ export default function CopyrightPage() {
 
             <H2>What happens next</H2>
             <P>
-                We will review the notice promptly. If the complaint appears valid we may remove or restrict the
-                material while we look into it, and we may contact the person who supplied it. If you believe material
+                Indian copyright law (the Copyright Act, 1957) applies to notices sent to this site. We will review
+                the notice promptly. If the complaint appears valid we may remove or restrict the material while we
+                look into it, and we may contact the person who supplied it. If you believe material
                 was removed by mistake, you can reply to us explaining why and we will review again.
             </P>
 

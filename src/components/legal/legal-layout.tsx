@@ -28,6 +28,16 @@ export function Fill({ field }: { field: RequiredLegalField }) {
     );
 }
 
+/** The operator's name plus, for an individual, a plain statement of that status. */
+export function Operator() {
+    return (
+        <>
+            <Fill field="operatorName" />
+            {LEGAL.operatorType === "individual" ? ", an individual" : null}
+        </>
+    );
+}
+
 export function H2({ children }: { children: React.ReactNode }) {
     return <h2 className="mt-10 mb-3 text-xl font-bold text-gray-900">{children}</h2>;
 }

@@ -1,4 +1,4 @@
-import { EmailLink, Fill, H2, LegalLayout, P, UL, legalMetadata } from "@/components/legal/legal-layout";
+import { EmailLink, H2, LegalLayout, Operator, P, UL, legalMetadata } from "@/components/legal/legal-layout";
 
 export const metadata = legalMetadata(
     "About",
@@ -11,7 +11,7 @@ export default function AboutPage() {
         <LegalLayout title="About ProCoderJii Notes">
             <P>
                 ProCoderJii Notes is a study site that goes with the ProCoderJii YouTube channel. It is operated by{" "}
-                <Fill field="operatorName" />. The aim is to give engineering students clear, unit-wise notes
+                <Operator />. The aim is to give engineering students clear, unit-wise notes
                 organised by branch, semester and subject.
             </P>
 
