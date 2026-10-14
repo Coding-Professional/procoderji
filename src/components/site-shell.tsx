@@ -17,7 +17,7 @@ export function SiteShell({ children, width = "max-w-4xl" }: { children: React.R
             <div className={`mx-auto ${width}`}>
                 <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
                     <Link href="/" className="flex items-center gap-2 text-lg font-bold text-gray-900">
-                        <Image src="/logo.svg" alt="" width={28} height={28} className="rounded-lg" />
+                        <Image src="/logo.png" alt="" width={28} height={28} className="rounded-lg" />
                         ProCoderJii Notes
                     </Link>
                     <nav aria-label="Main" className="flex items-center gap-5 text-sm font-semibold text-gray-700">

@@ -9,7 +9,9 @@ export function FloatingLogo() {
             initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             transition={{ duration: 0.8, type: "spring" }}
-            className="absolute top-24 left-[12%] lg:left-[18%] hidden md:block pointer-events-none z-20"
+            // Anchored to the page centre (the headline is centred, about 810px wide at its largest) so the
+            // tile always sits clear of the text, and only shown where there is room beside it.
+            className="absolute top-28 left-1/2 -translate-x-[570px] hidden xl:block pointer-events-none z-20"
         >
             <motion.div
                 animate={{ y: [0, -2, 0] }}
@@ -25,8 +27,8 @@ export function FloatingLogo() {
                 "
             >
                 <Image
-                    src="/logo.svg"
-                    alt="ProCoderJii"
+                    src="/logo.png"
+                    alt=""
                     width={90}
                     height={90}
                     className="object-contain"

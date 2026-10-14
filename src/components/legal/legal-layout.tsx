@@ -65,7 +65,7 @@ export function LegalLayout({ title, children }: { title: string; children: Reac
             <div className="mx-auto max-w-3xl">
                 <header className="mb-8 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 text-lg font-bold text-gray-900">
-                        <Image src="/logo.svg" alt="" width={28} height={28} className="rounded-lg" />
+                        <Image src="/logo.png" alt="" width={28} height={28} className="rounded-lg" />
                         ProCoderJii Notes
                     </Link>
                     <Link href="/dashboard" className="text-sm font-semibold text-gray-700 underline">

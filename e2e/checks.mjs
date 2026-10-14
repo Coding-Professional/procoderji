@@ -240,6 +240,40 @@ await interaction("legal pages: draft banner, markers, no index", "desktop", asy
   expectTrue(((await page.locator('meta[name=robots]').getAttribute("content")) ?? "").includes("noindex"), "noindex");
 });
 
+await interaction("hero headline is never covered by the floating logo (several desktop widths)", "desktop", async (page) => {
+  // The floating logo tile has pointer-events:none, so elementFromPoint cannot see it: compare geometry instead.
+  for (const [width, height] of [[768, 900], [1024, 768], [1280, 800], [1366, 768], [1440, 900], [1920, 1080]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    await page.waitForTimeout(1200); // let the entrance animations finish
+    const overlaps = await page.evaluate(() => {
+      const h1 = document.querySelector("h1");
+      const range = document.createRange();
+      range.selectNodeContents(h1);
+      const textLines = [...range.getClientRects()].filter((r) => r.width > 0 && r.height > 0);
+      // Outermost pointer-events:none wrapper around every visible image = decorative overlays such as the logo tile.
+      const overlays = new Set();
+      for (const img of document.querySelectorAll("img")) {
+        if (!img.getClientRects().length) continue;
+        let el = img;
+        while (el.parentElement && getComputedStyle(el.parentElement).pointerEvents === "none") el = el.parentElement;
+        if (el !== img || getComputedStyle(img).pointerEvents === "none") overlays.add(el);
+      }
+      const hits = [];
+      for (const el of overlays) {
+        const o = el.getBoundingClientRect();
+        if (o.width === 0 || o.height === 0 || getComputedStyle(el).display === "none") continue;
+        for (const t of textLines) {
+          if (o.left < t.right && o.right > t.left && o.top < t.bottom && o.bottom > t.top) hits.push(`${el.tagName}.${String(el.className).slice(0, 50)}`);
+        }
+      }
+      return [...new Set(hits)];
+    });
+    expectTrue(overlaps.length === 0, `at ${width}px the headline text is overlapped by: ${overlaps.join(", ")}`);
+  }
+});
+
+
 await interaction("privacy page discloses every third-party host the site contacts", "desktop", async (page) => {
   // Every external host that these pages request must be named on the Privacy page.
   const DISCLOSED_AS = { "lottie.host": "lottie.host", "cdn.jsdelivr.net": "jsdelivr", "i.ytimg.com": "i.ytimg.com" };

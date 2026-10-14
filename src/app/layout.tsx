@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { getSiteUrl } from "@/lib/site";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
+import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
 import { MotionProvider } from "@/components/motion-provider";
 
 const siteUrl = getSiteUrl();
@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: SITE_NAME,
     type: "website",
-    images: [{ url: "/og.png" }],
+    images: [OG_IMAGE],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
 };
 
 export default function RootLayout({

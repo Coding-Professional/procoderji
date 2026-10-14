@@ -42,6 +42,9 @@ function analyse(html) {
 		description: decode(metaContent(html, "name", "description")),
 		robots: metaContent(html, "name", "robots"),
 		ogUrl: metaContent(html, "property", "og:url"),
+		ogImage: metaContent(html, "property", "og:image"),
+		twitterImage: metaContent(html, "name", "twitter:image"),
+		icons: [...html.matchAll(/<link\s[^>]*rel="(?:icon|apple-touch-icon|shortcut icon)"[^>]*>/gi)].map((m) => attr(m[0], "href")).filter(Boolean),
 		canonical: canonical ? attr(canonical, "href") : undefined,
 		lang: html.match(/<html[^>]*lang="([^"]*)"/i)?.[1],
 		viewport: metaContent(html, "name", "viewport"),
@@ -137,6 +140,8 @@ try {
 			const want = pathname === "/" ? SITE : SITE + pathname;
 			if (a.canonical !== want) bad(p, `canonical is "${a.canonical}" (expected ${want})`);
 			if (a.ogUrl && a.ogUrl !== want) bad(p, `og:url is "${a.ogUrl}" (expected ${want})`);
+			if (a.ogImage !== `${SITE}/og.png`) bad(p, `og:image is "${a.ogImage}" (expected ${SITE}/og.png)`);
+			if (a.twitterImage !== `${SITE}/og.png`) bad(p, `twitter:image is "${a.twitterImage}" (expected ${SITE}/og.png)`);
 			if (!a.description || a.description.length < 40 || a.description.length > 200) bad(p, `description length ${a.description?.length ?? 0} (expected 40-200)`);
 			// Titles must be unique per canonical page, so query variants of one page do not count.
 			if (a.title && !p.includes("?")) titles.set(a.title, [...(titles.get(a.title) ?? []), p]);
@@ -170,10 +175,19 @@ try {
 	if (notFound.status !== 404) bad("/this/page/does/not/exist", `expected 404, got ${notFound.status}`);
 
 	// ---------- assets ----------
-	for (const p of ["/favicon.ico", "/logo.svg", "/og.png"]) {
+	for (const p of ["/favicon.ico", "/logo.png", "/og.png", "/brand/procoderji-logo.png"]) {
 		const r = await fetch(BASE + p);
 		if (!r.ok) bad(p, `asset status ${r.status}`);
+		else if (!(r.headers.get("content-type") ?? "").startsWith("image/")) bad(p, `asset is not an image (${r.headers.get("content-type")})`);
 	}
+	// Every icon the pages declare must load, and the old logo must be gone.
+	const homeAnalysis = seen.get("/");
+	if (!homeAnalysis?.icons.length) bad("/", "no <link rel=icon> declared");
+	for (const href of homeAnalysis?.icons ?? []) {
+		const r = await fetch(new URL(href, BASE));
+		if (!r.ok || !(r.headers.get("content-type") ?? "").startsWith("image/")) bad("/", `declared icon ${href} did not load as an image`);
+	}
+	if ((await fetch(BASE + "/logo.svg")).status !== 404) bad("/logo.svg", "the old RGPV logo is still being served");
 	// ---------- response headers ----------
 	const home = await get("/");
 	for (const h of ["x-content-type-options", "x-frame-options", "referrer-policy", "permissions-policy"]) {

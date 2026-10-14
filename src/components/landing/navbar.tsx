@@ -20,7 +20,7 @@ export function Navbar() {
             <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
                 <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900">
                     <Image
-                        src="/logo.svg"
+                        src="/logo.png"
                         alt=""
                         width={32}
                         height={32}

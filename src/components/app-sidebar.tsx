@@ -128,7 +128,7 @@ export function AppSidebar({ className }: { className?: string }) {
     >
       <div className="p-4 border-b border-sidebar-border">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg text-sidebar-foreground">
-          <Image src="/logo.svg" alt="" width={24} height={24} className="w-6 h-6" />
+          <Image src="/logo.png" alt="" width={24} height={24} className="w-6 h-6" />
           ProCoderJii
         </Link>
       </div>
