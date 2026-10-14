@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
+import { LEGAL_PAGES } from "@/lib/legal";
 import { motion } from "framer-motion";
 
 export function Footer() {
@@ -114,6 +115,13 @@ export function Footer() {
 
                     <div className="relative z-10 md:mt-2 mt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                         <p>Copyright {new Date().getFullYear()} ProCoderJii. All rights reserved.</p>
+                        <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+                            {LEGAL_PAGES.filter((p) => p.path !== "/about").map((p) => (
+                                <Link key={p.path} href={p.path} className="hover:text-gray-700 underline-offset-2 hover:underline">
+                                    {p.label}
+                                </Link>
+                            ))}
+                        </nav>
                     </div>
                 </motion.div>
             </div>
