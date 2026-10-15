@@ -9,17 +9,17 @@ const faqs = [
     {
         question: "Are the notes and study files free?",
         answer:
-            "Yes. Core notes, PYQs, and most study resources are freely available for students.",
+            "Yes. Everything published here is free to read online.",
     },
     {
         question: "Is this connected to the ProCoderJii YouTube channel?",
         answer:
-            "Yes. This platform is built to complement ProCoderJii YouTube content with downloadable notes and revision files.",
+            "Yes. This platform is built to go along with the ProCoderJii YouTube videos, with notes added unit by unit as they are reviewed.",
     },
     {
-        question: "Can I download PDFs and keep them offline?",
+        question: "Can I download the notes as PDFs?",
         answer:
-            "Yes. You can open resources online and also download materials for offline study.",
+            "Not yet. Notes are read online for now. If you would like downloadable PDFs, email us and let us know.",
     },
     {
         question: "How is content organized?",
@@ -29,7 +29,7 @@ const faqs = [
     {
         question: "Do you upload previous year questions?",
         answer:
-            "Yes. PYQ collections are added subject-wise to support exam-focused preparation.",
+            "Not yet. Previous year questions are not published here at the moment. You can request them by email.",
     },
     {
         question: "How can I request missing notes?",
@@ -39,7 +39,7 @@ const faqs = [
     {
         question: "Can I contribute my own notes?",
         answer:
-            "Yes. High-quality student notes can be reviewed and added to help the wider community.",
+            "Not at the moment. Notes here are written and reviewed by the ProCoderJii team. If you spot a mistake or want a topic covered, email us.",
     },
     {
         question: "Where can I contact the team?",

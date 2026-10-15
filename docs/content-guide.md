@@ -1,0 +1,183 @@
+# Content guide: adding notes
+
+Notes are plain files in this repository; there is no admin panel or database.
+Only publish **reviewed, original** material (or link to the official source).
+Do not paste other people's notes, papers or PDFs without written permission.
+
+## How it fits together
+
+1. `src/data/courses.json` is the catalogue: course → branch → semester → subject → unit.
+2. `src/content/**.mdx` holds the text of each unit.
+3. Registering a unit in the catalogue is what publishes it. It then appears in the
+   sidebar, on the subject page, in the sitemap, and at its own URL:
+
+   `/dashboard/<course>/<branch>/<semester>/<subject>/<unit>`
+
+Semesters without subjects show a "Notes coming soon" page and are kept out of search
+results and the sitemap. Do not add placeholder or sample units.
+
+## Add a subject and units
+
+In `src/data/courses.json`, find the branch and semester and add a subject:
+
+```json
+{
+  "slug": "data-structures",
+  "title": "Data Structures",
+  "desc": "One or two original sentences describing the subject.",
+  "units": [
+    {
+      "slug": "unit-1",
+      "title": "Unit 1 - Arrays and Linked Lists",
+      "desc": "Optional short summary shown on the card and in search results.",
+      "path": "content/courses/btech/cse/sem3/data-structures/unit-1.mdx",
+      "addedAt": "2026-11-01",
+      "updatedAt": "2026-11-01"
+    }
+  ]
+}
+```
+
+| Field       | Rules                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------- |
+| `slug`      | lowercase letters, digits and single hyphens; unique among siblings                   |
+| `title`     | non-empty                                                                             |
+| `desc`      | optional, original wording                                                            |
+| `path`      | relative to `src/`, must point to an existing file **inside** `src/content`           |
+| `addedAt`   | optional `YYYY-MM-DD`; shown on the page and used for the sitemap `lastmod`           |
+| `updatedAt` | optional `YYYY-MM-DD`, not earlier than `addedAt`; update it when you change the note |
+
+Dates are never invented: if you leave them out, no date is shown and no `lastmod` is
+published. Units are listed in array order, which is also the previous/next order.
+
+## Write the note
+
+Create the file at the `path` you registered. Standard Markdown is supported: headings,
+paragraphs, lists, links, images, block quotes, and fenced code blocks.
+
+```md
+# Arrays
+An array stores elements in contiguous memory...
+
+## Why it matters
+- Fast index access
+- Costly insertion in the middle
+```
+
+**Do not repeat the unit title.** The page already shows the `title` from the catalogue as its
+main heading, so start the note with its first section. Use `#` for the main sections of a note
+and `##` for subsections: headings in a note are shown one level lower than written (`#` appears
+as a second-level heading under the page title, `##` as third-level), so every page keeps a
+single main heading and no skipped levels.
+
+Notes are **Markdown only**. Raw HTML or JSX tags (`<script>`, `<div>`...), `{curly-brace
+expressions}` and `import`/`export` lines are **rejected**: the build fails with a message
+naming the line, so nothing is ever dropped silently and nothing unsafe is published.
+
+This matters for computer-science notes, where these characters are common:
+
+| You want to write            | Write it like this                                  |
+| ---------------------------- | --------------------------------------------------- |
+| code or symbols such as `List<int>` or `{a, b}` | in backticks: `` `List<int>` ``, `` `{a, b}` `` |
+| a less-than sign in prose    | `&lt;` (for example `List&lt;int&gt;`)             |
+| literal braces in prose      | put a backslash before each: `\{1, 2, 3\}`          |
+| an automatic link            | `[text](https://...)`, not `<https://...>`          |
+| an HTML comment              | not supported; remove it                            |
+
+Rules for links and images:
+
+- Links may use `https`, `http`, `mailto` or relative URLs; anything else (such as `javascript:`)
+  is shown as plain text.
+- **Images must live in this repository's `public/` folder** and be referenced by absolute path,
+  for example `![Diagram of a stack](/images/stack.png)`. Remote images are not shown, so readers'
+  IP addresses are never sent to a third party. Always write meaningful alt text.
+- Note files must be real files inside `src/content`; links (symlinks) that point elsewhere are
+  refused.
+- Tables need a plugin that is not installed yet, so avoid them for now.
+
+## Check your work
+
+```bash
+npm run dev          # read it at the unit URL
+npm run lint && npm run typecheck && npm test && npm run build
+```
+
+`npm test` validates the catalogue against the files on disk (unique slugs, real dates,
+every registered note exists inside `src/content`).
+
+## Troubleshooting
+
+- **404** - the slugs in the URL must match the catalogue exactly.
+- **"This note is not available yet"** - the `path` does not point to a readable file.
+- **Build fails on a note** - the file contains invalid MDX (for example an unclosed tag).
+
+## Guides
+
+Original guides (interview prep, DSA roadmaps, system design, resumes, GitHub, tools) are
+registered in `src/data/guides.json` and written as Markdown under `src/content/guides/`.
+
+```json
+{
+  "slug": "dsa-roadmap",
+  "title": "A DSA roadmap",
+  "description": "One or two original sentences, used on the card and in search results.",
+  "category": "dsa",
+  "level": "beginner",
+  "path": "content/guides/dsa-roadmap.mdx",
+  "addedAt": "2026-11-01"
+}
+```
+
+`category` is one of `interview-prep`, `dsa`, `system-design`, `resume`, `github`, `tools`;
+`level` is `beginner`, `intermediate` or `advanced`. `updatedAt` is optional. The same Markdown
+safety rules as notes apply. The `/guides` section only appears in the navigation and the
+sitemap once at least one guide is registered, and `npm test` validates the file.
+
+## Jobs and internships (hand-curated)
+
+Listings live in `src/data/jobs.json`. There is no scraping and no feed: every entry is added
+by hand after checking the employer's own careers page.
+
+```json
+{
+  "id": "company-role-2026",
+  "company": "Company name",
+  "title": "Role title",
+  "category": "fresher",
+  "employmentType": "full-time",
+  "location": { "city": "City", "country": "India", "remote": false },
+  "eligibility": { "degrees": ["B.Tech"], "batches": [2026], "skills": ["..."] },
+  "summary": "Short summary in YOUR OWN words (max 400 characters).",
+  "applyUrl": "https://the-employer.example/careers/123",
+  "postedAt": "2026-11-01",
+  "deadline": "2026-11-30",
+  "lastVerifiedAt": "2026-11-02"
+}
+```
+
+Rules enforced by `npm test` and the page:
+
+- `applyUrl` must be `https` and the employer's **official** page (no link shorteners, no
+  credentials in the URL). Do not use referral or affiliate links.
+- Do **not** paste job descriptions: write a short original summary.
+- Set `lastVerifiedAt` every time you re-check a listing. After 30 days without a re-check it is
+  flagged "Not recently verified".
+- After the `deadline` the listing shows as **Closed** (no apply link) and is archived (hidden)
+  60 days later. Listings without a deadline are archived 90 days after `lastVerifiedAt`.
+- Dates must be real `YYYY-MM-DD` dates and not in the future. Never invent a listing or a date.
+- The `/jobs` page refreshes daily, so status changes without a redeploy. It is `noindex` and
+  left out of the sitemap while nothing is open.
+
+## Latest videos
+
+The home page can show the latest uploads from the channel using YouTube's public feed (no API
+key). Set the server-side environment variable `YOUTUBE_CHANNEL_ID` (the channel's `UC...` id,
+24 characters) in your hosting settings and redeploy. Until it is set the section is hidden. The
+Privacy page mentions the YouTube thumbnail requests automatically when it is enabled.
+
+**Channel ID for @Pro_coder_ji:** `UC74q2pzSGuoaikYwnavcGMg`. It was read from the channel page
+(canonical link, identifier metadata, RSS link and embedded ids all agree) and confirmed against
+the channel's feed, whose title is "Pro coder jii" and whose author URL is
+`https://www.youtube.com/channel/UC74q2pzSGuoaikYwnavcGMg` (checked 2026-10-14). To re-check it
+yourself: open the channel page, choose View Source, and search for `channel_id=`; or open
+YouTube Studio, then Settings, then Channel, then Advanced settings, where the Channel ID is shown.

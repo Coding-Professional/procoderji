@@ -1,10 +1,24 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { getSiteUrl } from "@/lib/site";
+import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
+import { MotionProvider } from "@/components/motion-provider";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "ProCoderJii Notes | Free Engineering Notes & Study Material",
-  description:
-    "Free notes, PYQs, and study material for engineering students from the ProCoderJii community.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "ProCoderJii Notes | Free Engineering Notes & Study Material",
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    siteName: SITE_NAME,
+    type: "website",
+    images: [OG_IMAGE],
+  },
+  twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
 };
 
 export default function RootLayout({
@@ -16,6 +30,13 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`antialiased font-sans`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-gray-900 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        >
+          Skip to main content
+        </a>
+        <MotionProvider>
         {/* Background Layer */}
         <div className="min-h-screen w-full  relative overflow-hidden">
           <div
@@ -32,10 +53,11 @@ export default function RootLayout({
           />
 
           {/* Main Content */}
-          <main className="relative z-10">
+          <div className="relative z-10">
             {children}
-          </main>
+          </div>
         </div>
+        </MotionProvider>
       </body>
     </html>
   );

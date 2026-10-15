@@ -2,134 +2,52 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChevronRight,
-  GraduationCap,
-  LayoutDashboard,
-  Settings,
-  Search,
-  FileText,
-  Folder
-} from "lucide-react";
+import { ChevronRight, GraduationCap, LayoutDashboard, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { getCourses } from "@/lib/courses";
+import { dashboardHref } from "@/lib/catalog";
 
-// Mock Data for the Tree
-const navigationData = [
-  {
-    title: "B.Tech",
-    icon: GraduationCap,
-    items: [
-      {
-        title: "AIML",
-        items: [
-          {
-            title: "First Year",
-            items: [
-              { title: "Semester 1", href: "/dashboard/btech/aiml/sem1" },
-              { title: "Semester 2", href: "/dashboard/btech/aiml/sem2" },
-            ],
-          },
-          {
-            title: "Second Year",
-            items: [
-              { title: "Semester 3", href: "/dashboard/btech/aiml/sem3" },
-              { title: "Semester 4", href: "/dashboard/btech/aiml/sem4" },
-            ],
-          },
-          {
-            title: "Third Year",
-            items: [
-              { title: "Semester 5", href: "/dashboard/btech/aiml/sem5" },
-              { title: "Semester 6", href: "/dashboard/btech/aiml/sem6" },
-            ],
-          },
-          {
-            title: "Fourth Year",
-            items: [
-              { title: "Semester 7", href: "/dashboard/btech/aiml/sem7" },
-              { title: "Semester 8", href: "/dashboard/btech/aiml/sem8" },
-            ],
-          },
-        ]
-      },
-      {
-        title: "CSE",
-        items: [
-          {
-            title: "First Year",
-            items: [
-              { title: "Semester 1", href: "/dashboard/btech/cse/sem1" },
-              { title: "Semester 2", href: "/dashboard/btech/cse/sem2" },
-            ],
-          },
-          {
-            title: "Second Year",
-            items: [
-              { title: "Semester 3", href: "/dashboard/btech/cse/sem3" },
-              { title: "Semester 4", href: "/dashboard/btech/cse/sem4" },
-            ],
-          },
-          {
-            title: "Third Year",
-            items: [
-              { title: "Semester 5", href: "/dashboard/btech/cse/sem5" },
-              { title: "Semester 6", href: "/dashboard/btech/cse/sem6" },
-            ],
-          },
-          {
-            title: "Fourth Year",
-            items: [
-              { title: "Semester 7", href: "/dashboard/btech/cse/sem7" },
-              { title: "Semester 8", href: "/dashboard/btech/cse/sem8" },
-            ],
-          },
-        ]
-      }
-    ],
-  },
-  {
-    title: "Projects",
-    icon: Folder,
-    items: [
-      { title: "Final Year Project", href: "/dashboard/projects/final-year" },
-      { title: "Mini Projects", href: "/dashboard/projects/mini" },
-    ],
-  },
-];
-
-interface SidebarItemProps {
-  item: any;
-  depth?: number;
+interface NavItem {
+  title: string;
+  href?: string;
+  icon?: LucideIcon;
+  items?: NavItem[];
 }
 
-const SidebarItem = ({ item, depth = 0 }: SidebarItemProps) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const pathname = usePathname();
-  const hasChildren = item.items && item.items.length > 0;
-  const isActive = item.href ? pathname === item.href : false;
+// Built from the catalogue so the sidebar can never link to pages that don't exist.
+const navigationData: NavItem[] = getCourses().map((course) => ({
+  title: course.title,
+  icon: GraduationCap,
+  items: course.branches.map((branch) => ({
+    title: branch.short ?? branch.title,
+    items: branch.semesters.map((sem) => ({
+      title: sem.title,
+      href: dashboardHref([course.slug, branch.slug, sem.slug]),
+    })),
+  })),
+}));
 
-  // Auto-expand if child is active
-  React.useEffect(() => {
-    if (hasChildren) {
-      const isChildActive = (items: any[]): boolean => {
-        return items.some(child =>
-          child.href === pathname || (child.items && isChildActive(child.items))
-        );
-      };
-      if (isChildActive(item.items)) {
-        setIsOpen(true);
-      }
-    }
-  }, [pathname, hasChildren, item.items]);
+function containsPath(items: NavItem[], pathname: string): boolean {
+  return items.some((child) => child.href === pathname || (child.items && containsPath(child.items, pathname)));
+}
+
+const SidebarItem = ({ item, depth = 0 }: { item: NavItem; depth?: number }) => {
+  const pathname = usePathname();
+  // `null` = follow the current route; once the user toggles, their choice wins.
+  const [manualOpen, setManualOpen] = React.useState<boolean | null>(null);
+  const hasChildren = !!item.items && item.items.length > 0;
+  const isActive = item.href ? pathname === item.href : false;
+  const isOpen = manualOpen ?? (hasChildren && containsPath(item.items!, pathname));
 
   return (
-    <div className="select-none">
+    <div>
       {item.href ? (
         <Link
           href={item.href}
+          aria-current={isActive ? "page" : undefined}
           className={cn(
             "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 relative group",
             "hover:text-sidebar-accent-foreground",
@@ -146,15 +64,19 @@ const SidebarItem = ({ item, depth = 0 }: SidebarItemProps) => {
               exit={{ opacity: 0, scale: 0.95 }}
             />
           )}
-
           {item.icon && (
-            <item.icon className={cn("w-4 h-4 transition-colors", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+            <item.icon
+              aria-hidden="true"
+              className={cn("w-4 h-4 transition-colors", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")}
+            />
           )}
           <span>{item.title}</span>
         </Link>
       ) : (
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+          onClick={() => setManualOpen(!isOpen)}
+          aria-expanded={hasChildren ? isOpen : undefined}
           className={cn(
             "flex w-full items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors group",
             "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
@@ -163,15 +85,15 @@ const SidebarItem = ({ item, depth = 0 }: SidebarItemProps) => {
           )}
         >
           <div className="flex items-center gap-2">
-            {item.icon && <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />}
+            {item.icon && (
+              <item.icon aria-hidden="true" className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            )}
             <span>{item.title}</span>
           </div>
           {hasChildren && (
             <ChevronRight
-              className={cn(
-                "w-4 h-4 transition-transform duration-200 text-muted-foreground",
-                isOpen && "rotate-90"
-              )}
+              aria-hidden="true"
+              className={cn("w-4 h-4 transition-transform duration-200 text-muted-foreground", isOpen && "rotate-90")}
             />
           )}
         </button>
@@ -187,8 +109,8 @@ const SidebarItem = ({ item, depth = 0 }: SidebarItemProps) => {
             className="overflow-hidden"
           >
             <div className="border-l border-sidebar-border/50 ml-5 pl-1 my-1 space-y-1">
-              {item.items.map((child: any, index: number) => (
-                <SidebarItem key={index} item={child} depth={depth + 1} />
+              {item.items!.map((child) => (
+                <SidebarItem key={child.href ?? child.title} item={child} depth={depth + 1} />
               ))}
             </div>
           </motion.div>
@@ -200,63 +122,32 @@ const SidebarItem = ({ item, depth = 0 }: SidebarItemProps) => {
 
 export function AppSidebar({ className }: { className?: string }) {
   return (
-    <aside className={cn("w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col sticky top-0", className)}>
-      {/* Header */}
+    <aside
+      aria-label="Notes navigation"
+      className={cn("w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col sticky top-0", className)}
+    >
       <div className="p-4 border-b border-sidebar-border">
-        <div className="flex items-center gap-2 font-bold text-lg text-sidebar-foreground">
-          {/* <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground"> */}
-          <Image
-            src="/logo.svg"
-            alt="ProCoderJii"
-            width={24}
-            height={24}
-            className="w-6 h-6"
-          />
-          {/* </div> */}
+        <Link href="/" className="flex items-center gap-2 font-bold text-lg text-sidebar-foreground">
+          <Image src="/logo.png" alt="" width={24} height={24} className="w-6 h-6" />
           ProCoderJii
-        </div>
+        </Link>
       </div>
 
-      {/* Search (Mock) */}
-      <div className="px-4 py-3">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search notes..."
-            className="w-full pl-9 pr-4 py-2 bg-sidebar-accent/50 border border-sidebar-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-2 px-2 space-y-1">
-        <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Platform
-        </div>
+      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+        <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Platform</div>
         <Link
-          href="/"
+          href="/dashboard"
           className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
         >
-          <LayoutDashboard className="w-4 h-4" />
-          Dashboard
+          <LayoutDashboard aria-hidden="true" className="w-4 h-4" />
+          Browse Notes
         </Link>
 
-        <div className="mt-4 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Library
-        </div>
-        {navigationData.map((item, index) => (
-          <SidebarItem key={index} item={item} />
+        <div className="mt-4 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Library</div>
+        {navigationData.map((item) => (
+          <SidebarItem key={item.title} item={item} />
         ))}
-      </div>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-sidebar-border">
-        <button className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent rounded-md transition-colors">
-          <Settings className="w-4 h-4" />
-          Settings
-        </button>
-      </div>
+      </nav>
     </aside>
   );
 }

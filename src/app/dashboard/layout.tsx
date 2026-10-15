@@ -1,4 +1,3 @@
-import { ChatBot } from "@/components/chatbot";
 import { DashboardClientLayout } from "./dashboard-layout-client";
 import Image from "next/image";
 
@@ -13,7 +12,8 @@ export default function DashboardLayout({
             <div className="fixed inset-0 z-[-1]">
                 <Image
                     src="/bg.jpg"
-                    alt="Background"
+                    alt=""
+                    aria-hidden="true"
                     fill
                     className="object-cover opacity-20 dark:opacity-10"
                     priority
@@ -24,7 +24,6 @@ export default function DashboardLayout({
 
             <DashboardClientLayout>
                 {children}
-                <ChatBot />
             </DashboardClientLayout>
         </>
     );

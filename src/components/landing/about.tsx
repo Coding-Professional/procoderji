@@ -22,21 +22,11 @@ export function About() {
                     </h2>
                     <div className="text-lg text-gray-600 leading-relaxed space-y-4">
                         <p>
-                            ProCoderJii Notes is a student-first learning platform connected with the ProCoderJii YouTube channel. We organize notes, PYQs, practical files, and exam material so you can revise faster and study with clarity.
+                            ProCoderJii Notes is a student-first learning site that goes with the ProCoderJii YouTube channel. We are building a library of unit-wise notes for engineering students, organised by branch, semester and subject, so you can revise faster and study with clarity.
                         </p>
                         <p>
-                            Every resource is designed for quick access. You can open or download material in one click, follow video explanations, and prepare unit by unit without wasting time searching in multiple groups or drives.
+                            Notes are written and reviewed by the ProCoderJii team before they are published. Where official university syllabi or question papers exist, we link to the official source instead of copying it.
                         </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-6 pt-4">
-                        <div className="space-y-2">
-                            <h4 className="text-3xl font-bold text-gray-900">3k+</h4>
-                            <p className="text-gray-500 text-sm">YouTube Learners</p>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="text-3xl font-bold text-gray-900">500+</h4>
-                            <p className="text-gray-500 text-sm">Notes & Study Files</p>
-                        </div>
                     </div>
                 </motion.div>
                 <motion.div

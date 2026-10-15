@@ -32,7 +32,9 @@ const services = [
     },
 ];
 
-const ServiceCard = ({ title, price, features, recommended }: any) => (
+type Service = (typeof services)[number];
+
+const ServiceCard = ({ title, price, features, recommended }: Service) => (
     <motion.div
         whileHover={{ y: -4 }}
         transition={{ duration: 0.2 }}

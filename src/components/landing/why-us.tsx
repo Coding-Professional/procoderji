@@ -55,7 +55,7 @@ export function WhyUs() {
                         Why Learn with ProCoderJii?
                     </h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        More than files. A practical, exam-ready system built from classroom and YouTube learning patterns.
+                        Unit-wise notes that go with the ProCoderJii videos, organised so you can find what you need.
                     </p>
                 </motion.div>
 
@@ -75,7 +75,7 @@ export function WhyUs() {
                     <FeatureCard
                         icon={BookOpenCheck}
                         title="Exam Ready Content"
-                        description="Get notes, PYQs, and important question sets curated for actual university exams and last-week revision."
+                        description="Notes are written unit by unit to support exam preparation and last-week revision."
                     />
                 </div>
             </div>

@@ -2,10 +2,16 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Globe, Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
+import { LEGAL_PAGES } from "@/lib/legal";
+import { getGuides, getJobs } from "@/lib/content-data";
 import { motion } from "framer-motion";
 
 export function Footer() {
+    // Only link sections that have content.
+    const hasGuides = getGuides().length > 0;
+    const hasJobs = getJobs().length > 0;
+
     return (
         <footer className="py-8 px-4 sm:px-6 bg-white overflow-hidden">
             <div className="max-w-8xl mx-auto">
@@ -74,18 +80,27 @@ export function Footer() {
                                 className="grid grid-cols-2 gap-12 lg:pl-20"
                             >
                                 <div>
-                                    <h4 className="font-bold mb-6 uppercase tracking-wider text-sm">Platform</h4>
+                                    <h3 className="font-bold mb-6 uppercase tracking-wider text-sm">Platform</h3>
                                     <ul className="space-y-4 text-sm font-medium">
                                         <li>
                                             <Link href="/dashboard" className="hover:text-gray-500 transition-colors">
                                                 Browse Notes
                                             </Link>
                                         </li>
-                                        <li>
-                                            <Link href="/dashboard" className="hover:text-gray-500 transition-colors">
-                                                Question Papers
-                                            </Link>
-                                        </li>
+                                        {hasGuides && (
+                                            <li>
+                                                <Link href="/guides" className="hover:text-gray-500 transition-colors">
+                                                    Guides
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {hasJobs && (
+                                            <li>
+                                                <Link href="/jobs" className="hover:text-gray-500 transition-colors">
+                                                    Jobs
+                                                </Link>
+                                            </li>
+                                        )}
                                         <li>
                                             <a href="#faq" className="hover:text-gray-500 transition-colors">
                                                 FAQs
@@ -94,17 +109,12 @@ export function Footer() {
                                     </ul>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold mb-6 uppercase tracking-wider text-sm">Connect</h4>
+                                    <h3 className="font-bold mb-6 uppercase tracking-wider text-sm">Connect</h3>
                                     <ul className="space-y-4 text-sm font-medium ">
                                         <li>
                                             <a href="mailto:procoderji@gmail.com" className="hover:text-gray-500 transition-colors">
                                                 Email
                                             </a>
-                                        </li>
-                                        <li>
-                                            <Link href="https://procoderji.xyz" target="_blank" className="hover:text-gray-500 transition-colors">
-                                                Website
-                                            </Link>
                                         </li>
                                         <li>
                                             <a href="#contact" className="hover:text-gray-500 transition-colors">
@@ -119,9 +129,13 @@ export function Footer() {
 
                     <div className="relative z-10 md:mt-2 mt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                         <p>Copyright {new Date().getFullYear()} ProCoderJii. All rights reserved.</p>
-                        <Link target="_blank" href="https://procoderji.xyz" className="hover:text-gray-700 transition-colors p-2 hover:bg-white/50 rounded-full">
-                            <Globe className="w-4 h-4" />
-                        </Link>
+                        <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+                            {LEGAL_PAGES.filter((p) => p.path !== "/about").map((p) => (
+                                <Link key={p.path} href={p.path} className="hover:text-gray-700 underline-offset-2 hover:underline">
+                                    {p.label}
+                                </Link>
+                            ))}
+                        </nav>
                     </div>
                 </motion.div>
             </div>
