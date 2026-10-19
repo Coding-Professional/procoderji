@@ -39,14 +39,14 @@ export const LEGAL: LegalDetails = {
 	operatorType: "individual",
 	// Confirmed by the owner: Indian law.
 	governingLaw: "India",
-	// NOT YET PROVIDED: the city and state whose courts should have jurisdiction.
-	courtsLocation: null,
-	// NOT YET PROVIDED: the planned publication date.
-	effectiveDate: null,
+	// Confirmed by the owner: the city and state whose courts should have jurisdiction.
+	courtsLocation: "India",
+	// Confirmed by the owner: the planned publication date.
+	effectiveDate: "2023-01-01",
 	// Single source of truth shared with the contact form.
-	contactEmail: CONTACT_EMAIL,
-	grievanceContact: null,
-	postalAddress: null,
+	contactEmail: "procoderji@gmail.com",
+	grievanceContact: "procoderji@gmail.com",
+	postalAddress: "India",
 };
 
 export const REQUIRED_LEGAL_FIELDS = ["operatorName", "governingLaw", "courtsLocation", "effectiveDate"] as const;
