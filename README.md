@@ -10,11 +10,13 @@ branch and semester and read unit-wise notes online.
 
 ## What it is (and is not)
 
-- A statically-built reading site: Next.js App Router, React 19, Tailwind CSS 4,
-  Framer Motion, `next-mdx-remote` for rendering notes.
+- A statically-built notes site with browser-based practice games: Next.js App Router,
+  React 19, Tailwind CSS 4, Framer Motion, `next-mdx-remote` for rendering notes.
 - Content lives in the repository (MDX files + `src/data/courses.json`).
 - There is **no database, no user accounts, no admin panel, no PDF downloads, no search
   and no chatbot.** Older versions of this README described those; they do not exist.
+- `/games` offers two free browser-based practice games: Pattern Sprint and Digit Recall.
+  They do not require login or save scores; each session's result lasts until the page is refreshed.
 - The contact form opens the visitor's email app with a pre-filled message to the team
   address. Nothing is stored or sent by the server.
 

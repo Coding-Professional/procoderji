@@ -11,7 +11,8 @@ const PAGES = [
   "/", "/dashboard", "/dashboard/btech", "/dashboard/btech/cse", "/dashboard/btech/cse/sem1",
   "/dashboard/btech/cse/sem2", "/dashboard/btech/cse/sem1/qa-subject",
   "/dashboard/btech/cse/sem1/qa-subject/unit-a", "/dashboard/btech/cse/sem1/qa-subject/unit-b",
-  "/guides", "/guides/qa-guide", "/jobs", "/about", "/privacy", "/terms", "/disclaimer", "/copyright",
+  "/guides", "/guides/qa-guide", "/jobs", "/games", "/games/pattern-sprint", "/games/digit-recall",
+  "/about", "/privacy", "/terms", "/disclaimer", "/copyright",
   "/nope/zzz", "/dashboard/btech/year3/sem5/ml",
 ];
 
@@ -123,7 +124,7 @@ await interaction("home: mobile menu opens, lists links, closes", "mobile", asyn
   await btn.click();
   await page.locator("#mobile-menu").waitFor({ state: "visible" });
   expectTrue((await page.getByRole("button", { name: /close menu/i }).getAttribute("aria-expanded")) === "true", "aria-expanded should be true when open");
-  for (const t of ["About", "Contact", "Guides", "Jobs", "Browse Notes"]) {
+  for (const t of ["About", "Games", "Contact", "Guides", "Jobs", "Browse Notes"]) {
     expectTrue(await page.locator("#mobile-menu").getByText(t, { exact: true }).isVisible(), `menu should list ${t}`);
   }
   await page.getByRole("button", { name: /close menu/i }).click();
@@ -132,11 +133,32 @@ await interaction("home: mobile menu opens, lists links, closes", "mobile", asyn
 
 await interaction("home: desktop nav has working links", "desktop", async (page) => {
   await page.goto(BASE + "/", { waitUntil: "networkidle" });
-  for (const [t, href] of [["Guides", "/guides"], ["Jobs", "/jobs"], ["Browse Notes", "/dashboard"]]) {
+  for (const [t, href] of [["Games", "/games"], ["Guides", "/guides"], ["Jobs", "/jobs"], ["Browse Notes", "/dashboard"]]) {
     const a = page.locator("nav").getByRole("link", { name: t, exact: true }).first();
     expectTrue((await a.getAttribute("href")) === href, `${t} should link to ${href}`);
   }
   expectTrue((await page.locator("a[href*='procoderji.xyz']").count()) === 0, "no .xyz links");
+});
+
+await interaction("games: pattern round reaches a result", "desktop", async (page) => {
+  await page.goto(BASE + "/games/pattern-sprint", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Start game" }).click();
+  for (let i = 0; i < 8; i++) {
+    await page.getByRole("button", { name: /^Answer \d+$/ }).first().click();
+    expectTrue(await page.getByRole("status").isVisible(), "answer feedback appears");
+    await page.getByRole("button", { name: i === 7 ? "See result" : "Next question" }).click();
+  }
+  expectTrue(await page.getByText(/You got \d out of 8/).isVisible(), "final score appears");
+});
+
+await interaction("games: digit recall accepts an answer", "mobile", async (page) => {
+  await page.goto(BASE + "/games/digit-recall", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Start game" }).click();
+  const shown = await page.locator("[role=status] .font-mono").textContent();
+  await page.getByLabel("What was the number?").waitFor({ state: "visible" });
+  await page.getByLabel("What was the number?").fill(shown.trim());
+  await page.getByRole("button", { name: "Check answer" }).click();
+  expectTrue(await page.getByRole("heading", { name: "Correct!" }).isVisible(), "correct answer feedback appears");
 });
 
 for (const vp of ["desktop", "mobile"]) {
@@ -245,11 +267,15 @@ await interaction("jobs: statuses and apply links", "mobile", async (page) => {
   expectTrue((await page.locator("a[target=_blank]:not([rel*=noopener])").count()) === 0, "external links have noopener");
 });
 
-await interaction("legal pages: draft banner, markers, no index", "desktop", async (page) => {
+await interaction("legal pages: completed details are indexable", "desktop", async (page) => {
   await page.goto(BASE + "/terms", { waitUntil: "networkidle" });
-  expectTrue(await page.getByText(/Draft - not yet reviewed/).isVisible(), "draft banner");
-  expectTrue((await page.getByText("[REQUIRED:", { exact: false }).count()) >= 1, "required markers visible");
-  expectTrue(((await page.locator('meta[name=robots]').getAttribute("content")) ?? "").includes("noindex"), "noindex");
+  expectTrue((await page.getByText(/Draft - not yet reviewed/).count()) === 0, "no draft banner");
+  expectTrue((await page.getByText("[REQUIRED:", { exact: false }).count()) === 0, "no required markers");
+  const robots = page.locator('meta[name="robots"]');
+  if (await robots.count()) {
+    expectTrue(!((await robots.getAttribute("content")) ?? "").includes("noindex"), "page is indexable");
+  }
+  expectTrue((await page.locator('link[rel="canonical"]').getAttribute("href")) === "https://procoderji.com/terms", "canonical URL");
 });
 
 await interaction("hero headline is never covered by the floating logo (several desktop widths)", "desktop", async (page) => {

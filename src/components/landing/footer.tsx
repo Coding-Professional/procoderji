@@ -87,6 +87,11 @@ export function Footer() {
                                                 Browse Notes
                                             </Link>
                                         </li>
+                                        <li>
+                                            <Link href="/games" className="hover:text-gray-500 transition-colors">
+                                                Practice Games
+                                            </Link>
+                                        </li>
                                         {hasGuides && (
                                             <li>
                                                 <Link href="/guides" className="hover:text-gray-500 transition-colors">

@@ -39,6 +39,9 @@ test("sitemap lists static and content pages without query URLs or duplicates", 
 	assert.deepEqual(entries, [
 		{ url: "https://procoderji.com" },
 		{ url: "https://procoderji.com/dashboard" },
+		{ url: "https://procoderji.com/games" },
+		{ url: "https://procoderji.com/games/pattern-sprint" },
+		{ url: "https://procoderji.com/games/digit-recall" },
 		{ url: "https://procoderji.com/dashboard/btech/cse/sem1/web", lastModified: "2026-10-01" },
 	]);
 });
