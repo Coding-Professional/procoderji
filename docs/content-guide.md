@@ -31,8 +31,8 @@ In `src/data/courses.json`, find the branch and semester and add a subject:
       "title": "Unit 1 - Arrays and Linked Lists",
       "desc": "Optional short summary shown on the card and in search results.",
       "path": "content/courses/btech/cse/sem3/data-structures/unit-1.mdx",
-      "addedAt": "2026-11-01",
-      "updatedAt": "2026-11-01"
+      "addedAt": "2026-10-01",
+      "updatedAt": "2026-10-02"
     }
   ]
 }
@@ -124,7 +124,7 @@ registered in `src/data/guides.json` and written as Markdown under `src/content/
   "category": "dsa",
   "level": "beginner",
   "path": "content/guides/dsa-roadmap.mdx",
-  "addedAt": "2026-11-01"
+  "addedAt": "2026-10-01"
 }
 ```
 
@@ -149,9 +149,9 @@ by hand after checking the employer's own careers page.
   "eligibility": { "degrees": ["B.Tech"], "batches": [2026], "skills": ["..."] },
   "summary": "Short summary in YOUR OWN words (max 400 characters).",
   "applyUrl": "https://the-employer.example/careers/123",
-  "postedAt": "2026-11-01",
-  "deadline": "2026-11-30",
-  "lastVerifiedAt": "2026-11-02"
+  "postedAt": "2026-10-01",
+  "deadline": "2026-10-30",
+  "lastVerifiedAt": "2026-10-02"
 }
 ```
 

@@ -1,17 +1,14 @@
 # Security notes
 
-Last reviewed: 2026-10-14. This is a static, content-driven site: no accounts, no database, no
+Last reviewed: 2026-10-30. This is a static, content-driven site: no accounts, no database, no
 user uploads and no server-side secrets.
+
+To report a vulnerability privately, follow the repository's [security policy](../SECURITY.md).
 
 ## Dependencies
 
-- `npm audit --omit=dev` (what ships to production): **0 vulnerabilities**.
-- `npm audit` reports 5 high findings, all one advisory chain in the **linter** dependencies
-  (`eslint-config-next` -> `@next/eslint-plugin-next` -> `fast-glob` -> `micromatch` -> `braces`;
-  GHSA-vfj7-8cjw-p6xm, a denial of service on deeply nested glob patterns). None of it is
-  installed in production, and no patched `braces` release exists yet (3.0.3 is the latest).
-  Do not run `npm audit fix --force`: it would downgrade `eslint-config-next` to 14.x. Re-check
-  after each `eslint-config-next` release.
+- `npm audit` reported **0 vulnerabilities** on 2026-10-30 after updating Next.js and its matching
+  ESLint config to 16.4.3. Audit findings change over time; run the command again before a release.
 - `playwright-core` (browser tests) is a dev dependency only.
 
 ## Notes and guides (content pipeline)
