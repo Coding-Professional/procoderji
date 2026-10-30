@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, GraduationCap, LayoutDashboard, type LucideIcon } from "lucide-react";
+import { Brain, ChevronRight, GraduationCap, LayoutDashboard, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCourses } from "@/lib/courses";
 import { dashboardHref } from "@/lib/catalog";
@@ -141,6 +141,13 @@ export function AppSidebar({ className }: { className?: string }) {
         >
           <LayoutDashboard aria-hidden="true" className="w-4 h-4" />
           Browse Notes
+        </Link>
+        <Link
+          href="/games"
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+        >
+          <Brain aria-hidden="true" className="w-4 h-4" />
+          Practice Games
         </Link>
 
         <div className="mt-4 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Library</div>

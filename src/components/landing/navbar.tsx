@@ -32,6 +32,7 @@ export function Navbar() {
                 {/* Desktop Menu */}
                 <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
                     <a href="#about" className="hover:text-primary transition-colors">About</a>
+                    <Link href="/games" className="hover:text-primary transition-colors">Games</Link>
                     <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
                     {sections.map((s) => (
                         <Link key={s.href} href={s.href} className="hover:text-primary transition-colors">{s.label}</Link>
@@ -75,6 +76,13 @@ export function Navbar() {
                             >
                                 About
                             </a>
+                            <Link
+                                href="/games"
+                                className="hover:text-primary transition-colors"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Games
+                            </Link>
                             <a
                                 href="#contact"
                                 className="hover:text-primary transition-colors"

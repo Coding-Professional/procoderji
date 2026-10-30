@@ -42,7 +42,13 @@ export interface SitemapRoute {
 }
 
 /** Static pages worth indexing. Placeholder pages are excluded. */
-export const STATIC_ROUTES: SitemapRoute[] = [{ path: "/" }, { path: "/dashboard" }];
+export const STATIC_ROUTES: SitemapRoute[] = [
+  { path: "/" },
+  { path: "/dashboard" },
+  { path: "/games" },
+  { path: "/games/pattern-sprint" },
+  { path: "/games/digit-recall" },
+];
 
 /**
  * Build sitemap entries. Query-string routes (?note=) are dropped because they

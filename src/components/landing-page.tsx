@@ -5,6 +5,7 @@ import { Navbar } from "@/components/landing/navbar";
 import { Hero } from "@/components/landing/hero";
 import { About } from "@/components/landing/about";
 import { WhyUs } from "@/components/landing/why-us";
+import { GamesSection } from "@/components/landing/games";
 
 import { FAQ } from "@/components/landing/faq";
 import { Contact } from "@/components/landing/contact";
@@ -20,6 +21,7 @@ export function LandingPage({ latestVideos }: { latestVideos?: React.ReactNode }
                 <Hero />
                 <About />
                 <WhyUs />
+                <GamesSection />
                 {latestVideos}
                 {/* <Services /> */}
                 <FAQ />
