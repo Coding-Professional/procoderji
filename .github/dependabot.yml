@@ -27,6 +27,11 @@ updates:
       - dependency-name: lucide-react
         update-types:
           - version-update:semver-major
+      # @types/node must match the Node.js major version used in CI (24). Update
+      # it by hand when the Node.js version changes.
+      - dependency-name: "@types/node"
+        update-types:
+          - version-update:semver-major
   - package-ecosystem: github-actions
     directory: /
     schedule:
