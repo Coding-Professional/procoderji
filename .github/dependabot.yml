@@ -6,9 +6,34 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    # Minor and patch updates arrive as one pull request per dependency type.
+    # Major updates keep their own pull requests so breaking changes are reviewed
+    # one at a time.
+    groups:
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      development-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # lucide-react 1.x removes brand icons, including the `Youtube` icon used in
+      # src/components/landing/latest-videos.tsx and why-us.tsx. Remove this rule
+      # when those icons are replaced.
+      - dependency-name: lucide-react
+        update-types:
+          - version-update:semver-major
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - "*"
