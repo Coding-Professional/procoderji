@@ -222,7 +222,7 @@ try {
 	}
 	if (home.headers.get("x-powered-by")) bad("/", `framework header is still sent: X-Powered-By: ${home.headers.get("x-powered-by")}`);
 	// Removed template/unused files must not be served any more.
-	for (const p of ["/next.svg", "/vercel.svg", "/file.svg", "/globe.svg", "/window.svg", "/bg.png"]) {
+	for (const p of ["/next.svg", "/vercel.svg", "/file.svg", "/globe.svg", "/window.svg", "/bg.png", "/bg.jpg"]) {
 		if ((await fetch(BASE + p)).status !== 404) bad(p, "unused file is still being served");
 	}
 
