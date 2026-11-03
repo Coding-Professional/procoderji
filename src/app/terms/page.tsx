@@ -2,7 +2,7 @@ import { EmailLink, Fill, H2, LegalLayout, Operator, P, UL, legalMetadata } from
 
 export const metadata = legalMetadata(
     "Terms of Use",
-    "The terms for using ProCoderJii Notes.",
+    "Review the terms for using ProCoderJii Notes, including acceptable use, ownership of study material, and service limitations.",
     "/terms"
 );
 
