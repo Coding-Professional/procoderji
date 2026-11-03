@@ -16,7 +16,7 @@ project, check a change and open a pull request.
 Use Node.js 22.18 or newer and npm:
 
 ```bash
-git clone https://github.com/Coding-Professional/procoderji.git
+git clone https://github.com/procoderji-com/procoderji.git
 cd procoderji
 npm ci
 npm run dev
