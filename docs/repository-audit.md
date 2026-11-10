@@ -44,7 +44,11 @@ the active GitHub rules and review changes according to their impact.
 - Inspected account identity, Origin/CSRF checks, progress isolation, backend proxy allowlists,
   Markdown rejection and filesystem path boundaries had no blocking finding in this review.
 
-The MIT copyright notice and vendored-tool notices remain intact. `package.json` stays
+The MIT copyright notice and vendored-tool notices remain intact. The
+[third-party notice guide](../THIRD_PARTY_NOTICES.md) now distinguishes vendored tools from
+package licenses, including MPL, LGPL/native-image components and CC-BY data. Concrete frontend
+distribution artifacts need their own notice review; a lockfile is not a bundle inventory.
+`package.json` stays
 `private: true` to prevent accidental npm publication; this does not change the public repository
 or its MIT license. `FUNDING.yml` is retained for the owner to fill with funding links later.
 
@@ -54,6 +58,9 @@ or its MIT license. `FUNDING.yml` is retained for the owner to fill with funding
   preserve saved attempts when reviewed questions are corrected or retired.
 - [#73: duplicate legacy readers](https://github.com/procoderji-com/procoderji/issues/73):
   retire unreachable implementations while preserving `/courses` redirects and active readers.
+- [#76: MDX renderer maintenance](https://github.com/procoderji-com/procoderji/issues/76):
+  assess a maintained rendering path now that the current upstream is archived, preserving
+  content rejection and sanitization. Archival is not an advisory or evidence of an exploit.
 - Existing [games](https://github.com/procoderji-com/procoderji/issues/24) and
   [portfolio](https://github.com/procoderji-com/procoderji/issues/40) plans remain separate work.
   Portfolio API [PR #71](https://github.com/procoderji-com/procoderji/pull/71) was open during
