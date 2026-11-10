@@ -108,7 +108,8 @@ by Git.
   [content guide](content-guide.md).
 
 Read [ADR 0001](decisions/0001-student-product-boundaries.md) before changing account, storage,
-shared-data, or payment boundaries. The [architecture guide](architecture.md) describes the app.
+shared-data, or payment boundaries, and [ADR 0002](decisions/0002-student-portfolios.md) before
+working on student portfolios. The [architecture guide](architecture.md) describes the app.
 
 ## Checks
 

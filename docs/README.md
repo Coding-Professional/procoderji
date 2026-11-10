@@ -23,7 +23,8 @@ synchronization is a separate capability; paid billing is future work.
 ## Product decisions
 
 Architecture decisions describe a problem, the chosen boundary, and its consequences. Start with
-[ADR 0001: student-product boundaries](decisions/0001-student-product-boundaries.md). Add a new
+[ADR 0001: student-product boundaries](decisions/0001-student-product-boundaries.md), then
+[ADR 0002: student portfolios](decisions/0002-student-portfolios.md) (proposed). Add a new
 decision record when a change affects persistence, account requirements, payment handling, or
 other feature boundaries; update the architecture guide when the implementation changes.
 
