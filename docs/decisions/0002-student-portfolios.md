@@ -47,8 +47,9 @@ The TypeScript validator in `src/features/portfolio/` gives immediate feedback i
 
 ### Address
 
-Phase 1 serves portfolios at `/u/<username>` on the main site. No DNS work is needed, and the
-feature can launch as soon as the pages exist.
+Phase 1 serves portfolios at `/u/<username>` on the main site. Phase 1 does not require DNS
+changes. Public launch still needs the backend, moderation, and owner and legal decisions tracked
+in [#40](https://github.com/procoderji-com/procoderji/issues/40).
 
 Phase 2 adds subdomains (`<username>.<domain>`). A wildcard DNS record points at the frontend,
 and `src/proxy.ts` rewrites the host to `/u/<username>`. Addresses are mapped inside the
@@ -99,16 +100,22 @@ want a good portfolio quickly, not a design tool. Themes give variety without th
 
 ## Open questions for the owner
 
-1. **Age requirement.** India's DPDP Act requires verifiable parental consent before processing
-   a child's personal data. The simplest rule is that only students aged 18 or older may publish
-   a public portfolio, with a confirmation step in the editor. Confirm this or choose another
-   rule after advice.
+1. **Age requirement.** Section 9 of India's Digital Personal Data Protection Act, 2023 will
+   require verifiable parental consent before processing a child's personal data. The DPDP
+   Rules, 2025 were notified on 13 November 2025 (MeitY, G.S.R. 843(E)), and Section 9 is
+   scheduled to commence 18 months after that date, so it is not yet in force on this ADR's
+   date. Separately from the statutory timeline, the proposed product policy is that only
+   students aged 18 or older may publish a public portfolio, with a confirmation step in the
+   editor. Confirm this policy, or choose another rule after legal advice.
 2. **Username changes.** Should a username be changeable after publishing? Allowing it breaks
    shared links; forbidding it needs a clear notice before the first publish.
 3. **Phase 2 domain.** Serve subdomains under `procoderji.com`, or buy a separate domain for
    student pages (as GitHub uses `github.io`)? A separate domain protects the main site's
-   reputation if a page is abused. Wildcard certificates on Vercel need Vercel nameservers or
-   delegation of the `_acme-challenge` record.
+   reputation if a page is abused. Wildcard certificates on Vercel need
+   [Vercel nameservers](https://vercel.com/guides/why-use-domain-nameservers-method-wildcard-domains),
+   or the documented alternative of delegating the `_acme-challenge` record to Vercel DNS with
+   `NS` records while keeping the current nameservers
+   ([Vercel guide](https://vercel.com/kb/guide/wildcard-domain-without-vercel-nameservers)).
 4. **Legal text.** The Privacy and Terms pages need new sections (issue #48). The owner reviews
    and approves the wording; no placeholder legal text is published.
 
