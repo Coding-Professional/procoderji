@@ -7,12 +7,14 @@ branch.
 
 ## Report a vulnerability
 
-Do not open a public issue for an unpatched vulnerability. Email **procoderji@gmail.com** with
-the affected route or component, the impact, and steps to reproduce. Do not include real user
-data or secrets in the report.
+Do not open a public issue for an unpatched vulnerability. Use GitHub's
+[private vulnerability report](https://github.com/procoderji-com/procoderji/security/advisories/new)
+to contact the maintainers. If you cannot use GitHub reporting, email **procoderji@gmail.com**.
+Include the affected route or component, the impact, and steps to reproduce. Do not include real
+user data or secrets in the report.
 
-The maintainer will acknowledge the report, investigate it and coordinate a fix before public
-disclosure. There is no bug bounty program at this time.
+Maintainers investigate reports and coordinate fixes and disclosure with the reporter. Response
+times depend on availability. There is no bug bounty program at this time.
 
 ## Dependency checks
 

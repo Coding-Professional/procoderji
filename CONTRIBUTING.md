@@ -3,6 +3,10 @@
 Help ProCoderJii become a useful learning and placement-practice platform for students. Code,
 documentation, accessibility improvements, original questions, and clear bug reports are welcome.
 
+You can open a pull request for a focused bug fix, documentation correction, test improvement,
+or other work within an agreed issue without asking the owner for permission first. Use
+[Support](SUPPORT.md) when you need help choosing the right place for a question or report.
+
 ## Find a useful change
 
 - Read the [project overview](README.md) and [documentation index](docs/README.md).
@@ -13,7 +17,7 @@ documentation, accessibility improvements, original questions, and clear bug rep
   are larger.
 - Check existing [issues](https://github.com/procoderji-com/procoderji/issues) and
   [pull requests](https://github.com/procoderji-com/procoderji/pulls) before starting.
-- Discuss larger features, paid features, data collection, or dependency changes in an issue first.
+- Discuss larger features, paid features, data collection, or new runtime dependencies in an issue first.
   Include the student problem and the smallest useful outcome.
 - Use the practice-question issue form to propose a new exercise. Include the answer,
   explanation, audience, and authorship or source permission.
@@ -22,6 +26,8 @@ documentation, accessibility improvements, original questions, and clear bug rep
 
 An issue being open does not reserve it for anyone. Leave a short comment when you start work so
 contributors can coordinate. Ask for clarification when an acceptance criterion is unclear.
+Small fixes do not need a separate issue. Labels help maintainers organise work; contributors do
+not need to add labels or request a label before submitting an issue or pull request.
 
 ## Set up your fork
 
@@ -66,8 +72,11 @@ branches. Do not force-push over work you have not checked.
 - Keep a pull request about one student problem or contributor improvement.
 - Use TypeScript and the existing UI patterns. Keep practice rules and scoring independent of
   React, storage, authentication, and payment providers.
-- Put new practice-domain work under `src/features/practice/`; read the
+- Put question-practice domain work under `src/features/practice/`; read the
   [boundary decision](docs/decisions/0001-student-product-boundaries.md) before adding adapters.
+- Follow the [games plan](https://github.com/procoderji-com/procoderji/issues/24) and
+  [shared-game foundation](https://github.com/procoderji-com/procoderji/issues/58) for new games.
+  Keep game-result formats separate from the existing multiple-choice progress contract.
 - Add original questions to `shared/practice/questions.json`, the canonical bank consumed by
   both runtimes. Keep the TypeScript and .NET validation behavior consistent when its shape changes.
 - Put authentication, account persistence, and future server-owned capabilities under
@@ -89,23 +98,19 @@ payment or account requirements need an agreed scope and a documented data flow.
 Run the checks relevant to your change; the commands are explained in
 [Development](docs/development.md#checks).
 
-```bash
-npm run lint
-npm run typecheck
-npm test
-npm run build
-```
+| Change | Relevant checks |
+| --- | --- |
+| Documentation only | Review wording, commands and links; runtime tests are unnecessary when behavior is unchanged. |
+| Frontend code | `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`. |
+| Backend code | `dotnet test backend/ProCoderJi.slnx --configuration Release`; persistence changes also need the affected database contracts described in the backend guide. |
+| Shared questions or portfolio validation rules | Frontend and backend tests, because both runtimes consume the contract. |
+| Routes, metadata, or published learning content | `npm run launch-check`, plus the relevant code or content tests. |
+| Browser interactions | `npm run e2e` with Chrome or Edge installed, plus the relevant code checks. |
 
-For backend or shared-question changes, also run:
-
-```bash
-dotnet test backend/ProCoderJi.slnx --configuration Release
-```
-
-For routes, links, or metadata, also run `npm run launch-check`. For browser interactions, run
-`npm run e2e` with Chrome installed. Browser checks temporarily install synthetic content and
-refuse to run if `src/data` or `src/content` has local changes. For content-only changes, use
-`npm test` and `npm run launch-check` instead.
+Browser checks temporarily install synthetic content and refuse to run if `src/data` or
+`src/content` has local changes. Content authors should use `npm test` and
+`npm run launch-check` while editing those files. List the checks you actually ran and explain
+any that could not run; maintainers and CI complete the remaining validation.
 
 ## Submit the pull request
 
@@ -116,9 +121,14 @@ git push -u origin <your-branch-name>
 ```
 
 Open a pull request from your fork branch to `procoderji-com/procoderji:main`. Fill in the
-template, link the related issue, explain the resulting behavior, and list the checks you ran.
+template, link a related issue when one exists, explain the resulting behavior, and list the
+checks you ran.
 Include screenshots for visible UI changes and sources or permissions for learning content.
 
 Respond to review feedback and keep the branch up to date when needed. Maintainers review
 student value, correctness, accessibility, and maintenance cost before merging. A proposed
 feature may need a smaller scope or further discussion.
+
+The [maintainer guide](docs/maintainer-guide.md) explains routine review, labels, dependency
+updates, and decisions that need the project owner's input. Existing owner decisions remain
+valid; implementing their agreed scope does not need repeated permission.

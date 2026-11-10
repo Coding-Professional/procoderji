@@ -5,7 +5,11 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: Before submitting, check whether this problem has already been reported.
+      value: |
+        Before submitting, check whether this problem has already been reported.
+        For setup questions, use Discussions. Report vulnerabilities privately through
+        [SECURITY.md](https://github.com/procoderji-com/procoderji/blob/main/SECURITY.md),
+        and remove credentials or personal data from logs and screenshots.
   - type: textarea
     id: summary
     attributes:

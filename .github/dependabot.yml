@@ -11,6 +11,10 @@ updates:
     # Major updates keep their own pull requests so breaking changes are reviewed
     # one at a time.
     groups:
+      npm-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
       production-dependencies:
         dependency-type: production
         update-types:
@@ -33,6 +37,24 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - version-update:semver-major
+  - package-ecosystem: nuget
+    # Dependabot expands ProCoderJi.slnx here, covering the API and test projects
+    # together so shared .NET packages can move in one reviewed pull request.
+    directory: /backend
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      nuget-security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      nuget-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
   - package-ecosystem: github-actions
     directory: /
     schedule:
