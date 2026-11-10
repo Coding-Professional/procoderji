@@ -1,0 +1,59 @@
+name: Practice question proposal
+description: Propose an original, explained exercise for student placement practice.
+title: "practice: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check existing questions and issues first. A useful proposal includes a correct answer,
+        an explanation, and clear authorship or permission. Do not paste a private assessment
+        or copyrighted question bank without permission.
+  - type: input
+    id: topic
+    attributes:
+      label: Topic and skill
+      description: Which topic and specific skill does this question help a student practise?
+      placeholder: "Percentages: successive percentage changes"
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Student audience and difficulty
+      description: Describe the intended learner, prerequisites, and difficulty.
+      placeholder: "Students starting campus-placement aptitude practice; basic percentage knowledge."
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question and options
+      description: Include the full question and answer options, if applicable. State units and assumptions clearly.
+    validations:
+      required: true
+  - type: textarea
+    id: answer
+    attributes:
+      label: Correct answer and explanation
+      description: Show the reasoning, calculation, or code. Explain why the answer is correct and any common mistake.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Authorship, sources, and permission
+      description: State whether you wrote the question. Link any source and explain the permission or licence for adapting it.
+    validations:
+      required: true
+  - type: checkboxes
+    id: review
+    attributes:
+      label: Submission checks
+      options:
+        - label: I wrote this material or have permission under the stated licence to submit it.
+          required: true
+        - label: I checked the answer and included an explanation.
+          required: true
+        - label: This proposal contains no private student data, credentials, or confidential assessment material.
+          required: true

@@ -12,16 +12,29 @@ export default function PrivacyPage() {
     return (
         <LegalLayout title="Privacy Policy">
             <P>
-                This policy explains what information is handled when you visit ProCoderJii Notes (procoderji.com).
+                This policy explains what information is handled when you use ProCoderJii (procoderji.com).
                 The site is operated by <Operator />. You can reach us at <EmailLink />.
             </P>
 
             <H2>1. What we collect</H2>
             <P>
-                The site has no user accounts, no comments, and no database of visitors. We do not ask you to register
-                and we do not store the contents of any form on our own servers.
+                You can use free practice without registering. Completed guest sessions are saved in your browser.
+                When optional learning accounts are enabled, signing in lets you sync your practice history across devices.
             </P>
             <UL>
+                <li>
+                    <strong>Learning progress.</strong> We save the questions you attempted, your selected answers,
+                    completion times, and session duration. Your workspace displays up to 100 recent sessions.
+                    Guest history stays on your device. Signed-in history is stored in the learning service&apos;s
+                    database and is associated with your account. Guest history moves to an account only when you
+                    explicitly import it.
+                </li>
+                <li>
+                    <strong>Optional Google sign-in.</strong> Google confirms your identity and shares your account
+                    identifier, basic profile name, and email address with our learning service. We use these to
+                    create and maintain your learning account. ProCoderJii does not receive your Google password.
+                    We do not ask for your college, phone number, or resume to use practice.
+                </li>
                 <li>
                     <strong>Messages you send us.</strong> The contact form on the home page does not send anything
                     by itself. It opens your own email app with a message addressed to {LEGAL.contactEmail}. If you
@@ -39,8 +52,9 @@ export default function PrivacyPage() {
 
             <H2>2. Cookies and similar technologies</H2>
             <P>
-                At the time of writing, the site does not set cookies of its own, does not use browser storage to
-                track you, and does not use analytics or advertising services.
+                Browser storage keeps your learning progress on this device. If you sign in, essential authentication
+                cookies maintain your session, and a request-verification cookie protects account updates. These features are used to provide the learning service. The site does
+                not currently use analytics or advertising services.
             </P>
 
             <H2>3. Third-party content</H2>
@@ -55,14 +69,23 @@ export default function PrivacyPage() {
                 university websites) lead to other sites that have their own privacy practices.
             </P>
 
-            <H2>4. If this changes</H2>
+            <H2>4. Retention and deletion</H2>
+            <P>
+                Guest history remains in your browser until you delete it, clear browser data, or older sessions fall
+                outside the 100-session limit. Cloud practice history keeps the most recent 100 sessions per account;
+                older sessions are removed as new sessions are synced. The Account &amp; data page lets you export
+                the history currently visible in your workspace and delete practice progress. Cloud deletion resets
+                cached account history on other devices when they next sync. To request deletion of the sign-in
+                account or other data associated with your email, contact <EmailLink /> from that email address.
+            </P>
+            <H2>5. Future changes</H2>
             <P>
                 If we add analytics, advertising (such as Google AdSense), embedded videos, a newsletter or anything
                 else that collects data or sets cookies, we will update this policy first, describe the third parties
                 involved, and ask for your consent where the law requires it.
             </P>
 
-            <H2>5. Your choices and rights</H2>
+            <H2>6. Your choices and rights</H2>
             <P>
                 Depending on where you live, you may have the right to ask what personal data we hold about you, to
                 have it corrected or deleted, and to object to its use. We handle personal data in line with
@@ -70,18 +93,18 @@ export default function PrivacyPage() {
                 force. To make a request, email <EmailLink />. We will respond within a reasonable time.
             </P>
 
-            <H2>6. Children</H2>
+            <H2>7. Children</H2>
             <P>
                 The site is meant for students. We do not knowingly collect personal data from children through the
                 site. If you believe a child has sent us personal data, email us and we will delete it.
             </P>
 
-            <H2>7. Changes to this policy</H2>
+            <H2>8. Changes to this policy</H2>
             <P>
                 We may update this policy. The effective date at the top shows when the current version took effect.
             </P>
 
-            <H2>8. Contact</H2>
+            <H2>9. Contact</H2>
             <P>
                 Questions about this policy: <EmailLink />
                 {LEGAL.postalAddress ? <> &middot; {LEGAL.postalAddress}</> : null}.

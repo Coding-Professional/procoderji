@@ -1,50 +1,79 @@
-# Contributor Covenant Code of Conduct
+# Code of Conduct
 
 ## Our pledge
 
-We are committed to making participation in this project a respectful experience for everyone,
+We want students, first-time contributors, and experienced maintainers to participate in a
+welcoming, respectful community. We are committed to participation free from harassment,
 regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics,
 gender identity and expression, level of experience, education, socio-economic status,
 nationality, personal appearance, race, religion, or sexual identity and orientation.
 
-We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive,
-and healthy community.
+## Expected behavior
 
-## Our standards
+- Be patient with questions and explain feedback clearly. Someone may be learning Git, English,
+  a programming concept, or open-source collaboration for the first time.
+- Review the contribution and its impact on students. Critique ideas and code respectfully.
+- Give credit, respect copyright, and avoid publishing another person's private information.
+- Accept constructive feedback, take responsibility for mistakes, and help resolve their impact.
+- Respect a request to stop an interaction or move a discussion to an appropriate channel.
 
-Examples of behavior that contributes to a positive environment include:
+Unacceptable behavior includes harassment, threats, stalking, deliberate intimidation,
+discriminatory or derogatory remarks, sexualized language or imagery, unwelcome sexual
+attention, personal attacks, and publishing private information without permission. Repeated
+disruption of discussions or retaliation against someone who raises a concern is also
+unacceptable.
 
-- Showing empathy and kindness toward other people.
-- Giving and accepting constructive feedback respectfully.
-- Taking responsibility, apologizing to those affected, and learning from mistakes.
-- Focusing on what is best for the community.
+## Where this applies
 
-Examples of unacceptable behavior include:
+This Code applies to the project's issues, discussions, pull requests, reviews, learning-content
+submissions, and other project-managed spaces. It also applies when someone officially
+represents ProCoderJii, for example through an official project account or an appointed role.
 
-- Sexualized language or imagery, and unwelcome sexual attention.
-- Trolling, insulting or derogatory comments, and personal or political attacks.
-- Public or private harassment, including deliberate intimidation or stalking.
-- Publishing another person's private information without permission.
-- Other conduct that would reasonably be considered inappropriate in a professional setting.
+## Report a concern
 
-## Enforcement responsibilities
+Email **procoderji@gmail.com**. Project maintainers use this channel to receive conduct reports.
+Please include the information you are comfortable sharing:
 
-Project maintainers are responsible for clarifying and enforcing these standards and may remove,
-edit or reject comments, commits, code, issue reports and other contributions that do not align
-with this Code. Maintainers may temporarily or permanently restrict participation for behavior
-they consider inappropriate, threatening, offensive or harmful.
+- What happened and where it happened.
+- Links, dates, or screenshots that help explain the incident.
+- People involved and whether the behavior is ongoing.
+- A way to contact you and any concern about how a response could affect you.
 
-## Scope
+You do not need to investigate the incident yourself. Leave out unrelated personal information,
+passwords, and private student records. Conduct reports should go through the email channel
+rather than a public issue or pull-request discussion.
 
-This Code applies within project spaces and when someone is officially representing the project
-in public spaces.
+Reports will be handled as privately as practical. Maintainers may need to share relevant
+information with people who help review or resolve the incident; identifying details should be
+limited to what is needed. Absolute confidentiality or anonymity cannot be guaranteed,
+especially when an incident is already public. Reporters should be told about necessary
+sharing when practical.
 
-## Reporting
+## Review and response
 
-Report unacceptable behavior to **procoderji@gmail.com**. Reports will be reviewed and handled
-confidentially. Maintainers will communicate the response to the reporter when appropriate.
+Maintainers review available information, consider the behavior and its impact, and may ask for
+clarification. A maintainer who is involved in a report should not decide its outcome. If another
+reviewer is unavailable, that limitation should be made clear to the reporter.
+
+The response should be proportionate to the severity, context, and recurrence of the behavior.
+It may include:
+
+1. **Correction:** explain the concern, request a change, or remove inappropriate content.
+2. **Warning:** state the behavior that must stop and any conditions for continued participation.
+3. **Temporary restriction:** limit participation in project spaces for a stated period.
+4. **Permanent restriction:** end participation when serious or repeated harm makes it necessary.
+
+These are available responses, not a required sequence. Serious behavior may need an immediate
+restriction. Maintainers may remove or reject comments, content, or contributions that violate
+this Code. They should communicate a decision and relevant participation conditions to those
+affected when appropriate, while limiting disclosure of private report details.
+
+Retaliation against a reporter, witness, or person helping resolve a report is a separate conduct
+concern. If you believe a decision overlooked relevant information, request a review through
+**procoderji@gmail.com** and explain the concern or new information.
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org),
-version 2.1, available at <https://www.contributor-covenant.org/version/2/1/code_of_conduct.html>.
+This Code is adapted from the [Contributor Covenant](https://www.contributor-covenant.org),
+version 2.1, available at
+<https://www.contributor-covenant.org/version/2/1/code_of_conduct.html>.

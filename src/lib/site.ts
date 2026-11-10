@@ -1,3 +1,5 @@
+import { PRACTICE_TOPICS } from "../features/practice/domain/topics.ts";
+
 /**
  * Canonical site origin.
  *
@@ -48,6 +50,8 @@ export const STATIC_ROUTES: SitemapRoute[] = [
   { path: "/games" },
   { path: "/games/pattern-sprint" },
   { path: "/games/digit-recall" },
+  { path: "/practice" },
+  ...PRACTICE_TOPICS.map(({ id }) => ({ path: `/practice/${id}` })),
 ];
 
 /**

@@ -57,11 +57,74 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Set up .NET for browser checks
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
       - name: Install dependencies
         run: npm ci
 
       - name: Check desktop and mobile browser behavior
+        env:
+          E2E_DOTNET: '1'
         run: npm run e2e
 
       - name: Crawl production build and verify SEO
         run: npm run launch-check
+
+      - name: Upload browser failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-screenshots-${{ github.run_attempt }}
+          path: e2e/.out/*.png
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
+
+  backend:
+    name: Backend build and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          # Fixed credentials are only for this disposable CI database.
+          POSTGRES_DB: procoderji_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d procoderji_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore backend dependencies
+        run: dotnet restore backend/ProCoderJi.slnx --locked-mode
+
+      - name: Build backend
+        run: dotnet build backend/ProCoderJi.slnx --configuration Release --no-restore
+
+      - name: Test backend
+        run: dotnet test backend/ProCoderJi.slnx --configuration Release --no-build
+
+      - name: Verify PostgreSQL migrations
+        # Validates the PostgreSQL schema path; Google sign-in needs separate live checks.
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          Database__Provider: Postgres
+          ConnectionStrings__Platform: 'Host=localhost;Port=5432;Database=procoderji_test;Username=postgres;Password=postgres'
+          PublicOrigin: http://localhost:3000
+        run: dotnet run --project backend/src/ProCoderJi.Api --configuration Release --no-build --no-launch-profile -- --migrate

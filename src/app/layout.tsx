@@ -9,7 +9,7 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "ProCoderJii Notes | Free Engineering Notes & Study Material",
+    default: "ProCoderJii | Placement Practice & Engineering Learning",
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,

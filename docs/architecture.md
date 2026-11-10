@@ -1,66 +1,144 @@
 # Architecture
 
-This project is a content-driven Next.js App Router site. Most pages are generated from files in
-the repository at build time. There is no database or account system.
+ProCoderJii keeps its student interface in a Next.js App Router frontend and its optional
+account service in ASP.NET Core 10. Guest practice works without the backend. Both runtimes
+consume one canonical question bank at `shared/practice/questions.json`.
 
-## Request and content flow
+## Runtime boundaries
 
 ```mermaid
 flowchart TD
-  Browser --> App[Next.js routes in src/app]
-  App --> Catalog[src/data catalogues]
-  Catalog --> Notes[src/content Markdown and MDX]
-  App --> UI[src/components]
-  App --> Lib[src/lib validation and rendering]
-  Lib --> Safe[Rendered page content]
-  Notes --> Lib
+  Browser --> Frontend[Next.js student views]
+  Frontend --> Practice[Pure TypeScript practice rules]
+  Frontend --> Local[Validated browser progress]
+  Frontend --> BFF[Same-origin platform proxy]
+  BFF --> API[ASP.NET Core API]
+  API --> EF[EF Core account persistence]
+  EF --> Database[SQLite development or PostgreSQL]
+  API --> Google[Google sign-in]
+  Questions[Shared question JSON] --> Practice
+  Questions --> API
+  Frontend --> Content[Reviewed content catalogues]
 ```
 
-Course notes, guides and jobs use JSON catalogues that point to content files. Only entries in a
-catalogue are published. Validation checks slugs, dates and file paths before content is used.
-The note renderer accepts a safe Markdown subset; it rejects raw HTML, JSX, expressions and
-imports. See [the content guide](content-guide.md) for authoring details.
+The frontend owns question selection, learning feedback, and browser interaction. The backend
+owns trusted account identity, persistence, antiforgery validation, and future server-owned
+capabilities. The Next.js backend-for-frontend proxy keeps browser requests under the public
+site origin. See [ADR 0001](decisions/0001-student-product-boundaries.md) for the decision.
+
+| Route | Responsibility |
+| --- | --- |
+| `/learn` | Learner workspace, topic progress, recent sessions, and next-practice guidance. |
+| `/practice` | Discover the four practice topics. |
+| `/practice/[topic]` | Complete questions and review answers and explanations. |
+| `/account` | Optional Google sign-in and progress/data controls. |
+| `/api/platform/*` | Next.js forwarding layer for the configured backend. |
+| `/api/platform/auth/session` | Current account, account configuration status, and antiforgery token. |
+| `/api/platform/signin-google` | Public Google callback forwarded to ASP.NET Core. |
+| `/dashboard` | Course catalogue and reviewed note reader. |
+| `/games` | Existing short reasoning and memory exercises. |
+
+## Shared questions and learning rules
+
+The first bank contains 24 original multiple-choice questions across quantitative aptitude,
+logical reasoning, verbal ability, and programming foundations. Questions record topic,
+difficulty, options, correct answer, and explanation in `shared/practice/questions.json`.
+TypeScript and .NET adapters consume this file rather than maintaining independent copies.
+
+Practice-domain code under `src/features/practice/domain/` remains independent of React,
+browser storage, authentication, and payment SDKs. Session summaries are derived from selected
+answers. A submitted score is never treated as trusted account data; the backend validates
+question/option IDs against the shared bank.
+
+Question IDs are part of the persistence contract. Wording corrections can retain an ID; a
+semantic change needs a new ID so historical responses are not reinterpreted as a different
+question. Shared-bank changes should pass both TypeScript and .NET validation tests.
+
+## Guest and account progress
+
+`src/features/progress/` validates untrusted attempts and maintains the latest 100 completed
+sessions in browser state. Each browser store is scoped to `guest` or an authenticated account
+ID. Signing in does not silently move guest history into an account; import is an explicit
+student action. Browser storage failures leave practice usable with an appropriate message.
+
+When the backend is configured, account progress can synchronize across devices. Backend
+queries and mutations derive the student from the authenticated cookie and authorize access to
+that account's records. Progress resets advance the account's generation; stale uploads cannot
+silently restore deleted history. A stale local account snapshot is replaced on sync. This can
+discard offline attempts in that snapshot, so visible history can be exported before a reset or
+reconnection.
+
+The existing `/games` exercises keep temporary round state and do not add records to the
+placement-practice history.
+
+## Optional ASP.NET Core accounts
+
+The frontend reads `DOTNET_API_URL` only on the server. With no configured backend, free guest
+practice and local progress remain available. Google client credentials are backend secrets,
+configured through user-secrets for development or environment/secret management in hosting.
+
+Google signs the student into a backend cookie session. The Google OAuth callback is the public
+frontend URL `/api/platform/signin-google`, which the proxy forwards. `PublicOrigin` tells the
+backend the canonical frontend origin for those redirects. The private API origin is not a
+Google callback URL.
+
+The session response supplies a CSRF token, and mutating requests send `X-CSRF-Token`. The
+backend validates authentication, antiforgery state, attempt structure, and question references.
+Private account responses must not be cached as public content. No privileged account credential
+belongs in a browser variable.
+
+EF Core uses SQLite for local development and supports PostgreSQL through explicit operator
+configuration. Data Protection keys are persisted through EF in the same database; deployments
+with replicas must share the configured persistence and protect its access. Database schema
+provisioning, Google setup, and production checks are documented in
+[Backend setup](../backend/README.md).
+
+## Reviewed content
+
+Course notes, guides, and jobs use JSON catalogues pointing to repository content files. Only
+registered entries are published. Validation checks slugs, dates, and safe file paths. The
+renderer accepts a safe Markdown subset and rejects raw HTML, JSX, expressions, and imports;
+read the [content guide](content-guide.md).
+
+The course catalogue currently has no published subjects or notes; guides and jobs are empty.
+Sample notes are intentionally unregistered. Empty pages stay out of the index and sitemap. Old
+`/courses/*` paths redirect to `/dashboard/*`.
 
 ## Main areas
 
 | Path | Responsibility |
 | --- | --- |
-| `src/app/` | Routes, metadata, page layouts and sitemap/robots endpoints |
-| `src/components/` | Shared site shell, landing-page sections, cards and reader UI |
-| `src/content/` | Note and guide files |
-| `src/data/courses.json` | Course, branch, semester, subject and unit catalogue |
-| `src/data/guides.json` | Guide catalogue |
-| `src/data/jobs.json` | Hand-curated job and internship catalogue |
-| `src/lib/` | Validation, safe paths, Markdown parsing, dates, metadata and game logic |
-| `e2e/` | Browser interactions, temporary fixtures and production crawl checks |
-| `docs/` | Contributor, content, security and deployment documentation |
-| `.agents/` | Optional coding-agent skills; see [agent tools](agent-tools.md) |
-| `.claude/` | Pointers to the canonical copies under `.agents/skills/` |
+| `src/app/` | Frontend routes, metadata, layouts, and same-origin backend proxy. |
+| `src/features/practice/` | TypeScript practice rules, shared-bank adapter, and student views. |
+| `src/features/progress/` | Attempt model, browser storage, and sync coordination. |
+| `src/features/account/` | Frontend account API client and controls. |
+| `src/components/` | Shared shell, landing sections, and reusable UI. |
+| `shared/practice/questions.json` | Canonical original practice bank used by both runtimes. |
+| `backend/src/ProCoderJi.Api/` | ASP.NET Core account API, Google auth, and EF persistence. |
+| `backend/tests/` | Backend integration and validation tests. |
+| `src/content/` and `src/data/` | Reviewed notes, guides, listings, and their catalogues. |
+| `src/lib/` | Existing content rendering/validation, SEO, and game helpers. |
+| `e2e/` | Browser interactions, synthetic fixtures, and production crawl. |
+| `docs/` | Development, content, architecture, and decision guides. |
 
-The old `/courses/*` routes are retained as redirects to `/dashboard/*`; new course work should
-use the dashboard routes.
+## Rendering and checks
 
-## Games
+Public practice discovery is independent of account setup. Course content enters the sitemap
+only when its referenced file can be read; empty sections are `noindex`. Canonical metadata uses
+`NEXT_PUBLIC_SITE_URL`, defaulting to `https://procoderji.com`. Latest videos use the public
+YouTube feed only when `YOUTUBE_CHANNEL_ID` is configured.
 
-The games hub and individual games live under `src/app/games/`. Game components own their
-temporary round state in the browser. Shared question data and digit generation live in
-`src/lib/games.ts`; unit tests cover the generated content. Scores are not sent to a server or
-saved between visits.
+Frontend CI checks types, domain/store behavior, content rules, production builds, desktop/mobile
+flows, and real-site links/metadata. Browser CI also starts a real .NET process with isolated
+SQLite persistence and exercises the Next.js proxy and Google sign-in challenge/public callback
+URL. It uses test client configuration and does not complete Google consent or token exchange.
+Default local browser checks stay frontend-only unless `E2E_DOTNET=1` is set.
 
-## Rendering and search indexing
+CI retains failure screenshots for seven days. Backend CI restores, builds, and tests
+`backend/ProCoderJi.slnx` with .NET 10 and checks PostgreSQL migrations. Controlled test
+authentication requires no Google credentials; live OAuth and production deployment checks
+remain operator tasks. See [Development](development.md#checks).
 
-- Content pages are included in the sitemap only when their referenced file can be read.
-- Empty course sections are marked `noindex` and are omitted from the sitemap.
-- Site-wide metadata and canonical URLs are built from `NEXT_PUBLIC_SITE_URL`, which defaults to
-  `https://procoderji.com`.
-- Latest videos are fetched from YouTube's public RSS feed only when `YOUTUBE_CHANNEL_ID` is set.
-
-## Tests
-
-- `npm test` checks pure helpers, catalogues, file boundaries and content rules.
-- `npm run launch-check` builds the real content and crawls routes, links, metadata and sitemap.
-- `npm run e2e` installs synthetic content, checks desktop/mobile pages and interactions, then
-  restores the original files. It needs Chrome or Edge installed.
-
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for setup and the recommended checks.
-For optional agent instructions, see [the agent tools guide](agent-tools.md).
+Billing, checkout, and paid entitlements are not implemented. Razorpay or Paytm is a future
+provider decision that also needs server-verified payment state, cancellation/support behavior,
+and operational readiness. Keep payment decisions outside educational scoring rules.

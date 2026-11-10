@@ -26,11 +26,13 @@ export function Navbar() {
                         height={32}
                         className="rounded-lg"
                     />
-                    ProCoderJii Notes
+                    ProCoderJii
                 </div>
 
                 {/* Desktop Menu */}
-                <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+                <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-600">
+                    <Link href="/practice" className="inline-flex min-h-11 items-center font-semibold hover:text-primary">Placement practice</Link>
+                    <Link href="/learn" className="inline-flex min-h-11 items-center font-semibold hover:text-primary">My learning</Link>
                     <a href="#about" className="hover:text-primary transition-colors">About</a>
                     <Link href="/games" className="hover:text-primary transition-colors">Games</Link>
                     <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
@@ -48,7 +50,7 @@ export function Navbar() {
                 {/* Mobile Menu Button */}
                 <button
                     type="button"
-                    className="md:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    className="xl:hidden min-h-11 min-w-11 p-2 text-gray-600 hover:text-gray-900 transition-colors"
                     onClick={() => setIsOpen(!isOpen)}
                     aria-label={isOpen ? "Close menu" : "Open menu"}
                     aria-expanded={isOpen}
@@ -66,9 +68,11 @@ export function Navbar() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden border-t border-gray-100 bg-white overflow-hidden"
+                        className="xl:hidden border-t border-gray-100 bg-white overflow-hidden"
                     >
                         <div className="px-6 py-8 flex flex-col gap-6 text-lg font-medium text-gray-600">
+                            <Link href="/practice" onClick={() => setIsOpen(false)} className="inline-flex min-h-11 items-center font-semibold">Placement practice</Link>
+                            <Link href="/learn" onClick={() => setIsOpen(false)} className="inline-flex min-h-11 items-center font-semibold">My learning</Link>
                             <a
                                 href="#about"
                                 className="hover:text-primary transition-colors"

@@ -1,0 +1,626 @@
+[
+  {
+    "id": "quant-discount-price",
+    "topicId": "quantitative",
+    "difficulty": "easy",
+    "prompt": "A backpack marked at Rs 800 is sold at a 15% discount. What is its selling price?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Rs 600"
+      },
+      {
+        "id": "b",
+        "text": "Rs 680"
+      },
+      {
+        "id": "c",
+        "text": "Rs 720"
+      },
+      {
+        "id": "d",
+        "text": "Rs 785"
+      }
+    ],
+    "answerId": "b",
+    "explanation": "15% of 800 is 120. Subtract the discount: 800 - 120 = Rs 680."
+  },
+  {
+    "id": "quant-ratio-share",
+    "topicId": "quantitative",
+    "difficulty": "easy",
+    "prompt": "Two groups have students in the ratio 3:5. There are 64 students in total. How many are in the smaller group?",
+    "options": [
+      {
+        "id": "a",
+        "text": "16"
+      },
+      {
+        "id": "b",
+        "text": "20"
+      },
+      {
+        "id": "c",
+        "text": "24"
+      },
+      {
+        "id": "d",
+        "text": "40"
+      }
+    ],
+    "answerId": "c",
+    "explanation": "There are 3 + 5 = 8 equal parts. Each part is 64 / 8 = 8 students, so the smaller group has 3 x 8 = 24 students."
+  },
+  {
+    "id": "quant-arithmetic-mean",
+    "topicId": "quantitative",
+    "difficulty": "easy",
+    "prompt": "What is the arithmetic mean of 12, 16, 20, and 24?",
+    "options": [
+      {
+        "id": "a",
+        "text": "16"
+      },
+      {
+        "id": "b",
+        "text": "18"
+      },
+      {
+        "id": "c",
+        "text": "20"
+      },
+      {
+        "id": "d",
+        "text": "22"
+      }
+    ],
+    "answerId": "b",
+    "explanation": "Add the four values to get 72, then divide by 4. The mean is 18."
+  },
+  {
+    "id": "quant-average-speed",
+    "topicId": "quantitative",
+    "difficulty": "easy",
+    "prompt": "A bus covers 150 km in 3 hours. What is its average speed over the trip?",
+    "options": [
+      {
+        "id": "a",
+        "text": "30 km/h"
+      },
+      {
+        "id": "b",
+        "text": "45 km/h"
+      },
+      {
+        "id": "c",
+        "text": "50 km/h"
+      },
+      {
+        "id": "d",
+        "text": "60 km/h"
+      }
+    ],
+    "answerId": "c",
+    "explanation": "Average speed is total distance divided by total time: 150 / 3 = 50 km/h."
+  },
+  {
+    "id": "quant-simple-interest",
+    "topicId": "quantitative",
+    "difficulty": "medium",
+    "prompt": "What is the simple interest on Rs 5,000 at 8% per year for 2 years?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Rs 400"
+      },
+      {
+        "id": "b",
+        "text": "Rs 800"
+      },
+      {
+        "id": "c",
+        "text": "Rs 832"
+      },
+      {
+        "id": "d",
+        "text": "Rs 5,800"
+      }
+    ],
+    "answerId": "b",
+    "explanation": "Simple interest = principal x rate x time / 100 = 5,000 x 8 x 2 / 100 = Rs 800. Rs 5,800 is the total amount, not the interest."
+  },
+  {
+    "id": "quant-equal-pump-rates",
+    "topicId": "quantitative",
+    "difficulty": "medium",
+    "prompt": "Six identical pumps fill a tank in 4 hours. At the same constant rate per pump, how long would 3 pumps take to fill the same empty tank?",
+    "options": [
+      {
+        "id": "a",
+        "text": "2 hours"
+      },
+      {
+        "id": "b",
+        "text": "4 hours"
+      },
+      {
+        "id": "c",
+        "text": "6 hours"
+      },
+      {
+        "id": "d",
+        "text": "8 hours"
+      }
+    ],
+    "answerId": "d",
+    "explanation": "The tank requires 6 x 4 = 24 pump-hours of work. With 3 identical pumps, the time is 24 / 3 = 8 hours."
+  },
+  {
+    "id": "reasoning-constant-gap",
+    "topicId": "reasoning",
+    "difficulty": "easy",
+    "prompt": "What comes next in the sequence 4, 9, 14, 19, ...?",
+    "options": [
+      {
+        "id": "a",
+        "text": "22"
+      },
+      {
+        "id": "b",
+        "text": "23"
+      },
+      {
+        "id": "c",
+        "text": "24"
+      },
+      {
+        "id": "d",
+        "text": "25"
+      }
+    ],
+    "answerId": "c",
+    "explanation": "Each term increases by 5. Adding 5 to 19 gives 24."
+  },
+  {
+    "id": "reasoning-doubling",
+    "topicId": "reasoning",
+    "difficulty": "easy",
+    "prompt": "What comes next in the sequence 3, 6, 12, 24, ...?",
+    "options": [
+      {
+        "id": "a",
+        "text": "30"
+      },
+      {
+        "id": "b",
+        "text": "36"
+      },
+      {
+        "id": "c",
+        "text": "42"
+      },
+      {
+        "id": "d",
+        "text": "48"
+      }
+    ],
+    "answerId": "d",
+    "explanation": "Each term is twice the previous term, so the next term is 24 x 2 = 48."
+  },
+  {
+    "id": "reasoning-notebook-deduction",
+    "topicId": "reasoning",
+    "difficulty": "medium",
+    "prompt": "All notebooks are stationery items. No stationery item is edible. Which statement must follow?",
+    "options": [
+      {
+        "id": "a",
+        "text": "No notebook is edible."
+      },
+      {
+        "id": "b",
+        "text": "All stationery items are notebooks."
+      },
+      {
+        "id": "c",
+        "text": "Some notebooks are edible."
+      },
+      {
+        "id": "d",
+        "text": "Everything that is not edible is a notebook."
+      }
+    ],
+    "answerId": "a",
+    "explanation": "Every notebook belongs to the stationery group, and every member of that group is not edible. The other statements reverse or contradict the given relationships."
+  },
+  {
+    "id": "reasoning-shortest-distance",
+    "topicId": "reasoning",
+    "difficulty": "medium",
+    "prompt": "A student walks 4 km north and then 3 km east. What is the straight-line distance from the starting point?",
+    "options": [
+      {
+        "id": "a",
+        "text": "1 km"
+      },
+      {
+        "id": "b",
+        "text": "5 km"
+      },
+      {
+        "id": "c",
+        "text": "7 km"
+      },
+      {
+        "id": "d",
+        "text": "12 km"
+      }
+    ],
+    "answerId": "b",
+    "explanation": "The two legs are perpendicular. By the Pythagorean theorem, the straight-line distance is the square root of (4 squared + 3 squared), which is 5 km."
+  },
+  {
+    "id": "reasoning-three-person-order",
+    "topicId": "reasoning",
+    "difficulty": "easy",
+    "prompt": "A, B, and C stand in a row facing north. A is to the left of B, and B is to the left of C. Who is at the left end?",
+    "options": [
+      {
+        "id": "a",
+        "text": "A"
+      },
+      {
+        "id": "b",
+        "text": "B"
+      },
+      {
+        "id": "c",
+        "text": "C"
+      },
+      {
+        "id": "d",
+        "text": "Cannot be determined"
+      }
+    ],
+    "answerId": "a",
+    "explanation": "The constraints give the order A, B, C from left to right, so A is at the left end."
+  },
+  {
+    "id": "reasoning-letter-shift",
+    "topicId": "reasoning",
+    "difficulty": "medium",
+    "prompt": "A code replaces each letter with the next letter of the alphabet, so MAP becomes NBQ. How is CAR written?",
+    "options": [
+      {
+        "id": "a",
+        "text": "DBS"
+      },
+      {
+        "id": "b",
+        "text": "BZQ"
+      },
+      {
+        "id": "c",
+        "text": "DCS"
+      },
+      {
+        "id": "d",
+        "text": "CBR"
+      }
+    ],
+    "answerId": "a",
+    "explanation": "Shift C to D, A to B, and R to S. CAR becomes DBS."
+  },
+  {
+    "id": "verbal-neither-agreement",
+    "topicId": "verbal",
+    "difficulty": "medium",
+    "prompt": "In formal written English, choose the correct word: Neither of the two proposals ___ ready.",
+    "options": [
+      {
+        "id": "a",
+        "text": "are"
+      },
+      {
+        "id": "b",
+        "text": "were"
+      },
+      {
+        "id": "c",
+        "text": "is"
+      },
+      {
+        "id": "d",
+        "text": "have"
+      }
+    ],
+    "answerId": "c",
+    "explanation": "In formal subject-verb agreement, 'neither' is singular here, so it takes the singular verb 'is'."
+  },
+  {
+    "id": "verbal-concise-meaning",
+    "topicId": "verbal",
+    "difficulty": "easy",
+    "prompt": "A teacher asks for a concise explanation. Which description best matches 'concise'?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Long and repetitive"
+      },
+      {
+        "id": "b",
+        "text": "Brief and clear"
+      },
+      {
+        "id": "c",
+        "text": "Uncertain and hesitant"
+      },
+      {
+        "id": "d",
+        "text": "Technical and difficult"
+      }
+    ],
+    "answerId": "b",
+    "explanation": "A concise explanation expresses the important information clearly in few words."
+  },
+  {
+    "id": "verbal-duration-preposition",
+    "topicId": "verbal",
+    "difficulty": "easy",
+    "prompt": "Choose the correct word: She has been studying ___ two hours.",
+    "options": [
+      {
+        "id": "a",
+        "text": "since"
+      },
+      {
+        "id": "b",
+        "text": "from"
+      },
+      {
+        "id": "c",
+        "text": "during"
+      },
+      {
+        "id": "d",
+        "text": "for"
+      }
+    ],
+    "answerId": "d",
+    "explanation": "Use 'for' with a duration such as two hours. Use 'since' with a starting point, such as 9 a.m."
+  },
+  {
+    "id": "verbal-active-voice",
+    "topicId": "verbal",
+    "difficulty": "medium",
+    "prompt": "Which active-voice sentence preserves the meaning of 'The report was submitted by Nila'?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Nila submitted the report."
+      },
+      {
+        "id": "b",
+        "text": "Nila will submit the report."
+      },
+      {
+        "id": "c",
+        "text": "The report submitted Nila."
+      },
+      {
+        "id": "d",
+        "text": "Nila is submitting the report."
+      }
+    ],
+    "answerId": "a",
+    "explanation": "The original sentence describes a completed past action. 'Nila submitted the report' makes Nila the subject and keeps the same tense and meaning."
+  },
+  {
+    "id": "verbal-attendee-inference",
+    "topicId": "verbal",
+    "difficulty": "medium",
+    "prompt": "Every attendee at a workshop registered in advance. Ravi attended that workshop. Which conclusion follows?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Ravi organized the workshop."
+      },
+      {
+        "id": "b",
+        "text": "Ravi registered in advance."
+      },
+      {
+        "id": "c",
+        "text": "Ravi was the first to register."
+      },
+      {
+        "id": "d",
+        "text": "Everyone who registered attended."
+      }
+    ],
+    "answerId": "b",
+    "explanation": "Ravi is an attendee, and the statement says every attendee registered in advance. It gives no information about registration order or people who registered but did not attend."
+  },
+  {
+    "id": "verbal-ambiguous-meaning",
+    "topicId": "verbal",
+    "difficulty": "easy",
+    "prompt": "If an instruction is ambiguous, what does that mean?",
+    "options": [
+      {
+        "id": "a",
+        "text": "It is always incorrect."
+      },
+      {
+        "id": "b",
+        "text": "It is unusually short."
+      },
+      {
+        "id": "c",
+        "text": "It can be understood in more than one way."
+      },
+      {
+        "id": "d",
+        "text": "It must be followed immediately."
+      }
+    ],
+    "answerId": "c",
+    "explanation": "An ambiguous statement has more than one possible interpretation. Clear wording helps remove the uncertainty."
+  },
+  {
+    "id": "programming-number-type",
+    "topicId": "programming",
+    "difficulty": "easy",
+    "prompt": "In JavaScript, what string does typeof 42 return?",
+    "options": [
+      {
+        "id": "a",
+        "text": "\"integer\""
+      },
+      {
+        "id": "b",
+        "text": "\"number\""
+      },
+      {
+        "id": "c",
+        "text": "\"string\""
+      },
+      {
+        "id": "d",
+        "text": "\"float\""
+      }
+    ],
+    "answerId": "b",
+    "explanation": "JavaScript represents ordinary numeric values such as 42 using the number type. typeof returns the string 'number'."
+  },
+  {
+    "id": "programming-array-length",
+    "topicId": "programming",
+    "difficulty": "easy",
+    "prompt": "In JavaScript, what is the value of [2, 4, 6].length?",
+    "options": [
+      {
+        "id": "a",
+        "text": "2"
+      },
+      {
+        "id": "b",
+        "text": "3"
+      },
+      {
+        "id": "c",
+        "text": "6"
+      },
+      {
+        "id": "d",
+        "text": "12"
+      }
+    ],
+    "answerId": "b",
+    "explanation": "The array contains three elements. Its length is 3, independently of the values stored in those elements."
+  },
+  {
+    "id": "programming-loop-sum",
+    "topicId": "programming",
+    "difficulty": "medium",
+    "prompt": "A program starts total at 0, then adds each integer from 1 through 4, inclusive, once. What is total at the end?",
+    "options": [
+      {
+        "id": "a",
+        "text": "4"
+      },
+      {
+        "id": "b",
+        "text": "6"
+      },
+      {
+        "id": "c",
+        "text": "10"
+      },
+      {
+        "id": "d",
+        "text": "16"
+      }
+    ],
+    "answerId": "c",
+    "explanation": "The loop adds 1 + 2 + 3 + 4. The final total is 10; 'inclusive' means that 4 is included."
+  },
+  {
+    "id": "programming-binary-search",
+    "topicId": "programming",
+    "difficulty": "medium",
+    "prompt": "For n sorted items, binary search repeatedly halves the remaining search range. What is its worst-case time complexity?",
+    "options": [
+      {
+        "id": "a",
+        "text": "O(1)"
+      },
+      {
+        "id": "b",
+        "text": "O(log n)"
+      },
+      {
+        "id": "c",
+        "text": "O(n)"
+      },
+      {
+        "id": "d",
+        "text": "O(n squared)"
+      }
+    ],
+    "answerId": "b",
+    "explanation": "Each comparison removes roughly half of the remaining candidates. The number of halvings needed grows logarithmically with n, so the worst case is O(log n)."
+  },
+  {
+    "id": "programming-value-copy",
+    "topicId": "programming",
+    "difficulty": "medium",
+    "prompt": "In JavaScript: let x = 5; const y = x; x = 8; What is the value of y afterward?",
+    "options": [
+      {
+        "id": "a",
+        "text": "5"
+      },
+      {
+        "id": "b",
+        "text": "8"
+      },
+      {
+        "id": "c",
+        "text": "undefined"
+      },
+      {
+        "id": "d",
+        "text": "The reassignment causes an error."
+      }
+    ],
+    "answerId": "a",
+    "explanation": "The numeric value 5 is copied into y when it is assigned. Reassigning the separate variable x does not change y. x was declared with let, so that reassignment is allowed."
+  },
+  {
+    "id": "programming-stack-order",
+    "topicId": "programming",
+    "difficulty": "easy",
+    "prompt": "An empty stack receives push(10), then push(20), then pop(). Which value does pop() return?",
+    "options": [
+      {
+        "id": "a",
+        "text": "10"
+      },
+      {
+        "id": "b",
+        "text": "20"
+      },
+      {
+        "id": "c",
+        "text": "30"
+      },
+      {
+        "id": "d",
+        "text": "The stack is empty, so it returns nothing."
+      }
+    ],
+    "answerId": "b",
+    "explanation": "A stack uses last-in, first-out order. The last value pushed was 20, so it is the first value popped."
+  }
+]

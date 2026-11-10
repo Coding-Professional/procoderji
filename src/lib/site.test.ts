@@ -42,8 +42,19 @@ test("sitemap lists static and content pages without query URLs or duplicates", 
 		{ url: "https://procoderji.com/games" },
 		{ url: "https://procoderji.com/games/pattern-sprint" },
 		{ url: "https://procoderji.com/games/digit-recall" },
+		{ url: "https://procoderji.com/practice" },
+		{ url: "https://procoderji.com/practice/quantitative" },
+		{ url: "https://procoderji.com/practice/reasoning" },
+		{ url: "https://procoderji.com/practice/verbal" },
+		{ url: "https://procoderji.com/practice/programming" },
 		{ url: "https://procoderji.com/dashboard/btech/cse/sem1/web", lastModified: "2026-10-01" },
 	]);
+});
+
+test("personal learning and authentication routes are excluded from the sitemap", () => {
+	const paths = buildSitemapEntries("https://procoderji.com", []).map((entry) => new URL(entry.url).pathname);
+	assert.ok(paths.includes("/practice"));
+	for (const path of ["/learn", "/account", "/api/platform/auth/session", "/api/platform/signin-google", "/api/platform/progress"]) assert.ok(!paths.includes(path));
 });
 
 test("no sitemap URL mentions the retired .xyz domain", () => {

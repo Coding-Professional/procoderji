@@ -4,14 +4,32 @@ Everything in this file is a **manual step for the site owner**. The code never 
 Vercel settings, and nothing here has been done for you. State of the domains was checked
 read-only on 2026-10-14.
 
+## Frontend and account service
+
+Deploy the Next.js frontend with Node 24. Guest practice works on its own. To enable Google
+accounts, deploy the [.NET 10 backend](../backend/README.md), run its database migrations,
+and set the frontend's server-only `DOTNET_API_URL` to the reachable backend origin. Use
+PostgreSQL or durable storage for account data; an ephemeral serverless filesystem is not a
+production SQLite volume. Data Protection keys persist in the account database and must be
+protected along with it.
+
+Set the backend's `PublicOrigin` to the exact HTTPS frontend origin and register
+`<frontend-origin>/api/platform/signin-google` in the Google OAuth client. Google secrets
+belong in the backend host's secret store. Verify Google consent, callback, cookies, progress
+sync, export, and deletion in the configured deployment before opening accounts to students.
+Razorpay/Paytm checkout is planned; this release does not accept payments.
+
+The DNS observations below are dated owner notes. Recheck them before changing a deployment.
+
 ## 1. Environment variables
 
-Set these in Vercel: **Project -> Settings -> Environment Variables**. Neither value is a secret.
+Set these in Vercel: **Project -> Settings -> Environment Variables**. Google credentials are configured separately on the backend.
 
 | Name | Value | Environments | Notes |
 | --- | --- | --- | --- |
 | `YOUTUBE_CHANNEL_ID` | `UC74q2pzSGuoaikYwnavcGMg` | Production (and Preview if you want videos there) | Enables the "Latest videos" section. Verified against the channel feed for @Pro_coder_ji. Leave it unset to hide the section. |
 | `NEXT_PUBLIC_SITE_URL` | *(do not set)* | - | The site already defaults to `https://procoderji.com`. Only set it to override, e.g. on a staging project. |
+| `DOTNET_API_URL` | Your backend origin | Environments with account sync enabled | Server-only. Leave unset for guest-only practice. Local example: `http://localhost:5100`. |
 
 Steps:
 

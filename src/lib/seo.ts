@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
-export const SITE_NAME = "ProCoderJii Notes";
+export const SITE_NAME = "ProCoderJii";
 /** Social-sharing image (public/og.png, 1200x630). Set on every indexable page: a page-level openGraph replaces the root one. */
 export const OG_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: "ProCoderJii Notes" };
 
 export const SITE_DESCRIPTION =
-  "Free notes and study material for engineering students from the ProCoderJii community.";
+  "Free campus-placement practice, answer explanations, and learning progress for engineering students. Build aptitude, reasoning, verbal, and programming skills.";
 
 interface PageMetaInput {
   title: string;

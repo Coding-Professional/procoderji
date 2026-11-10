@@ -18,3 +18,8 @@ disclosure. There is no bug bounty program at this time.
 
 Run `npm audit` before a release or dependency update. Review advisories and compatible fixes;
 avoid force-upgrading or downgrading unrelated packages to silence an audit finding.
+
+For the .NET backend, also run
+`dotnet list backend/ProCoderJi.slnx package --vulnerable --include-transitive` and keep the
+deployed .NET 10 runtime on a current servicing patch. See [security notes](docs/security.md)
+for the current boundaries and known dependency findings.
