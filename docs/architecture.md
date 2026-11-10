@@ -139,6 +139,10 @@ CI retains failure screenshots for seven days. Backend CI restores, builds, and 
 authentication requires no Google credentials; live OAuth and production deployment checks
 remain operator tasks. See [Development](development.md#checks).
 
+Student portfolios are planned but not implemented. [ADR 0002](decisions/0002-student-portfolios.md)
+records the proposed model, address scheme, and safety rules; [#40](https://github.com/procoderji-com/procoderji/issues/40)
+tracks the work.
+
 Billing, checkout, and paid entitlements are not implemented. Razorpay or Paytm is a future
 provider decision that also needs server-verified payment state, cancellation/support behavior,
 and operational readiness. Keep payment decisions outside educational scoring rules.
