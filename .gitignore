@@ -57,3 +57,15 @@ __pycache__/
 *.swp
 Thumbs.db
 desktop.ini
+
+# ASP.NET Core output, local databases, and test evidence
+**/bin/
+**/obj/
+**/TestResults/
+backend/**/.data/
+backend/**/*.db
+backend/**/*.db-shm
+backend/**/*.db-wal
+backend/**/appsettings.Local.json
+*.user
+*.suo

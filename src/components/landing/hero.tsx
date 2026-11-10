@@ -151,20 +151,24 @@ export function Hero() {
             >
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-primary shadow-sm mb-4">
                     <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                    <span>ProCoderJii YouTube Notes Hub</span>
+                    <span>Free learning. Focused placement practice.</span>
                 </div>
 
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.1] break-words">
-                    Study Material for <br className="hidden sm:block" />
+                    Build skills for <br className="hidden sm:block" />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-gray-900">
-                        ProCoderJii Community
+                        your next opportunity
                     </span>
                 </h1>
 
                 <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                    Free notes and unit-wise guides to go with the ProCoderJii YouTube videos. Pick your branch and
-                    semester to see what is available - more material is added as it is reviewed.
+                    Practise aptitude, reasoning, verbal ability, and programming with clear explanations.
+                    Save your progress, find your next topic, and build a study routine at your own pace.
                 </p>
+                <div className="flex flex-wrap justify-center gap-3">
+                    <Link href="/practice" className="inline-flex min-h-12 items-center rounded-xl bg-gray-900 px-6 py-3 font-bold text-white hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gray-900">Start placement practice</Link>
+                    <Link href="/learn" className="inline-flex min-h-12 items-center rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gray-900">My learning workspace</Link>
+                </div>
             </motion.div>
 
             <Suspense fallback={<SelectorFallback />}>

@@ -1,4 +1,4 @@
-import { EmailLink, Fill, H2, LegalLayout, P, UL, legalMetadata } from "@/components/legal/legal-layout";
+import { EmailLink, H2, LegalLayout, P, UL, legalMetadata } from "@/components/legal/legal-layout";
 import { LEGAL } from "@/lib/legal";
 
 export const metadata = legalMetadata(
@@ -12,8 +12,9 @@ export default function CopyrightPage() {
         <LegalLayout title="Copyright & Takedown">
             <H2>Our content</H2>
             <P>
-                Unless a page says otherwise, the original notes and other content on this site are the copyright of{" "}
-                <Fill field="operatorName" />, all rights reserved. See the Terms of Use for what you may do with it.
+                Source code and content in our public repository follow its MIT License unless a file carries a
+                separate notice. Third-party material retains its own copyright and licensing terms. See the Terms
+                of Use and the repository&apos;s LICENSE and THIRD_PARTY_NOTICES files for reuse information.
             </P>
 
             <H2>Respecting other people&apos;s work</H2>

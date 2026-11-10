@@ -4,6 +4,7 @@ import path from "node:path";
 
 const BASE = process.env.BASE || "http://localhost:3150";
 const CHANNEL = process.env.E2E_CHANNEL || "chrome";
+const FULLSTACK = process.env.E2E_DOTNET === "1";
 const OUT = path.resolve("e2e/.out");
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -12,6 +13,7 @@ const PAGES = [
   "/dashboard/btech/cse/sem2", "/dashboard/btech/cse/sem1/qa-subject",
   "/dashboard/btech/cse/sem1/qa-subject/unit-a", "/dashboard/btech/cse/sem1/qa-subject/unit-b",
   "/guides", "/guides/qa-guide", "/jobs", "/games", "/games/pattern-sprint", "/games/digit-recall",
+  "/learn", "/practice", "/practice/quantitative", "/account",
   "/about", "/privacy", "/terms", "/disclaimer", "/copyright",
   "/nope/zzz", "/dashboard/btech/year3/sem5/ml",
 ];
@@ -116,6 +118,39 @@ async function interaction(name, vpName, fn) {
 }
 const expectTrue = (v, msg) => { if (!v) throw new Error(msg); };
 
+if (FULLSTACK) {
+  await interaction("account: Google challenge and anonymous API boundaries", "desktop", async (page) => {
+    await page.goto(BASE + "/account", { waitUntil: "networkidle" });
+    const googleButton = page.getByRole("button", { name: "Continue with Google", exact: true });
+    await googleButton.waitFor({ state: "visible" });
+    const googleForm = googleButton.locator("xpath=ancestor::form");
+    expectTrue((await googleForm.getAttribute("action")) === "/api/platform/auth/google" && (await googleForm.getAttribute("method")) === "get", "Google sign-in uses a full-page same-origin account challenge");
+    expectTrue((await googleForm.locator('input[name="returnTo"]').inputValue()) === "/learn", "Google sign-in returns to the learning workspace");
+
+    const sessionResponse = await page.request.get(BASE + "/api/platform/auth/session");
+    expectTrue(sessionResponse.status() === 200, "anonymous account session returns 200");
+    const session = await sessionResponse.json();
+    expectTrue(session.configured === true && session.user === null, "fake Google configuration enables sign-in without authenticating a learner");
+    expectTrue(typeof session.csrfToken === "string" && session.csrfToken.length > 0, "session exposes the antiforgery request token");
+    expectTrue((sessionResponse.headers()["cache-control"] ?? "").includes("no-store"), "account responses are not cached");
+
+    // Never visit the external identity provider. Inspect only our challenge response.
+    const challenge = await page.request.get(BASE + "/api/platform/auth/google?returnTo=/learn", { maxRedirects: 0 });
+    expectTrue(challenge.status() === 302, `Google challenge returns a redirect (got ${challenge.status()})`);
+    const location = challenge.headers().location;
+    expectTrue(Boolean(location), "Google challenge provides an authorization URL");
+    const authorization = new URL(location);
+    expectTrue(authorization.hostname === "accounts.google.com", "challenge targets Google's authorization host");
+    expectTrue(authorization.searchParams.get("redirect_uri") === new URL("/api/platform/signin-google", BASE).href, "Google callback points back to the frontend proxy");
+    expectTrue(challenge.headersArray().some((header) => header.name.toLowerCase() === "set-cookie" && header.value.includes(".AspNetCore.Correlation.")), "challenge sets its browser correlation cookie");
+
+    const progress = await page.request.get(BASE + "/api/platform/progress");
+    expectTrue(progress.status() === 401, `anonymous progress remains protected (got ${progress.status()})`);
+    const logout = await page.request.post(BASE + "/api/platform/auth/logout", { headers: { Origin: new URL(BASE).origin }, maxRedirects: 0 });
+    expectTrue(logout.status() === 403, `same-origin logout still requires an antiforgery token (got ${logout.status()})`);
+  });
+}
+
 await interaction("home: mobile menu opens, lists links, closes", "mobile", async (page) => {
   await page.goto(BASE + "/", { waitUntil: "networkidle" });
   const btn = page.getByRole("button", { name: /open menu/i });
@@ -160,6 +195,45 @@ await interaction("games: digit recall accepts an answer", "mobile", async (page
   await page.getByRole("button", { name: "Check answer" }).click();
   expectTrue(await page.getByRole("heading", { name: "Correct!" }).isVisible(), "correct answer feedback appears");
 });
+
+for (const vp of ["desktop", "mobile"]) {
+  await interaction("practice: guest sessions persist and can be deleted", vp, async (page) => {
+    await page.goto(BASE + "/practice/reasoning", { waitUntil: "networkidle" });
+    await page.getByLabel("Session length").selectOption("3");
+    await page.getByRole("button", { name: "Start practice", exact: true }).click();
+    for (let index = 0; index < 3; index++) {
+      await page.getByRole("radio").first().check();
+      await page.getByRole("button", { name: index === 2 ? "Finish session" : "Next question", exact: true }).click();
+    }
+    await page.getByRole("heading", { name: "Session complete", exact: true }).waitFor({ state: "visible" });
+    const review = page.locator("section").filter({ has: page.getByRole("heading", { name: "Answer review", exact: true }) });
+    expectTrue((await review.locator("article").count()) === 3, "every question has an answer review");
+    expectTrue((await review.getByText("Correct answer:", { exact: true }).count()) === 3, "review includes every correct answer");
+    const explanations = await review.locator("article > p:last-child").allTextContents();
+    expectTrue(explanations.length === 3 && explanations.every((text) => text.trim().length > 20), "review includes useful explanations");
+    await page.getByRole("link", { name: "Review progress", exact: true }).click();
+    await page.waitForURL(/\/learn$/);
+    const completedSessions = () => page.locator("section").filter({ has: page.getByRole("heading", { name: "Completed sessions", exact: true }) });
+    await completedSessions().getByText("1", { exact: true }).waitFor({ state: "visible" });
+    await page.reload({ waitUntil: "networkidle" });
+    await completedSessions().getByText("1", { exact: true }).waitFor({ state: "visible" });
+
+    await page.goto(BASE + "/account", { waitUntil: "networkidle" });
+    const dataControls = page.locator("section").filter({ has: page.getByRole("heading", { name: "Your progress data", exact: true }) });
+    let guestDeletionConfirmed = false;
+    page.once("dialog", (dialog) => {
+      guestDeletionConfirmed = dialog.type() === "confirm" && dialog.message().includes("guest practice history");
+      return dialog.accept();
+    });
+    await dataControls.getByRole("button", { name: "Delete progress", exact: true }).click();
+    expectTrue(guestDeletionConfirmed, "guest history deletion requires explicit confirmation");
+    await page.getByText("Practice history deleted for this workspace.", { exact: true }).waitFor({ state: "visible" });
+    await page.goto(BASE + "/learn", { waitUntil: "networkidle" });
+    await completedSessions().getByText("0", { exact: true }).waitFor({ state: "visible" });
+    await page.reload({ waitUntil: "networkidle" });
+    await completedSessions().getByText("0", { exact: true }).waitFor({ state: "visible" });
+  });
+}
 
 for (const vp of ["desktop", "mobile"]) {
   await interaction("hero: pick branch then semester", vp, async (page) => {

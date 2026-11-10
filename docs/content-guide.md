@@ -1,6 +1,7 @@
 # Content guide: adding notes
 
-Notes are plain files in this repository; there is no admin panel or database.
+Learning notes are plain files in this repository; there is no content admin panel. The optional
+account database stores practice progress, not published notes.
 Only publish **reviewed, original** material (or link to the official source).
 Do not paste other people's notes, papers or PDFs without written permission.
 

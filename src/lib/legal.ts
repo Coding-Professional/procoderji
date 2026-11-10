@@ -44,7 +44,7 @@ export const LEGAL: LegalDetails = {
 	// Confirmed by the owner: the planned publication date.
 	effectiveDate: "2023-01-01",
 	// Single source of truth shared with the contact form.
-	contactEmail: "procoderji@gmail.com",
+	contactEmail: CONTACT_EMAIL,
 	grievanceContact: "procoderji@gmail.com",
 	postalAddress: "India",
 };

@@ -1,0 +1,44 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { BACKEND_PATHS, parseBackendOrigin } from "./config.ts";
+
+test("backend proxy accepts explicit root origins for local and hosted .NET services", () => {
+  assert.equal(
+    parseBackendOrigin("http://localhost:5100"),
+    "http://localhost:5100",
+  );
+  assert.equal(
+    parseBackendOrigin("http://backend:8080/"),
+    "http://backend:8080",
+  );
+  assert.equal(
+    parseBackendOrigin("https://api.example.org"),
+    "https://api.example.org",
+  );
+});
+test("backend proxy configuration rejects credentials, URL tricks and non-root destinations", () => {
+  for (const value of [
+    undefined,
+    "",
+    " localhost",
+    "javascript:alert(1)",
+    "https://user:secret@example.org",
+    "https://example.org/api",
+    "https://example.org?token=x",
+    "https://example.org#x",
+    "https://example.org\\evil",
+    "file:///tmp/private",
+  ])
+    assert.equal(parseBackendOrigin(value), null);
+});
+test("backend proxy exposes only the learner API paths", () => {
+  assert.ok(BACKEND_PATHS.has("auth/google"));
+  assert.ok(BACKEND_PATHS.has("progress"));
+  for (const path of [
+    "admin",
+    "../secrets",
+    "auth/unknown",
+    "billing/checkout",
+  ])
+    assert.ok(!BACKEND_PATHS.has(path));
+});

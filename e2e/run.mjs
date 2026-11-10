@@ -1,46 +1,150 @@
-// Browser tests: builds the site with temporary synthetic content, drives Chrome over every
-// page on desktop and mobile, then restores the real data. Usage: npm run e2e
-// Needs Google Chrome installed (set E2E_CHANNEL=msedge to use Edge instead).
+// Browser checks use temporary synthetic content and restore it when they exit.
+// E2E_DOTNET=1 also builds and starts an isolated ASP.NET Core API. Google
+// credentials are fake: checks inspect the challenge redirect without following it.
+// Needs Chrome installed (set E2E_CHANNEL=msedge to use Edge instead).
 import { spawn, spawnSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 
 import * as fixtures from "./fixtures.mjs";
 const ROOT = path.resolve(import.meta.dirname, "..");
-const PORT = process.env.E2E_PORT || "3150";
+const PORT = checkedPort(process.env.E2E_PORT || "3150", "E2E_PORT");
+const BASE = `http://localhost:${PORT}`;
+const FULLSTACK = process.env.E2E_DOTNET === "1";
+const BACKEND_PORT = checkedPort(process.env.E2E_BACKEND_PORT || "5151", "E2E_BACKEND_PORT");
+const BACKEND_ORIGIN = `http://127.0.0.1:${BACKEND_PORT}`;
+const BACKEND_PROJECT = path.join(ROOT, "backend", "src", "ProCoderJi.Api", "ProCoderJi.Api.csproj");
+const BACKEND_DLL = path.join(ROOT, "backend", "src", "ProCoderJi.Api", "bin", "Release", "net10.0", "ProCoderJi.Api.dll");
 const NEXT = path.join(ROOT, "node_modules", "next", "dist", "bin", "next");
+const TEMP_ROOT = fs.realpathSync(os.tmpdir());
+const runEnv = { ...process.env, DOTNET_API_URL: FULLSTACK ? BACKEND_ORIGIN : "" };
 
 let server = null;
-let restored = false;
-const cleanup = () => {
-	if (restored) return;
-	restored = true;
-	if (server?.pid) spawnSync("taskkill", ["/PID", String(server.pid), "/T", "/F"], { stdio: "ignore" });
-	if (server?.pid && process.platform !== "win32") try { process.kill(server.pid); } catch {}
-	fixtures.restore();
-};
-for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => { cleanup(); process.exit(130); });
+let backend = null;
+let activeCommand = null;
+let tempDirectory = null;
+let fixturesApplied = false;
+let cleaned = false;
+
+function checkedPort(value, name) {
+  if (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > 65535) throw new Error(`${name} must be a port from 1 to 65535`);
+  return value;
+}
+
+function stop(child) {
+  if (!child?.pid || child.exitCode !== null || child.signalCode !== null) return;
+  if (process.platform === "win32") {
+    spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
+  } else {
+    try { process.kill(-child.pid, "SIGKILL"); }
+    catch { try { child.kill("SIGKILL"); } catch {} }
+  }
+}
+
+function start(executable, args, env) {
+  const child = spawn(executable, args, {
+    cwd: ROOT, env, detached: process.platform !== "win32", windowsHide: true,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let output = "";
+  const capture = (chunk) => { output = (output + chunk.toString()).slice(-6000); };
+  child.stdout.on("data", capture);
+  child.stderr.on("data", capture);
+  child.on("error", (error) => capture(error.message));
+  return { child, logs: () => output };
+}
+
+function run(executable, args, env = runEnv) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(executable, args, {
+      cwd: ROOT, env, detached: process.platform !== "win32", windowsHide: true, stdio: "inherit",
+    });
+    activeCommand = child;
+    child.once("error", (error) => { if (activeCommand === child) activeCommand = null; reject(error); });
+    child.once("exit", (status, signal) => {
+      if (activeCommand === child) activeCommand = null;
+      if (status === 0) resolve();
+      else reject(new Error(`${path.basename(executable)} ${args[0]} failed (${signal ?? status ?? "unknown exit"})`));
+    });
+  });
+}
+
+async function waitUntilReady(service, url, name, attempts = 60) {
+  for (let index = 0; index < attempts; index++) {
+    if (service.child.exitCode !== null || !service.child.pid) break;
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(1000) });
+      if (response.ok) return;
+    } catch {}
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  throw new Error(`${name} did not become ready at ${url}.\n${service.logs()}`);
+}
+
+function cleanup() {
+  if (cleaned) return;
+  cleaned = true;
+  stop(activeCommand);
+  stop(server?.child);
+  stop(backend?.child);
+  try {
+    if (fixturesApplied) fixtures.restore();
+  } finally {
+    if (tempDirectory) {
+      // Delete only the uniquely generated directory owned by this invocation.
+      const target = path.resolve(tempDirectory);
+      if (path.dirname(target) !== TEMP_ROOT || !path.basename(target).startsWith("procoderji-e2e-")) {
+        throw new Error("Refusing to remove an unexpected E2E temporary directory");
+      }
+      fs.rmSync(target, { recursive: true, force: true });
+    }
+  }
+}
+
+for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => {
+  try { cleanup(); } finally { process.exit(130); }
+});
 
 let code = 1;
 try {
-	fixtures.apply(); // throws (and changes nothing) if real content has uncommitted changes
-	const build = spawnSync(process.execPath, [NEXT, "build"], { cwd: ROOT, stdio: "inherit" });
-	if (build.status !== 0) throw new Error("next build failed");
+  // If the cleanliness check fails, cleanup must never check out real content.
+  fixtures.assertClean();
+  fixturesApplied = true;
+  fixtures.apply();
 
-	server = spawn(process.execPath, [NEXT, "start", "-p", PORT], { cwd: ROOT, stdio: "ignore" });
-	const base = `http://localhost:${PORT}`;
-	for (let i = 0; i < 40; i++) {
-		try { if ((await fetch(base)).ok) break; } catch {}
-		await new Promise((r) => setTimeout(r, 500));
-	}
+  if (FULLSTACK) {
+    if (PORT === BACKEND_PORT) throw new Error("E2E_PORT and E2E_BACKEND_PORT must differ");
+    await run("dotnet", ["restore", BACKEND_PROJECT, "--locked-mode"]);
+    await run("dotnet", ["build", BACKEND_PROJECT, "--configuration", "Release", "--no-restore"]);
+    tempDirectory = fs.mkdtempSync(path.join(TEMP_ROOT, "procoderji-e2e-"));
+    const databasePath = path.join(tempDirectory, "platform.db").replaceAll('"', '""');
+    backend = start("dotnet", [BACKEND_DLL, "--urls", BACKEND_ORIGIN], {
+      ...runEnv,
+      ASPNETCORE_ENVIRONMENT: "Development",
+      DOTNET_ENVIRONMENT: "Development",
+      PublicOrigin: BASE,
+      Database__Provider: "Sqlite",
+      Database__MigrateOnStartup: "true",
+      ConnectionStrings__Platform: `Data Source="${databasePath}"`,
+      Authentication__Google__ClientId: "e2e-client.apps.googleusercontent.com",
+      Authentication__Google__ClientSecret: "e2e-not-a-real-secret",
+      Logging__LogLevel__Default: "Warning",
+    });
+    await waitUntilReady(backend, `${BACKEND_ORIGIN}/api/platform/health`, "ASP.NET Core API");
+    console.log(`Isolated ASP.NET Core API ready at ${BACKEND_ORIGIN}.`);
+  }
 
-	const checks = spawnSync(process.execPath, [path.join(ROOT, "e2e", "checks.mjs")], {
-		cwd: ROOT, stdio: "inherit", env: { ...process.env, BASE: base },
-	});
-	code = checks.status ?? 1;
-} catch (e) {
-	console.error(String(e.message ?? e));
+  await run(process.execPath, [NEXT, "build"]);
+  server = start(process.execPath, [NEXT, "start", "-p", PORT], runEnv);
+  await waitUntilReady(server, BASE, "Next.js", 40);
+  await run(process.execPath, [path.join(ROOT, "e2e", "checks.mjs")], { ...runEnv, BASE });
+  code = 0;
+} catch (error) {
+  console.error(String(error.message ?? error));
 } finally {
-	cleanup();
+  try { cleanup(); }
+  catch (error) { console.error(`E2E cleanup failed: ${String(error.message ?? error)}`); code = 1; }
 }
 process.exit(code);

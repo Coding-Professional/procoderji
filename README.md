@@ -4,13 +4,13 @@
 
 # ProCoderJii Learning Hub
 
-### A focused learning space for engineering students.
+### Practise for campus placements. Understand your answers. Build a study habit.
 
-Browse course resources, learn from practical guides, explore career opportunities, and take a short break with free coding games.
+A student learning workspace with original practice questions, explanations, and saved progress.
 
-[Visit the website](https://procoderji.com) · [Report a bug](https://github.com/Coding-Professional/procoderji/issues/new?template=bug_report.yml) · [Request a feature](https://github.com/Coding-Professional/procoderji/issues/new?template=feature_request.yml)
+[Website](https://procoderji.com) · [Documentation](docs/README.md) · [Roadmap](https://github.com/procoderji-com/procoderji/issues/22) · [Report a bug](https://github.com/procoderji-com/procoderji/issues/new?template=bug_report.yml) · [Propose a question](https://github.com/procoderji-com/procoderji/issues/new?template=practice_question.yml)
 
-[![CI](https://github.com/Coding-Professional/procoderji/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Coding-Professional/procoderji/actions/workflows/ci.yml)
+[![CI](https://github.com/procoderji-com/procoderji/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/procoderji-com/procoderji/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -18,121 +18,179 @@ Browse course resources, learn from practical guides, explore career opportuniti
 </div>
 
 > [!NOTE]
-> The course browser is in place, but no course subjects or notes are published yet. Guides and job listings are also awaiting reviewed content. The two games are playable now. See [Current content](#current-content) for details.
+> This is an early student-product foundation. Four practice topics contain 24 original multiple-choice questions. Practice and browser-saved progress work without login. An optional ASP.NET Core backend provides Google sign-in and account progress when configured. Billing and checkout are not enabled. Course notes, guides, and job listings are still awaiting published content.
+
+![Guest learning workspace before the first session](docs/images/learning-workspace.png)
+
+See the [product roadmap](docs/product-roadmap.md) for student validation, content growth, and future monetization work.
 
 ## Contents
 
-- [About](#about)
-- [Features](#features)
+- [Student experience](#student-experience)
+- [Progress and optional accounts](#progress-and-optional-accounts)
 - [Current content](#current-content)
 - [Getting started](#getting-started)
-- [Commands](#commands)
+- [Commands and CI](#commands-and-ci)
 - [Project structure](#project-structure)
 - [Contributing](#contributing)
-- [Security and privacy](#security-and-privacy)
+- [Privacy and security](#privacy-and-security)
 - [License and attributions](#license-and-attributions)
 
-## About
+## Student experience
 
-ProCoderJii is a learning hub for engineering students. The project brings course material, practical learning guides, career listings, and small browser games together in one Next.js website. It is built to make useful, reviewed resources easier to browse and to give contributors a clear path for adding them.
+ProCoderJii helps engineering students practise placement skills in short sessions and learn from
+their answers. Run the app locally to explore the implemented routes:
 
-The repository is organized for community contributions: start with the guides below, open an issue to discuss a larger change, and submit a pull request when you are ready.
+| Route | What it provides |
+| --- | --- |
+| `/learn` | A learner workspace with practice history, topic progress, and a suggested next step. |
+| `/practice` | Quantitative aptitude, logical reasoning, verbal ability, and programming foundations. |
+| `/practice/[topic]` | Multiple-choice practice sessions with scores, correct answers, and explanations. |
+| `/games` | Pattern Sprint and Digit Recall: short reasoning and memory exercises. |
+| `/account` | Optional Google sign-in and cloud progress controls when the backend is configured. |
+| `/dashboard` | Engineering course, branch, and semester navigation for future reviewed notes. |
 
-## Features
+Questions are original learning exercises. They are independent of employer assessments and do
+not predict or guarantee hiring outcomes. The first question bank is intentionally small so it
+can be reviewed and improved before expanding.
 
-- **Course browser:** organize learning material by course, branch, and semester.
-- **Games:** Pattern Sprint and Digit Recall are free to play at [`/games`](https://procoderji.com/games). No login is required and scores are not saved between visits.
-- **Guides and jobs:** curated sections for practical guides and career opportunities. Only reviewed entries are shown.
-- **Optional video cards:** show recent videos from a public YouTube channel feed when configured.
-- **Content validation:** validate Markdown and MDX content and prevent unsafe HTML from being rendered.
-- **Responsive interface:** browse the site on desktop and mobile.
+## Progress and optional accounts
 
-There are currently no user accounts, database, admin panel, PDF downloads, or chatbot. The contact form opens the visitor's email app; the site does not store submissions.
+Anonymous practice saves the latest **100 completed attempts** in the current browser. The
+learner workspace derives results from answers and the current question bank. Clearing browser
+site data removes that local history, and browser-only progress does not travel between devices.
+
+The optional **ASP.NET Core 10** backend provides Google sign-in and account progress through
+the frontend's same-origin API. Account progress is kept separate from guest progress. The
+backend authenticates requests, validates attempts against the shared question bank, and stores
+each student's own history with Entity Framework Core. See [Backend setup](backend/README.md)
+for local persistence, Google credentials, and production integration checks.
+
+The free practice flow works without provider credentials. Paid plans, payment processing, and
+commercial account entitlements require separate product and provider decisions; this repository
+does not currently enable them.
 
 ## Current content
 
-| Section | Status |
+| Area | Status |
 | --- | --- |
-| Course browser | Course, branch, and semester navigation is available; no subjects or notes are published yet. |
-| Games | Pattern Sprint and Digit Recall are playable without an account. |
+| Placement practice | 24 questions across four topics, explanations, and saved session history. |
+| Short games | Pattern Sprint and Digit Recall are playable without login; their scores are not saved. |
+| Course catalogue | Course, branch, and semester navigation exists; no subjects or notes are published yet. |
 | Guides | No reviewed guides published yet. |
-| Jobs | No reviewed listings published yet. |
-| Videos | Optional; requires a public YouTube channel ID. |
+| Jobs and internships | No reviewed listings published yet. |
+| Latest videos | Optional public YouTube channel feed. |
 
-Sample files under `src/content` are intentionally not registered as published notes. Please follow the [content guide](docs/content-guide.md) before adding learning material.
+Sample notes under `src/content` are intentionally unregistered. Follow the
+[content guide](docs/content-guide.md) before publishing learning material. The
+[roadmap](https://github.com/procoderji-com/procoderji/issues/22) records longer-term priorities.
 
 ## Getting started
 
-### Requirements
-
-- Node.js 22.18 or newer for the full test suite (Node.js 24 is used in CI).
-- npm.
-- Google Chrome for browser tests. Microsoft Edge can be used with `E2E_CHANNEL=msedge`.
-
-Clone the repository and install its locked dependencies:
+Use Node.js **24**, npm, and Google Chrome for frontend browser checks. `.nvmrc` and
+`.node-version` record the supported Node major. Install the **.NET 10 SDK** when working on the
+backend or enabling account synchronization.
 
 ```bash
-git clone https://github.com/Coding-Professional/procoderji.git
+git clone https://github.com/procoderji-com/procoderji.git
 cd procoderji
 npm ci
 npm run dev
 ```
 
-Open <http://localhost:3000>. The site works without environment variables. To show recent videos locally, copy `.env.example` to `.env.local` and configure the public YouTube channel ID.
+Open <http://localhost:3000>. No environment file is needed for practice and local progress.
+External contributors should follow the [fork workflow](CONTRIBUTING.md#set-up-your-fork).
 
-### Environment
+Copy `.env.example` to `.env.local` only when enabling optional services:
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `YOUTUBE_CHANNEL_ID` | No | Enables the latest-video section using the channel's public feed. |
-| `NEXT_PUBLIC_SITE_URL` | No | Overrides the canonical site URL, such as for a staging deployment. |
+| Variable | Purpose |
+| --- | --- |
+| `YOUTUBE_CHANNEL_ID` | Public channel ID for latest-video cards. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site URL override, such as a staging origin. |
+| `DOTNET_API_URL` | Optional server-only backend origin, such as `http://localhost:5100`. |
 
-See [deployment documentation](docs/deployment.md) for hosting and environment details. Never commit secrets or personal credentials.
+Google credentials belong in the backend's user-secrets or environment configuration, never in
+browser variables. Use the [development guide](docs/development.md) for setup and
+troubleshooting, [backend guide](backend/README.md) for accounts, and
+[deployment guide](docs/deployment.md) for hosting.
 
-## Commands
+## Commands and CI
 
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Start the local development server. |
 | `npm run lint` | Run ESLint. |
 | `npm run typecheck` | Check TypeScript types. |
-| `npm test` | Run unit and content validation tests. |
+| `npm test` | Run unit tests, including practice-domain, progress-model/store, and content-validation tests. |
 | `npm run build` | Create the production build. |
-| `npm run launch-check` | Build and crawl the site, checking links and SEO metadata. |
-| `npm run e2e` | Run browser checks in Chrome on desktop and mobile. |
+| `npm run e2e` | Build with synthetic content and check frontend browser behavior; opt into the backend with `E2E_DOTNET=1`. |
+| `npm run launch-check` | Build the real site and crawl links, sitemap, metadata, and SEO rules. |
+| `dotnet test backend/ProCoderJi.slnx --configuration Release` | Run backend integration and validation tests. |
 
-Browser checks use temporary synthetic content and restore their fixtures when they exit. They refuse to run if `src/data` or `src/content` has local changes. The runner and fixtures are documented in [`e2e/run.mjs`](e2e/run.mjs) and the [`e2e/` directory](e2e/).
+| CI job | Coverage |
+| --- | --- |
+| Lint, typecheck, tests and build | TypeScript, code quality, domain/store tests, and the production build. |
+| Browser and SEO checks | Desktop/mobile flows, a real .NET process and frontend proxy, the Google sign-in challenge, and a crawl of links/metadata. |
+| Backend build and tests | The .NET solution build and tests for backend rules and access behavior. |
+
+These jobs need no Google credentials or other external secrets. Browser screenshots are
+retained for seven days when the site-quality job fails. A deployed Google sign-in flow still
+needs the configured-provider checks in [Backend setup](backend/README.md). Browser CI verifies
+the challenge and public callback URL with test client configuration; it does not complete real
+Google consent or token exchange.
+
+The E2E runner refuses to run when `src/data` or `src/content` has local changes because it
+temporarily installs synthetic fixtures. See [Development](docs/development.md#checks).
 
 ## Project structure
 
 ```text
-src/app/          Routes and page layouts (Next.js App Router)
-src/components/   Shared UI and page sections
-src/content/      Markdown and MDX learning content
-src/data/         Course, guide, and job catalogues
-src/lib/          Content validation, rendering, SEO, and game logic
-e2e/              Browser tests, fixtures, and production crawl checks
-docs/             Architecture, content, security, and deployment guides
-.github/          CI workflow, issue forms, and pull-request template
-.agents/          Optional coding-agent instructions
-.claude/          Pointers to canonical agent-tool documentation
-seo/              Site-specific search and editorial planning notes
+src/app/                Next.js routes, metadata, and backend-for-frontend API
+src/features/practice/  Pure practice rules, question-bank adapter, and practice UI
+src/features/progress/  Validated attempt records and browser progress storage
+src/features/account/   Optional account-provider clients and controls
+src/components/         Shared UI and landing-page sections
+src/content/            Markdown and MDX learning content
+src/data/               Course, guide, and job catalogues
+src/lib/                Existing content, rendering, SEO, and game helpers
+backend/                ASP.NET Core 10 API, EF persistence, and backend tests
+shared/practice/        Canonical question JSON used by TypeScript and .NET
+e2e/                    Browser checks, fixtures, and production crawl
+docs/                   Development, architecture, content, and decision guides
+.github/                CI, Dependabot, issue forms, and pull-request template
 ```
 
-For the system overview, read [Architecture](docs/architecture.md). To add or update published notes, read the [Content guide](docs/content-guide.md).
+The Next.js frontend and .NET backend have clear boundaries in one repository. Read
+[Architecture](docs/architecture.md) and [ADR 0001](docs/decisions/0001-student-product-boundaries.md)
+for the boundaries between learning rules, UI, storage, and providers.
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. For larger changes, open an issue first so the scope can be discussed. Bug reports and feature ideas can use the repository's issue forms.
+Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [documentation index](docs/README.md).
+Check open issues before starting a larger feature and describe the student problem it solves.
+Contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-Contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md). Submit original learning content or link to official sources; do not copy notes, job descriptions, papers, or images without permission.
+| Contribution | Start here |
+| --- | --- |
+| Original questions and explanations | [Question proposal](https://github.com/procoderji-com/procoderji/issues/new?template=practice_question.yml), then the [shared question bank](shared/practice/questions.json). |
+| Scoring, validation, or recommendations | [Practice domain](src/features/practice/domain/) and its tests. |
+| Saved progress behavior | [Progress feature](src/features/progress/) and its model/store tests. |
+| Student interface and accessibility | [Practice views](src/features/practice/client/) and shared components. |
+| Optional accounts, synchronization, or persistence | [Backend setup](backend/README.md), [account feature](src/features/account/), and the Next.js `/api/platform/*` proxy. |
+| Original notes, guides, and listings | [Content guide](docs/content-guide.md). |
+| Setup and contributor guidance | `docs/` and the [contribution guide](CONTRIBUTING.md). |
 
-## Security and privacy
+Submit original material or link to official sources. Do not copy notes, question banks, job
+descriptions, papers, or images without permission. Optional coding-agent tools and their
+upstream notices are documented in [docs/agent-tools.md](docs/agent-tools.md) and
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Please report vulnerabilities using the private reporting instructions in [SECURITY.md](SECURITY.md). The site's data handling is described in its [privacy policy](https://procoderji.com/privacy). For local setup and deployment, see [docs/deployment.md](docs/deployment.md).
+## Privacy and security
+
+Read the site's [privacy policy](https://procoderji.com/privacy) for data handling. Report
+vulnerabilities privately using [SECURITY.md](SECURITY.md).
 
 ## License and attributions
 
-The project is available under the [MIT License](LICENSE). Optional coding-agent tools and their upstream license notices are documented in [docs/agent-tools.md](docs/agent-tools.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-The `private` setting in `package.json` prevents publishing this app as an npm package; it does not control GitHub repository visibility.
+The project is available under the [MIT License](LICENSE). Vendored agent tools retain their
+separate upstream notices; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

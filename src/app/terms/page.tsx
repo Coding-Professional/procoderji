@@ -2,7 +2,7 @@ import { EmailLink, Fill, H2, LegalLayout, Operator, P, UL, legalMetadata } from
 
 export const metadata = legalMetadata(
     "Terms of Use",
-    "The terms for using ProCoderJii Notes.",
+    "Review the terms for using ProCoderJii Notes, including acceptable use, ownership of study material, and service limitations.",
     "/terms"
 );
 
@@ -22,10 +22,11 @@ export default function TermsPage() {
 
             <H2>2. Ownership of content</H2>
             <P>
-                Unless a page says otherwise, the notes and other original content on this site are the copyright of{" "}
-                <Fill field="operatorName" />. All rights are reserved. You may read the content online and keep a
-                copy for your own personal, non-commercial study. You may not copy, republish, sell, redistribute or
-                use it to build another product or dataset without our prior written permission.
+                The public project repository is licensed under the MIT License, with separate notices for
+                third-party material. Reuse of source code and repository content follows that license and any
+                applicable file-specific notices. If a learning resource states a separate license, follow its
+                stated terms. The repository license is available at{" "}
+                <a href="https://github.com/procoderji-com/procoderji/blob/main/LICENSE" className="underline">GitHub</a>.
             </P>
             <P>
                 Names, logos and materials belonging to universities, exam bodies, YouTube, Google and other third

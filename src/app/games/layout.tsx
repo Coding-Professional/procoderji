@@ -8,6 +8,7 @@ export default function GamesLayout({ children }: { children: React.ReactNode })
         <nav aria-label="Games" className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <Link href="/games" className="text-lg font-extrabold tracking-tight hover:text-amber-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900">ProCoderJii Games</Link>
           <div className="flex flex-wrap items-center gap-2 text-sm font-semibold">
+            <Link href="/practice" className="inline-flex min-h-11 items-center rounded-lg px-3 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900">Placement practice</Link>
             <Link href="/games" className="inline-flex min-h-11 items-center rounded-lg px-3 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900">All games</Link>
             <Link href="/dashboard" className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"><BookOpen aria-hidden="true" className="h-4 w-4" /> Notes</Link>
           </div>

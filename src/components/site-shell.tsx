@@ -7,6 +7,8 @@ import { LEGAL_PAGES } from "@/lib/legal";
 export function SiteShell({ children, width = "max-w-4xl" }: { children: React.ReactNode; width?: string }) {
     // Only link sections that actually have content.
     const links = [
+        { href: "/practice", label: "Practice" },
+        { href: "/learn", label: "My learning" },
         { href: "/dashboard", label: "Notes" },
         ...(getGuides().length > 0 ? [{ href: "/guides", label: "Guides" }] : []),
         ...(getJobs().length > 0 ? [{ href: "/jobs", label: "Jobs" }] : []),
@@ -20,7 +22,7 @@ export function SiteShell({ children, width = "max-w-4xl" }: { children: React.R
                         <Image src="/logo.png" alt="" width={28} height={28} className="rounded-lg" />
                         ProCoderJii Notes
                     </Link>
-                    <nav aria-label="Main" className="flex items-center gap-5 text-sm font-semibold text-gray-700">
+                    <nav aria-label="Main" className="flex flex-wrap items-center gap-5 text-sm font-semibold text-gray-700">
                         {links.map((l) => (
                             <Link key={l.href} href={l.href} className="underline-offset-4 hover:underline">
                                 {l.label}
