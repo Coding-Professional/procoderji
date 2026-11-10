@@ -53,6 +53,64 @@ public sealed class PortfolioValidatorTests
         }
     }
 
+    // Text with a lone surrogate cannot be stored in JSON that System.Text.Json parses, so these
+    // fixtures list the UTF-16 code units and each runtime builds the string itself.
+    [Fact]
+    public void EveryMalformedTextFixtureGivesTheExpectedProblems()
+    {
+        var cases = Fixtures["malformedText"]!.AsArray();
+        Assert.NotEmpty(cases);
+        foreach (var fixture in cases)
+        {
+            var text = new string(fixture!["codeUnits"]!.AsArray().Select(unit => (char)unit!.GetValue<int>()).ToArray());
+            var field = fixture["field"]!.GetValue<string>();
+            var actual = Sorted(field == "username"
+                ? Validator.ValidateUsername(text)
+                : Validator.Validate(PortfolioWith(field, text), PortfolioMode.Draft));
+            Assert.True(
+                Expected(fixture).SequenceEqual(actual),
+                $"{fixture["name"]}: expected [{string.Join(", ", Expected(fixture))}] but got [{string.Join(", ", actual)}]");
+        }
+    }
+
+    private static JsonNode PortfolioWith(string field, string text) => field switch
+    {
+        "name" => new JsonObject { ["name"] = text },
+        "about" => new JsonObject { ["about"] = text },
+        "skill" => new JsonObject { ["skills"] = new JsonArray(text) },
+        "projectLink" => new JsonObject { ["projects"] = new JsonArray(new JsonObject { ["title"] = "App", ["link"] = text }) },
+        "website" => new JsonObject { ["links"] = new JsonObject { ["website"] = text } },
+        "email" => new JsonObject { ["links"] = new JsonObject { ["email"] = text } },
+        "key" => new JsonObject { [text] = 1 },
+        "linksKey" => new JsonObject { ["links"] = new JsonObject { [text] = 1 } },
+        "projectKey" => new JsonObject { ["projects"] = new JsonArray(new JsonObject { ["title"] = "App", [text] = 1 }) },
+        _ => throw new InvalidDataException($"Unknown fixture field: {field}")
+    };
+
+    [Fact]
+    public void ALoneSurrogateEscapeInParsedJsonIsAProblemNotAnException()
+    {
+        // JsonNode.Parse accepts the text; System.Text.Json only fails later, when a string or a
+        // property name is read, so the validator has to handle the read failing.
+        var json = "{\"name\":\"" + Escape("d800") + "\",\"skills\":[\"" + Escape("dc00") + "\"]}";
+        Assert.Equal(
+            ["name:invalid-characters", "skills[0]:invalid-characters"],
+            Sorted(Validator.Validate(JsonNode.Parse(json), PortfolioMode.Draft)));
+    }
+
+    [Theory]
+    [InlineData("{\"{0}\":1}", "$:invalid-characters")]
+    [InlineData("{\"links\":{\"{0}\":1}}", "links:invalid-characters")]
+    [InlineData("{\"projects\":[{\"title\":\"App\",\"{0}\":1}]}", "projects[0]:invalid-characters")]
+    public void ALoneSurrogateEscapeInAParsedFieldNameIsAProblemNotAnException(string template, string expected)
+    {
+        var node = JsonNode.Parse(template.Replace("{0}", Escape("d800"), StringComparison.Ordinal));
+        Assert.Equal([expected], Sorted(Validator.Validate(node, PortfolioMode.Draft)));
+    }
+
+    // The backslash is built from a char code so this source never contains a surrogate escape.
+    private static string Escape(string hex) => (char)92 + "u" + hex;
+
     [Fact]
     public void ValidatingDoesNotModifyTheInput()
     {

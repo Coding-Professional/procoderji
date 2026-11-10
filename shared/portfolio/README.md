@@ -37,6 +37,16 @@ The codes are `required`, `invalid-type`, `unknown-field`, `too-short`, `too-lon
 `invalid-characters`, `html-like`, `invalid-format`, `invalid-link`, `invalid-host`, `invalid-email`,
 `reserved` and `blocked-word`. Only the first failing check is reported for each field.
 
+Checks run in a fixed order for each field: type, well-formed text, length, blank, then the content rules. The length
+check comes before the blank check, so a field of only spaces cannot exceed its limit.
+
+**Malformed text.** A lone surrogate (half of a UTF-16 pair, such as the text a broken emoji leaves behind) cannot be
+stored or sent, so it is `invalid-characters` in a value, a link, an email or a username. In a field name it is
+reported as `invalid-characters` on the object that holds it, and that object's other fields are skipped.
+System.Text.Json decodes strings and field names lazily, so the .NET validator reads them without throwing and
+reports the same problem. A lone surrogate escape is not portable JSON (editors and many parsers reject it), so the
+`malformedText` fixtures list UTF-16 code units and each runtime builds the string itself.
+
 ## Limits
 
 Lengths count UTF-16 code units, the unit both JavaScript and .NET use, so one emoji counts as 2.

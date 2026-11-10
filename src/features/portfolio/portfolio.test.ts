@@ -33,6 +33,47 @@ test("every shared portfolio fixture gives the expected problems", () => {
     );
 });
 
+// Text with a lone surrogate cannot be stored in JSON that .NET parses, so these fixtures list
+// the UTF-16 code units and each runtime builds the string itself.
+test("every malformed-text fixture gives the expected problems", () => {
+  assert.ok(fixtures.malformedText.length > 0);
+  for (const fixture of fixtures.malformedText) {
+    const text = String.fromCharCode(...fixture.codeUnits);
+    const problems =
+      fixture.field === "username"
+        ? validateUsername(text)
+        : validatePortfolio(portfolioWith(fixture.field, text), "draft");
+    assert.deepEqual(keys(problems), [...fixture.problems].sort(), fixture.name);
+  }
+});
+
+function portfolioWith(field: string, text: string): unknown {
+  switch (field) {
+    case "name": return { name: text };
+    case "about": return { about: text };
+    case "skill": return { skills: [text] };
+    case "projectLink": return { projects: [{ title: "App", link: text }] };
+    case "website": return { links: { website: text } };
+    case "email": return { links: { email: text } };
+    case "key": return { [text]: 1 };
+    case "linksKey": return { links: { [text]: 1 } };
+    case "projectKey": return { projects: [{ title: "App", [text]: 1 }] };
+    default: throw new Error(`Unknown fixture field: ${field}`);
+  }
+}
+
+test("lone surrogate escapes in parsed JSON text are problems", () => {
+  // The backslash comes from a char code so this source never holds a surrogate escape.
+  const escape = (hex: string) => String.fromCharCode(92) + "u" + hex;
+  const values = '{"name":"' + escape("d800") + '","skills":["' + escape("dc00") + '"]}';
+  assert.deepEqual(keys(validatePortfolio(JSON.parse(values), "draft")), [
+    "name:invalid-characters",
+    "skills[0]:invalid-characters",
+  ]);
+  const name = '{"links":{"' + escape("d800") + '":1}}';
+  assert.deepEqual(keys(validatePortfolio(JSON.parse(name), "draft")), ["links:invalid-characters"]);
+});
+
 test("the fixtures cover valid and invalid input and both modes", () => {
   assert.ok(fixtures.usernames.some((f) => f.problems.length === 0));
   assert.ok(fixtures.usernames.some((f) => f.problems.length > 0));

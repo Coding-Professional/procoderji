@@ -61,7 +61,8 @@ public sealed class PortfolioValidator
     {
         const string path = "username";
         var rule = rules.Username;
-        if (!TryString(node, out var value)) return [new(path, "invalid-type")];
+        var read = new List<PortfolioProblem>();
+        if (!Read(read, path, node, out var value)) return read;
         if (IsBlank(value)) return [new(path, "required")];
         if (value.Length < rule.MinLength) return [new(path, "too-short")];
         if (value.Length > rule.MaxLength) return [new(path, "too-long")];
@@ -81,7 +82,7 @@ public sealed class PortfolioValidator
     {
         var problems = new List<PortfolioProblem>();
         if (node is not JsonObject root) return [new("$", "invalid-type")];
-        CheckUnknownFields(problems, "", root, TopLevelFields);
+        if (!CheckUnknownFields(problems, "", root, TopLevelFields)) return problems;
 
         bool RequiredOnPublish(string key) => mode == PortfolioMode.Publish && rules.RequiredForPublish.Contains(key);
         CheckText(problems, "name", Get(root, "name"), "name", RequiredOnPublish("name"));
@@ -126,9 +127,8 @@ public sealed class PortfolioValidator
         if (links.Present)
         {
             if (links.Node is not JsonObject linkObject) problems.Add(new("links", "invalid-type"));
-            else
+            else if (CheckUnknownFields(problems, "links", linkObject, ["github", "linkedin", "website", "email"]))
             {
-                CheckUnknownFields(problems, "links", linkObject, ["github", "linkedin", "website", "email"]);
                 CheckLink(problems, "links.github", Get(linkObject, "github"), "links.github");
                 CheckLink(problems, "links.linkedin", Get(linkObject, "linkedin"), "links.linkedin");
                 CheckLink(problems, "links.website", Get(linkObject, "website"), null);
@@ -143,15 +143,60 @@ public sealed class PortfolioValidator
     private static Field Get(JsonObject source, string key) =>
         source.TryGetPropertyValue(key, out var node) ? new(true, node) : new(false, null);
 
-    private static bool TryString(JsonNode? node, out string value)
+    private enum StringRead { Ok, NotAString, Malformed }
+
+    /// <summary>
+    /// Reads a JSON string without throwing. Depending on the runtime, a lazily decoded string
+    /// that holds a lone surrogate throws while it is read; that and a programmatically built
+    /// string with a lone surrogate are both reported as malformed.
+    /// </summary>
+    private static StringRead TryString(JsonNode? node, out string value)
     {
-        if (node is JsonValue json && json.TryGetValue<string>(out var text) && text is not null)
-        {
-            value = text;
-            return true;
-        }
         value = "";
-        return false;
+        if (node is not JsonValue json) return StringRead.NotAString;
+        string? text;
+        try
+        {
+            if (!json.TryGetValue<string>(out text) || text is null) return StringRead.NotAString;
+        }
+        catch (Exception cause) when (cause is InvalidOperationException or ArgumentException or FormatException)
+        {
+            return StringRead.Malformed;
+        }
+        if (!IsWellFormed(text)) return StringRead.Malformed;
+        value = text;
+        return StringRead.Ok;
+    }
+
+    /// <summary>Adds the problem for an unreadable value; returns true when the value was read.</summary>
+    private static bool Read(List<PortfolioProblem> problems, string path, JsonNode? node, out string value)
+    {
+        switch (TryString(node, out value))
+        {
+            case StringRead.Ok:
+                return true;
+            case StringRead.Malformed:
+                problems.Add(new(path, "invalid-characters"));
+                return false;
+            default:
+                problems.Add(new(path, "invalid-type"));
+                return false;
+        }
+    }
+
+    /// <summary>False when the text has a lone surrogate half, which no encoding can represent.</summary>
+    private static bool IsWellFormed(string text)
+    {
+        for (var i = 0; i < text.Length; i++)
+        {
+            if (char.IsHighSurrogate(text[i]))
+            {
+                if (i + 1 >= text.Length || !char.IsLowSurrogate(text[i + 1])) return false;
+                i++;
+            }
+            else if (char.IsLowSurrogate(text[i])) return false;
+        }
+        return true;
     }
 
     private static bool IsBlank(string value) => value.All(c => c is ' ' or '\t' or '\r' or '\n');
@@ -167,10 +212,29 @@ public sealed class PortfolioValidator
     private int Limit(IReadOnlyDictionary<string, int> table, string key) =>
         table.TryGetValue(key, out var value) ? value : throw new InvalidDataException($"Missing portfolio rule: {key}");
 
-    private static void CheckUnknownFields(List<PortfolioProblem> problems, string path, JsonObject source, IReadOnlyCollection<string> allowed)
+    /// <summary>
+    /// Reports unknown field names. Returns false, after reporting <c>invalid-characters</c> for the
+    /// object itself, when a field name is not well-formed text; the caller then skips that object.
+    /// System.Text.Json decodes property names lazily, so a lone surrogate escape in a parsed name
+    /// throws the first time the object is read.
+    /// </summary>
+    private static bool CheckUnknownFields(List<PortfolioProblem> problems, string path, JsonObject source, IReadOnlyCollection<string> allowed)
     {
-        foreach (var (key, _) in source)
+        List<string> keys;
+        try { keys = source.Select(property => property.Key).ToList(); }
+        catch (Exception cause) when (cause is InvalidOperationException or ArgumentException or FormatException)
+        {
+            problems.Add(new(path.Length == 0 ? "$" : path, "invalid-characters"));
+            return false;
+        }
+        if (keys.Any(key => !IsWellFormed(key)))
+        {
+            problems.Add(new(path.Length == 0 ? "$" : path, "invalid-characters"));
+            return false;
+        }
+        foreach (var key in keys)
             if (!allowed.Contains(key)) problems.Add(new(path.Length == 0 ? key : $"{path}.{key}", "unknown-field"));
+        return true;
     }
 
     private void CheckText(List<PortfolioProblem> problems, string path, Field field, string key, bool required)
@@ -180,13 +244,14 @@ public sealed class PortfolioValidator
             if (required) problems.Add(new(path, "required"));
             return;
         }
-        if (!TryString(field.Node, out var value)) { problems.Add(new(path, "invalid-type")); return; }
+        if (!Read(problems, path, field.Node, out var value)) return;
+        // Length comes before the blank check, so a field of only spaces cannot exceed its limit.
+        if (value.Length > Limit(rules.MaxLength, key)) { problems.Add(new(path, "too-long")); return; }
         if (IsBlank(value))
         {
             if (required) problems.Add(new(path, "required"));
             return;
         }
-        if (value.Length > Limit(rules.MaxLength, key)) { problems.Add(new(path, "too-long")); return; }
         if (control.IsMatch(value) || (!multiline.Contains(key) && value.AsSpan().IndexOfAny('\r', '\n') >= 0))
         {
             problems.Add(new(path, "invalid-characters"));
@@ -199,9 +264,9 @@ public sealed class PortfolioValidator
     private void CheckLink(List<PortfolioProblem> problems, string path, Field field, string? hostKey)
     {
         if (!field.Present) return;
-        if (!TryString(field.Node, out var value)) { problems.Add(new(path, "invalid-type")); return; }
-        if (IsBlank(value)) return;
+        if (!Read(problems, path, field.Node, out var value)) return;
         if (value.Length > Limit(rules.MaxLength, "link")) { problems.Add(new(path, "too-long")); return; }
+        if (IsBlank(value)) return;
         var scheme = rules.Link.Scheme;
         if (linkForbidden.IsMatch(value) || value.Length < scheme.Length || AsciiLower(value[..scheme.Length]) != scheme)
         {
@@ -223,9 +288,9 @@ public sealed class PortfolioValidator
     private void CheckEmail(List<PortfolioProblem> problems, string path, Field field)
     {
         if (!field.Present) return;
-        if (!TryString(field.Node, out var value)) { problems.Add(new(path, "invalid-type")); return; }
-        if (IsBlank(value)) return;
+        if (!Read(problems, path, field.Node, out var value)) return;
         if (value.Length > Limit(rules.MaxLength, "email")) { problems.Add(new(path, "too-long")); return; }
+        if (IsBlank(value)) return;
         if (!email.IsMatch(value)) problems.Add(new(path, "invalid-email"));
     }
 
@@ -240,7 +305,6 @@ public sealed class PortfolioValidator
     private static void CheckObjectItem(List<PortfolioProblem> problems, string path, JsonNode? item, string[] allowed, Action<JsonObject> checkFields)
     {
         if (item is not JsonObject source) { problems.Add(new(path, "invalid-type")); return; }
-        CheckUnknownFields(problems, path, source, allowed);
-        checkFields(source);
+        if (CheckUnknownFields(problems, path, source, allowed)) checkFields(source);
     }
 }
