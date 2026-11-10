@@ -1,15 +1,14 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- Describe the problem and resulting behavior. Link a related issue when one exists. -->
 
 ## Checks
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
-- [ ] `npm test`
-- [ ] `npm run build`
-- [ ] Browser checks, when the change affects routes or interactions
+<!-- List relevant commands and their results; explain anything not run.
+Frontend: lint, typecheck, tests, build. Backend: .NET tests and affected database contracts.
+Shared rules/questions need both runtimes. Routes/interactions need applicable browser/SEO checks.
+Documentation-only changes need wording and link review, not runtime tests. -->
 
 ## Review notes
 
-<!-- Add screenshots for visual changes. Mention content sources and licences when relevant. -->
+<!-- Add screenshots for visible UI changes, content sources/licences, and any operator steps. -->

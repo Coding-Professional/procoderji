@@ -15,6 +15,18 @@ To report a vulnerability privately, follow the repository's [security policy](.
   update rather than forcing a major override or unrelated ESLint downgrade. Audit findings
   change over time; rerun both commands before a release.
 - `playwright-core` (browser tests) is a dev dependency only.
+- The API and test projects reported **no known vulnerable NuGet packages** on 2026-11-10,
+  including transitive dependencies. This is an advisory check, not a guarantee against unknown
+  vulnerabilities.
+
+Repository security alerts, Dependabot security updates and private vulnerability reporting are
+enabled. Version-update PRs are scheduled monthly and grouped; security updates can arrive
+between those runs. NuGet maintenance covers the backend solution as well as npm and GitHub
+Actions maintenance.
+
+The pull-request **Dependency review** check blocks newly introduced high/critical dependency
+vulnerabilities using GitHub's dependency data. It complements the full audits above; it does
+not remove existing advisories or replace review of compatibility and lockfile changes.
 
 ## Accounts and saved progress
 

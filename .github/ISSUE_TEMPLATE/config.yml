@@ -1,1 +1,11 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Questions and setup help
+    url: https://github.com/procoderji-com/procoderji/discussions
+    about: Ask how to use the project or discuss a contribution before opening a bug report.
+  - name: Report a security vulnerability privately
+    url: https://github.com/procoderji-com/procoderji/blob/main/SECURITY.md
+    about: Follow the security policy instead of publishing an unpatched vulnerability in an issue.
+  - name: Report a conduct concern
+    url: https://github.com/procoderji-com/procoderji/blob/main/CODE_OF_CONDUCT.md#report-a-concern
+    about: Use the private reporting channel in the Code of Conduct.

@@ -55,6 +55,11 @@ Questions are original learning exercises. They are independent of employer asse
 not predict or guarantee hiring outcomes. The first question bank is intentionally small so it
 can be reviewed and improved before expanding.
 
+The expanded [placement-game catalogue](https://github.com/procoderji-com/procoderji/issues/24)
+and [student portfolios](https://github.com/procoderji-com/procoderji/issues/40) are tracked as
+separate work. Check those issues for delivery status; the table above describes the current
+student experience.
+
 ## Progress and optional accounts
 
 Anonymous practice saves the latest **100 completed attempts** in the current browser. The
@@ -68,8 +73,8 @@ each student's own history using PostgreSQL, SQL Server, MongoDB, or local-devel
 See [Backend setup](backend/README.md) and [Docker setup](docs/containers.md)
 for local persistence, Google credentials, and production integration checks.
 
-The hosted product uses [Neon PostgreSQL](docs/neon.md), with separate runtime and migration
-connections.
+[Neon PostgreSQL](docs/neon.md) is the selected hosted database, with separate runtime and
+migration connections. The guide covers configuration and production verification.
 
 The free practice flow works without provider credentials. Paid plans, payment processing, and
 commercial account entitlements require separate product and provider decisions; this repository
@@ -137,6 +142,8 @@ troubleshooting, [backend guide](backend/README.md) for accounts, and
 | Lint, typecheck, tests and build | TypeScript, code quality, domain/store tests, and the production build. |
 | Browser and SEO checks | Desktop/mobile flows, a real .NET process and frontend proxy, the Google sign-in challenge, and a crawl of links/metadata. |
 | Backend build and tests | The .NET solution build and tests for backend rules and access behavior. |
+| Database contracts and container smoke | PostgreSQL, SQL Server and MongoDB contracts, Compose configuration, and the packaged API image. |
+| Dependency review | Pull-request dependency changes checked for newly introduced high or critical vulnerabilities. |
 
 These jobs need no Google credentials or other external secrets. Browser screenshots are
 retained for seven days when the site-quality job fails. A deployed Google sign-in flow still
@@ -154,12 +161,14 @@ src/app/                Next.js routes, metadata, and backend-for-frontend API
 src/features/practice/  Pure practice rules, question-bank adapter, and practice UI
 src/features/progress/  Validated attempt records and browser progress storage
 src/features/account/   Optional account-provider clients and controls
+src/features/portfolio/ Shared-rule validation for portfolio fields and usernames
 src/components/         Shared UI and landing-page sections
 src/content/            Markdown and MDX learning content
 src/data/               Course, guide, and job catalogues
 src/lib/                Existing content, rendering, SEO, and game helpers
-backend/                ASP.NET Core 10 API, EF persistence, and backend tests
+backend/                ASP.NET Core 10 API, persistence adapters, and backend tests
 shared/practice/        Canonical question JSON used by TypeScript and .NET
+shared/portfolio/       Portfolio validation rules and cross-runtime test fixtures
 e2e/                    Browser checks, fixtures, and production crawl
 docs/                   Development, architecture, content, and decision guides
 .github/                CI, Dependabot, issue forms, and pull-request template
@@ -174,6 +183,8 @@ for the boundaries between learning rules, UI, storage, and providers.
 Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [documentation index](docs/README.md).
 Check open issues before starting a larger feature and describe the student problem it solves.
 Contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+For setup questions, bug reports and private concerns, follow [Support](SUPPORT.md).
+The [maintainer guide](docs/maintainer-guide.md) explains triage, review and dependency updates.
 
 | Contribution | Start here |
 | --- | --- |
@@ -182,6 +193,7 @@ Contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 | Saved progress behavior | [Progress feature](src/features/progress/) and its model/store tests. |
 | Student interface and accessibility | [Practice views](src/features/practice/client/) and shared components. |
 | Optional accounts, synchronization, or persistence | [Backend setup](backend/README.md), [account feature](src/features/account/), and the Next.js `/api/platform/*` proxy. |
+| Portfolio field and username validation | [Shared rules](shared/portfolio/README.md) and the [portfolio roadmap](https://github.com/procoderji-com/procoderji/issues/40). |
 | Original notes, guides, and listings | [Content guide](docs/content-guide.md). |
 | Setup and contributor guidance | `docs/` and the [contribution guide](CONTRIBUTING.md). |
 

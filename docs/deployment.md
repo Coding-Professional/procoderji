@@ -1,146 +1,191 @@
 # Deployment and launch guide
 
-Everything in this file is a **manual step for the site owner**. The code never changes DNS or
-Vercel settings, and nothing here has been done for you. State of the domains was checked
-read-only on 2026-10-14.
+The Next.js frontend and the optional ASP.NET Core account service deploy separately. Contributors
+can prepare and test changes locally; an operator with authorised hosting-project access completes
+production configuration and rollout.
 
-## Frontend and account service
+## Current production observation
 
-The selected hosted database is **Neon PostgreSQL**. Follow the [Neon setup](neon.md) for pooled
-runtime connections, direct migration connections, and backend environment variables.
+Read-only checks on **2026-11-10** found:
 
-For a container image and local/VPS stacks with PostgreSQL, SQL Server or MongoDB, follow
-[Container setup](containers.md). Vercel containers still need an externally hosted database.
+| Check | Observed result |
+| --- | --- |
+| `https://procoderji.com/` and `/about` | HTTP 200; the live About page still used the older Notes branding. |
+| `/robots.txt` and `/sitemap.xml` | HTTP 200; the live sitemap contained 10 URLs. |
+| `/practice`, `/learn`, and `/api/platform/auth/session` | HTTP 404, although these routes are implemented on the repository's `main` branch. |
+| GitHub deployment history | The latest recorded Production deployment was dated 2026-11-02. |
 
-Deploy the Next.js frontend with Node 24. Guest practice works on its own. To enable Google
-accounts, deploy the [.NET 10 backend](../backend/README.md), run its database migrations,
-and set the frontend's server-only `DOTNET_API_URL` to the reachable backend origin. Use
-PostgreSQL or durable storage for account data; an ephemeral serverless filesystem is not a
-production SQLite volume. Data Protection keys persist in the account database and must be
-protected along with it.
+These observations establish a difference between the repository and the live site. The deployment
+cause is unconfirmed: inspect the actual Vercel project's connected repository, build logs, source
+commit and production assignment. GitHub deployment records alone do not establish the state of
+every Vercel deployment.
+
+[Issue #74](https://github.com/procoderji-com/procoderji/issues/74) tracks restoring the current
+frontend to production. Resolving the hosting configuration requires access to the authorised
+project. Passing repository CI verifies the tested commit; verify the deployed commit and routes
+separately after rollout.
+
+## Frontend project and Git integration
+
+Check the existing hosting project after the repository ownership transfer:
+
+| Setting | Expected configuration |
+| --- | --- |
+| Connected repository | `procoderji-com/procoderji` |
+| Production branch | `main` |
+| Root directory | Repository root; leave the field unset if that represents the root. |
+| Framework | Next.js |
+| Node.js | 24.x, matching `package.json`, `.nvmrc` and CI. |
+| Install command | `npm ci` |
+| Build command | `npm run build` |
+| Output directory | Next.js framework default. |
+
+Use [Vercel's Git integration guide](https://vercel.com/docs/git) to inspect the connected
+repository and production branch. Confirm that the GitHub integration can access the transferred
+organisation repository and that the desired commit appears in deployment history. A missing
+deployment, a failed build and a successful deployment assigned to the wrong domain require
+different fixes.
+
+Check the build's source commit and logs before redeploying. Review the preview for the intended
+commit, follow the project's production deployment procedure, and confirm which deployment the
+production domain serves. [Vercel's Node.js documentation](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions)
+explains the project setting and `package.json` version override.
+
+## Environment variables
+
+Set frontend values in the hosting project's environment settings, separately for Production and
+Preview. Google credentials and database connection strings belong on the backend.
+
+| Name | Value | Environments | Purpose |
+| --- | --- | --- | --- |
+| `YOUTUBE_CHANNEL_ID` | `UC74q2pzSGuoaikYwnavcGMg` | Production, and Preview when desired | Public ID for @Pro_coder_ji; enables the latest-video cards without an API key. Leave unset to hide them. |
+| `NEXT_PUBLIC_SITE_URL` | Unset for the production default | Override only when needed, such as staging | The canonical origin defaults to `https://procoderji.com`. This public value is compiled into the build. |
+| `DOTNET_API_URL` | Reachable backend origin | Environments with account sync enabled | Server-only; leave unset for guest-only practice. Local example: `http://localhost:5100`. |
+
+Create a new deployment after changing environment configuration, then verify the intended
+environment's result. For local development, copy `.env.example` to the ignored `.env.local`.
+The Privacy page discloses YouTube thumbnail requests when the channel feed is enabled.
+
+Keep previews separate from production account data and secrets. A staging canonical override
+does not itself provide deployment protection or prevent indexing; inspect the preview's access
+and robots settings.
+
+## Optional account service and database
+
+**Neon PostgreSQL is the selected hosted database.** Follow [Neon setup](neon.md) for pooled
+runtime connections, direct migration connections and backend settings. Selection and setup
+instructions do not establish that a live Neon project or account service is configured.
+
+Deploy the [.NET 10 backend](../backend/README.md) independently and run its migration/provisioning
+command before enabling account traffic. [Container setup](containers.md) covers the API image and
+database options. A frontend deployment does not start the .NET service.
+
+Use PostgreSQL or other durable configured storage for account data. SQLite needs a durable
+volume; an ephemeral serverless filesystem cannot preserve accounts. Protect the database's
+Data Protection keys along with student data and backups.
 
 Set the backend's `PublicOrigin` to the exact HTTPS frontend origin and register
-`<frontend-origin>/api/platform/signin-google` in the Google OAuth client. Google secrets
-belong in the backend host's secret store. Verify Google consent, callback, cookies, progress
-sync, export, and deletion in the configured deployment before opening accounts to students.
-Razorpay/Paytm checkout is planned; this release does not accept payments.
+`<frontend-origin>/api/platform/signin-google` in the Google OAuth client. Keep Google secrets in
+the backend host's secret store. Verify actual consent, callback, cookies, progress sync, export
+and deletion in the configured deployment before opening accounts to students. Guest practice
+remains usable without those credentials.
 
-The DNS observations below are dated owner notes. Recheck them before changing a deployment.
+## Domains and canonical URLs
 
-## 1. Environment variables
+The code's default canonical origin is `https://procoderji.com`. The apex returned HTTP 200 on
+2026-11-10; the older observation that it redirected to `www` is no longer current.
 
-Set these in Vercel: **Project -> Settings -> Environment Variables**. Google credentials are configured separately on the backend.
+Inspect the live redirect chain and hosting Domains configuration before changing DNS or aliases.
+The intended production setup serves the canonical HTTPS origin directly and redirects alternate
+hosts to that origin while preserving paths. Compare the final served host with canonical tags,
+Open Graph URLs, robots and sitemap entries.
 
-| Name | Value | Environments | Notes |
-| --- | --- | --- | --- |
-| `YOUTUBE_CHANNEL_ID` | `UC74q2pzSGuoaikYwnavcGMg` | Production (and Preview if you want videos there) | Enables the "Latest videos" section. Verified against the channel feed for @Pro_coder_ji. Leave it unset to hide the section. |
-| `NEXT_PUBLIC_SITE_URL` | *(do not set)* | - | The site already defaults to `https://procoderji.com`. Only set it to override, e.g. on a staging project. |
-| `DOTNET_API_URL` | Your backend origin | Environments with account sync enabled | Server-only. Leave unset for guest-only practice. Local example: `http://localhost:5100`. |
-
-Steps:
-
-1. Open the project in Vercel, then Settings, then Environment Variables.
-2. Add `YOUTUBE_CHANNEL_ID` with the value above, tick **Production** (optionally **Preview**), save.
-3. **Redeploy** (Deployments, the latest one, the menu, Redeploy). Values are read at build time, so
-   a change only takes effect after a new deployment.
-4. For local development copy `.env.example` to `.env.local` (that file is git-ignored).
-
-The Privacy page mentions the YouTube thumbnail requests automatically while the variable is set.
-
-## 2. Make `https://procoderji.com` the primary domain (apex), redirect `www` to it
-
-**Why:** today `https://procoderji.com` answers with a **308 redirect to `https://www.procoderji.com`**,
-but the site declares `https://procoderji.com` as its canonical address (canonical tags, Open Graph
-URLs, sitemap, robots). Search engines treat a canonical that redirects elsewhere as a conflicting
-signal. The two must agree.
-
-**No DNS change is needed.** Both hosts already resolve to Vercel (checked 2026-10-14: the apex
-`A` record points at Vercel, and `www` is a `CNAME` to a `vercel-dns` host). Only change DNS if the
-Vercel Domains page itself shows "Invalid Configuration" for a domain, and then use exactly the
-values Vercel displays there.
-
-Steps (button names can vary slightly between Vercel UI versions):
-
-1. Vercel dashboard -> your team -> the **ProCoderJii Notes** project -> **Settings -> Domains**.
-2. Find **`procoderji.com`**. Click **Edit**. Make sure it is set to serve the **Production** deployment
-   directly and is **not** set to "Redirect to another domain". Save.
-3. Find **`www.procoderji.com`**. Click **Edit**. Choose **Redirect to Another Domain**, enter
-   **`procoderji.com`**, and pick **308 Permanent Redirect**. Save.
-4. If the page offers "Set as primary" for `procoderji.com`, choose it.
-5. Wait about a minute, then verify (see below).
-
-**Verify** (run in a terminal; expected results shown):
+Read-only checks:
 
 ```bash
-curl -sI https://procoderji.com/          # expect: HTTP/2 200   (no Location header)
-curl -sI https://www.procoderji.com/      # expect: HTTP/2 308   Location: https://procoderji.com/
-curl -sI http://procoderji.com/           # expect: 308 to https://procoderji.com/
-curl -s  https://procoderji.com/robots.txt   # expect: ... Sitemap: https://procoderji.com/sitemap.xml
+curl -sSI https://procoderji.com/
+curl -sSI https://www.procoderji.com/
+curl -sSI http://procoderji.com/
+curl -sS https://procoderji.com/robots.txt
+curl -sS https://procoderji.com/sitemap.xml
 ```
 
-**Alternative (not recommended):** keep `www` as primary instead. Then set
-`NEXT_PUBLIC_SITE_URL=https://www.procoderji.com` in Vercel, redeploy, and update the apex to redirect
-to `www`. The default in the code, the tests and the docs all assume the apex.
+In Windows PowerShell, use `curl.exe` when `curl` is an alias for another command. Investigate
+unexpected responses before changing settings. Apply DNS values only when the authorised hosting
+project identifies a configuration problem and supplies the required records. Other domains and
+separate portfolio sites need their own verified scope.
 
-## 3. Other domains
+## Checks before rollout
 
-- **`procoderji.xyz`** (checked 2026-10-14): its DNS points at Vercel, but HTTPS fails (no valid
-  certificate), so it does not serve a working site. The code no longer links to it. Choose one:
-  leave it as it is; or in Vercel add it to this project and set it to redirect to
-  `procoderji.com` (Vercel will tell you if DNS verification is needed); or remove its DNS records.
-- **`satyam.procoderji.com`** is a separate portfolio site. Nothing in this project touches it.
-
-## 4. Before you merge and deploy
-
-Run these locally; all must pass:
+Use the [contribution checks](../CONTRIBUTING.md#check-your-change) and inspect CI for the final
+commit. For a frontend release:
 
 ```bash
 npm ci
-npm run typecheck && npm run lint && npm test
-npm run launch-check        # builds the real site and crawls it
-npm run e2e                 # real-Chrome browser tests (needs Chrome installed)
+npm run lint
+npm run typecheck
+npm test
+npm run launch-check
+npm run e2e
 ```
 
-To also run the latest-videos checks (three cards on phones, six on desktop), set the channel for that
-run, for example `YOUTUBE_CHANNEL_ID=UC74q2pzSGuoaikYwnavcGMg npm run e2e` (they need internet access
-to YouTube's feed and are reported as skipped otherwise).
+`launch-check` builds and crawls the real content. Browser checks use synthetic fixtures and
+refuse to run when `src/data` or `src/content` has local changes. Use `E2E_DOTNET=1` for the
+full-stack checks described in [Development](development.md#browser-checks). Backend or shared-rule
+changes also need their .NET tests and relevant database contracts.
 
-**Decide before launch: the dashboard background image.** `public/bg.jpg` (9.8 MB, used faintly behind
-the dashboard) is a stock illustration from Rawpixel Ltd. ("Graduating in the time of covid-19
-background", 2020). Its embedded metadata marks it copyright-protected and links
-`rawpixel.com/services/licenses`; nothing in the repository shows a licence for it. Unless you can show a
-Rawpixel licence that covers this use, replace it (for example with a plain CSS background, which also
-removes 9.8 MB of page weight) or delete it, and note that it already exists in the repository history.
+Latest-video browser checks require internet access and
+`YOUTUBE_CHANNEL_ID=UC74q2pzSGuoaikYwnavcGMg`; they report a skip when it is unset. Run those checks
+when verifying the channel integration. Review the licences and notices for newly added assets
+and content as part of the release.
 
-Then merge the branch via a pull request and let Vercel build it. Review the preview deployment
-first (Vercel normally keeps preview URLs out of search results, but confirm in your project settings).
+## Legal metadata and launch decisions
 
-## 5. Complete the legal pages (they are Drafts until you do)
+The required owner-provided fields in `src/lib/legal.ts` are currently populated. Verify their
+accuracy with the owner, including the effective/publication date and jurisdiction wording,
+instead of replacing them with guessed values or today's date.
 
-Open `src/lib/legal.ts` and set the two remaining fields:
+The code checks whether required values are present and whether the date is valid. That check
+controls the legal pages' draft/indexing state; it does not constitute review of the wording.
+The owner reviews changes to legal text and public-data policy, with qualified advice where
+appropriate. See [ADR 0002](decisions/0002-student-portfolios.md) and
+[issue #48](https://github.com/procoderji-com/procoderji/issues/48) for the outstanding portfolio
+privacy, terms and age decisions.
 
-```ts
-courtsLocation: "City, State",     // whose courts have jurisdiction, e.g. where you live
-effectiveDate: "YYYY-MM-DD",       // the date you publish the pages
-```
+Razorpay/Paytm checkout and paid entitlements remain future work. Keep public-portfolio and
+monetization launch decisions separate from deploying the current guest practice experience.
 
-Both are required. While either is missing every legal page shows a "Draft" banner, is `noindex`
-and stays out of the sitemap; once both are set the banner disappears, the pages become indexable
-and are added to the sitemap automatically. Have a qualified adviser review the texts first.
+## Verify the deployed release
 
-## 6. After the first production deploy
+Record the production deployment URL, source commit and verification date. Test a private
+browser window and a mobile viewport, and check:
 
-1. Confirm the four `curl` checks in section 2 and open `https://procoderji.com/` in a private window.
-2. In Google Search Console add the property (a **Domain** property verified with a DNS TXT record
-   covers apex, `www` and `https`), then submit `https://procoderji.com/sitemap.xml`.
-3. Check the social preview of the home page and one inner page with a share-preview tool (the card
-   should show the ProCoderJii badge from `/og.png`).
-4. Check the "Latest videos" section shows recent uploads from the channel.
-5. Empty sections (`/guides`, `/jobs`, semesters without notes) stay `noindex` and unlinked until you
-   add genuine content; nothing else is required for that.
+| Route or flow | Expected behavior for the current frontend |
+| --- | --- |
+| `/`, `/about` | HTTP 200 with the intended release's content and branding. |
+| `/practice` and a topic session | HTTP 200; a guest can answer questions and read explanations. |
+| `/learn` | HTTP 200; guest progress is visible after a session, and the page remains `noindex`. |
+| `/games/pattern-sprint`, `/games/digit-recall` | Both existing games can complete without login. |
+| `/api/platform/auth/session` | Session JSON; a guest-only deployment returns HTTP 200 with `configured: false`. |
+| `/account` | Optional account controls or an understandable unconfigured state; free practice remains available. |
+| `/robots.txt`, `/sitemap.xml` | HTTP 200, correct canonical origin, current public routes and no private workspace/account URLs in the sitemap. |
+| Legal pages | Owner-approved details, no unintended placeholders, and indexing consistent with configuration. |
 
-## 7. Hosting plan
+If accounts are enabled, separately complete the live Google and account-data checks in the
+backend guide. Check the latest-video cards when configured and the social preview image
+(`/og.png`). Verify internal links and an unknown route's 404 behavior.
 
-The free Vercel Hobby plan is, as far as I know, limited to non-commercial use. A site that carries
-advertising is commercial, so check Vercel's current terms and plans before you apply for AdSense.
-This repository does not change or choose a plan.
+Once the intended release is live, submit the current sitemap through the site's authorised
+Google Search Console property. Keep empty content sections out of indexing until reviewed
+material is published. Recheck these results after later deployments rather than relying on an
+old screenshot or GitHub status.
+
+## Hosting plan and funding configuration
+
+Before adding advertising or paid features, check the hosting provider's current plan terms and
+limits. Vercel's [Hobby plan documentation](https://vercel.com/docs/plans/hobby) restricts that plan
+to personal, non-commercial use. The owner chooses the appropriate plan and approves any new
+spending commitment before a monetized rollout.
+
+The owner is keeping [`.github/FUNDING.yml`](../.github/FUNDING.yml) for future sponsorship links.
+Recipients are not configured yet; add only the owner-selected accounts when ready.
