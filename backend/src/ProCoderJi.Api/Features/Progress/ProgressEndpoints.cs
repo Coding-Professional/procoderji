@@ -17,7 +17,7 @@ public static class ProgressEndpoints
 
     public static void MapProgressEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/platform/progress", async (HttpContext context, ProgressService service) =>
+        app.MapGet("/api/platform/progress", async (HttpContext context, IProgressStore service) =>
         {
             var userId = ApiSecurity.UserId(context);
             if (userId is null) return Results.Json(new { error = "Sign in to sync your progress." }, statusCode: 401);
@@ -25,7 +25,7 @@ public static class ProgressEndpoints
             if (accountError is not null) return accountError;
             return Results.Json(await service.Read(userId.Value, context.RequestAborted));
         });
-        app.MapPost("/api/platform/progress", async (HttpContext context, ProgressService service, PracticeQuestionBank bank, PlatformConfiguration configuration, IAntiforgery antiforgery) =>
+        app.MapPost("/api/platform/progress", async (HttpContext context, IProgressStore service, PracticeQuestionBank bank, PlatformConfiguration configuration, IAntiforgery antiforgery) =>
         {
             var userId = ApiSecurity.UserId(context);
             if (userId is null) return Results.Json(new { error = "Sign in to sync your progress." }, statusCode: 401);
@@ -60,7 +60,7 @@ public static class ProgressEndpoints
             try { return Results.Json(await service.Sync(userId.Value, body.Generation, attempts, context.RequestAborted)); }
             catch (ProgressGenerationConflictException) { return Results.Json(new { error = "Progress was reset on another device. Refresh before syncing." }, statusCode: 409); }
         });
-        app.MapDelete("/api/platform/progress", async (HttpContext context, ProgressService service, PlatformConfiguration configuration, IAntiforgery antiforgery) =>
+        app.MapDelete("/api/platform/progress", async (HttpContext context, IProgressStore service, PlatformConfiguration configuration, IAntiforgery antiforgery) =>
         {
             var userId = ApiSecurity.UserId(context);
             if (userId is null) return Results.Json(new { error = "Sign in to sync your progress." }, statusCode: 401);

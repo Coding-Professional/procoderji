@@ -74,8 +74,10 @@ backend uses cookie authentication; the session endpoint
 `/api/platform/auth/session` returns the current user, configuration status, and an antiforgery
 token. Mutating account requests send that token in `X-CSRF-Token`.
 
-The backend uses EF Core with SQLite for local development. A PostgreSQL provider is available
-through `Database__Provider=Postgres` and the server-side `ConnectionStrings__Platform` setting.
+The backend defaults to SQLite for local development. PostgreSQL (`Postgres`), Microsoft SQL
+Server (`SqlServer`), and MongoDB (`MongoDb`) are deployment options selected with
+`Database__Provider` and server-only `ConnectionStrings__Platform`; MongoDB also needs
+`Database__Name`. The [container guide](containers.md) runs the API and one database together.
 See [Backend setup](../backend/README.md) for database provisioning, Google configuration, and
 production operating requirements.
 

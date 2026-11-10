@@ -1,6 +1,7 @@
 using System.Data;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using ProCoderJi.Api.Data;
@@ -11,7 +12,7 @@ namespace ProCoderJi.Api.Features.Progress;
 public sealed record ProgressSnapshot(IReadOnlyList<ProgressAttemptDto> Attempts, Guid Generation);
 public sealed class ProgressGenerationConflictException : Exception { }
 
-public sealed class ProgressService(IDbContextFactory<PlatformDbContext> factory)
+public sealed class ProgressService(IDbContextFactory<PlatformDbContext> factory) : IProgressStore
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
@@ -94,5 +95,6 @@ public sealed class ProgressService(IDbContextFactory<PlatformDbContext> factory
     private static bool IsRetryable(Exception error) => error is DbUpdateConcurrencyException
         || error is SqliteException { SqliteErrorCode: 5 or 6 }
         || error is PostgresException { SqlState: "40001" or "40P01" or "23505" }
+        || error is SqlException { Number: 1205 or 2601 or 2627 or 3960 }
         || error is DbUpdateException { InnerException: not null } update && IsRetryable(update.InnerException!);
 }

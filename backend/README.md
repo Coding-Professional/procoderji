@@ -54,9 +54,27 @@ Attempts store raw question IDs and selected answers, not trusted scores. The ba
 
 Serializable transactions and a state concurrency token serialize sync/reset races. A reset rotates the generation, so old devices cannot silently restore deleted cloud history. Attempts are keyed by account plus session UUID, and the newest 100 are retained per account. Requests are limited to 100 attempts and 256 KiB.
 
-## PostgreSQL and deployment
+## Choose a database
 
-The same EF Core model and initial migration support PostgreSQL through Npgsql. Supply backend-only configuration:
+**Neon PostgreSQL is the selected hosted database.** Follow [Neon setup](../docs/neon.md) for
+the runtime and migration connections. The other providers remain available for contributors.
+
+Choose one provider per deployment. These are operator settings; students use the same account
+and progress API with every provider. SQLite remains the default for development without Docker.
+
+| `Database__Provider` | Storage | Required configuration |
+| --- | --- | --- |
+| `Sqlite` | Local SQLite file through EF Core | Optional `ConnectionStrings__Platform`; defaults to `Data/procoderji.db`. |
+| `Postgres` | PostgreSQL through EF Core/Npgsql | `ConnectionStrings__Platform` with a PostgreSQL connection string. |
+| `SqlServer` | Microsoft SQL Server through EF Core | `ConnectionStrings__Platform` with a SQL Server connection string. |
+| `MongoDb` | MongoDB through the official .NET driver | MongoDB URI in `ConnectionStrings__Platform`, plus `Database__Name`. |
+
+The API, migrations, and selected database can run together with Docker Compose, in separate
+containers with persistent database volumes. Follow [Container setup](../docs/containers.md).
+Vercel container deployments need an external durable database; Compose volumes are for a
+Docker host. Changing providers does not copy existing data or sessions between databases.
+
+Example backend-only PostgreSQL configuration:
 
 ```text
 Database__Provider=Postgres
@@ -64,15 +82,37 @@ ConnectionStrings__Platform=Host=YOUR_HOST;Database=YOUR_DATABASE;Username=YOUR_
 PublicOrigin=https://YOUR_FRONTEND_ORIGIN
 ```
 
+For SQL Server, use `Database__Provider=SqlServer` and a connection string such as
+`Server=YOUR_HOST;Database=procoderji;User Id=YOUR_USER;Password=YOUR_PASSWORD;Encrypt=True;TrustServerCertificate=False`.
+For MongoDB, use `Database__Provider=MongoDb`, `Database__Name=procoderji`, and
+`ConnectionStrings__Platform=mongodb+srv://YOUR_USER:YOUR_PASSWORD@YOUR_HOST/`.
+Keep actual credentials in user-secrets or the hosting secret store.
+
+## Provision and deploy
+
 Run migrations deliberately before starting production replicas:
 
 ```bash
 dotnet run --project backend/src/ProCoderJi.Api --no-launch-profile -- --migrate
 ```
 
-This command uses the current environment's database/provider settings and exits after migration. Development and Testing apply migrations automatically; production does so only for `--migrate` or explicit `Database__MigrateOnStartup=true`. Back up the database before schema changes. Keep versioned migrations and the model snapshot together, and validate changes against both providers.
+This command uses the current environment's database/provider settings and exits after
+provisioning. It applies EF migrations for relational databases and creates MongoDB's unique
+Google-subject index for MongoDB. Development and Testing provision automatically; production
+does so only for `--migrate` or explicit `Database__MigrateOnStartup=true`. Back up the database
+before schema changes. Shared relational migrations contain provider-specific SQL where needed;
+keep both the default and SQL Server model snapshots current and run the provider checks.
 
-Data Protection keys are stored in the application database with a stable application name, so replicas using the same database can decrypt sessions. Protect database access, backups, and key material at rest, and isolate key rings between deployments. Restrict direct network access to the backend and use the frontend BFF as the public entry point. Configure infrastructure rate limits, HTTPS, operational monitoring, and backups before public account launch.
+Data Protection keys are stored in the selected application database with a stable application
+name, so replicas using the same database can decrypt sessions. Relational storage uses EF Core;
+MongoDB uses a key collection and an XML repository. Protect database access, backups, and key
+material at rest, and isolate key rings between deployments. Restrict direct network access to
+the backend and use the frontend BFF as the public entry point. Configure infrastructure rate
+limits, HTTPS, operational monitoring, and backups before public account launch.
+
+MongoDB stores each account's progress generation, revision and 100 retained attempts in one
+document. Conditional atomic writes preserve reset and immutable-attempt behavior without a
+replica set or multi-document transactions. See [ADR 0003](../docs/decisions/0003-container-database-options.md).
 
 Razorpay or Paytm integration is planned for a later billing slice. No payment, subscription activation, or live checkout is implemented in this API yet.
 
@@ -84,7 +124,13 @@ dotnet test backend/ProCoderJi.slnx --no-restore
 
 The default suite creates isolated SQLite databases and uses test-only authentication registered by `WebApplicationFactory` in the test assembly. The API has no test-header login path. Tests cover anonymous behavior, Google challenge URL construction, CSRF/origin checks, account isolation, immutable sync, generation resets, stale requests, question validation, and retention.
 
-To run the same API contract tests against a **disposable PostgreSQL instance**, set `PROCODERJI_TEST_POSTGRES` to its administrative test connection string before running the command. Each factory creates and drops only its own randomly named schema. Do not point test configuration at a production database. A real Google login still needs operator-provided credentials and an end-to-end callback check in the configured deployment.
+To run the same API contract tests against a disposable server, set exactly one of
+`PROCODERJI_TEST_POSTGRES`, `PROCODERJI_TEST_SQLSERVER`, or `PROCODERJI_TEST_MONGODB` to its
+administrative test connection string. Each factory creates and drops only its randomly named
+test schema/database. The MongoDB setting also enables its persistence and Data Protection
+integration tests, which otherwise report skipped. Never use a production database for these
+tests. The backend-container workflow exercises all three servers and the packaged API.
+A real Google login still needs operator-provided credentials and a live callback check.
 
 ## References
 

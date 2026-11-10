@@ -2,10 +2,12 @@ using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Data.Sqlite;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.EntityFrameworkCore;
 using ProCoderJi.Api.Configuration;
 using ProCoderJi.Api.Data;
+using ProCoderJi.Api.Data.Mongo;
 using ProCoderJi.Api.Features.Accounts;
 using ProCoderJi.Api.Features.Practice;
 using ProCoderJi.Api.Features.Progress;
@@ -15,24 +17,22 @@ builder.Services.AddSingleton(services => PlatformConfiguration.From(services.Ge
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow);
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 256 * 1024);
 
-builder.Services.AddDbContextFactory<PlatformDbContext>((services, options) =>
-{
-    var configuration = services.GetRequiredService<IConfiguration>();
-    var provider = configuration["Database:Provider"] ?? "Sqlite";
-    var connection = configuration.GetConnectionString("Platform");
-    if (provider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
-    {
-        var sqlite = new SqliteConnectionStringBuilder(connection ?? "Data Source=Data/procoderji.db");
-        if (sqlite.DataSource != ":memory:" && !Path.IsPathRooted(sqlite.DataSource)) sqlite.DataSource = Path.Combine(services.GetRequiredService<IHostEnvironment>().ContentRootPath, sqlite.DataSource);
-        if (sqlite.DataSource != ":memory:") Directory.CreateDirectory(Path.GetDirectoryName(sqlite.DataSource)!);
-        options.UseSqlite(sqlite.ConnectionString);
-    }
-    else if (provider.Equals("Postgres", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(connection)) options.UseNpgsql(connection);
-    else throw new InvalidOperationException("Choose Sqlite or configure Postgres with ConnectionStrings:Platform.");
-});
-builder.Services.AddDataProtection().SetApplicationName("ProCoderJi.Platform").PersistKeysToDbContext<PlatformDbContext>();
-builder.Services.AddSingleton<PracticeQuestionBank>();
+// Resolve the selected provider from DI after configuration is complete. Only the selected
+// adapter connects; account and progress endpoints do not depend on a database technology.
+builder.Services.AddRelationalDatabase();
+builder.Services.AddMongoDatabase();
+builder.Services.AddScoped<RelationalAccountStore>();
 builder.Services.AddScoped<ProgressService>();
+builder.Services.AddScoped<IAccountStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
+    ? services.GetRequiredService<MongoAccountStore>() : services.GetRequiredService<RelationalAccountStore>());
+builder.Services.AddScoped<IProgressStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
+    ? services.GetRequiredService<MongoProgressStore>() : services.GetRequiredService<ProgressService>());
+builder.Services.AddDataProtection().SetApplicationName("ProCoderJi.Platform");
+builder.Services.AddOptions<KeyManagementOptions>().Configure<IServiceProvider>((options, services) =>
+    options.XmlRepository = IsMongo(services.GetRequiredService<IConfiguration>())
+        ? services.GetRequiredService<MongoXmlRepository>()
+        : new EntityFrameworkCoreXmlRepository<PlatformDbContext>(services, services.GetRequiredService<ILoggerFactory>()));
+builder.Services.AddSingleton<PracticeQuestionBank>();
 
 var authentication = builder.Services.AddAuthentication(options =>
 {
@@ -56,8 +56,8 @@ var authentication = builder.Services.AddAuthentication(options =>
         OnValidatePrincipal = async context =>
         {
             if (!Guid.TryParse(context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier), out var id)) { context.RejectPrincipal(); return; }
-            await using var db = await context.HttpContext.RequestServices.GetRequiredService<IDbContextFactory<PlatformDbContext>>().CreateDbContextAsync(context.HttpContext.RequestAborted);
-            if (!await db.Users.AnyAsync(user => user.Id == id, context.HttpContext.RequestAborted)) context.RejectPrincipal();
+            var accounts = context.HttpContext.RequestServices.GetRequiredService<IAccountStore>();
+            if (!await accounts.Exists(id, context.HttpContext.RequestAborted)) context.RejectPrincipal();
         },
     };
 });
@@ -100,8 +100,10 @@ var platform = app.Services.GetRequiredService<PlatformConfiguration>();
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing") || builder.Configuration.GetValue<bool>("Database:MigrateOnStartup") || args.Contains("--migrate"))
 {
     await using var scope = app.Services.CreateAsyncScope();
-    var db = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
-    await db.Database.MigrateAsync();
+    if (IsMongo(app.Configuration))
+        await scope.ServiceProvider.GetRequiredService<MongoPlatformDatabase>().InitializeAsync();
+    else
+        await scope.ServiceProvider.GetRequiredService<PlatformDbContext>().Database.MigrateAsync();
 }
 if (args.Contains("--migrate")) return;
 
@@ -127,5 +129,8 @@ app.MapAccountEndpoints();
 app.MapProgressEndpoints();
 app.MapGet("/api/platform/health", () => Results.Json(new { status = "ok" }));
 app.Run();
+
+static bool IsMongo(IConfiguration configuration) =>
+    string.Equals(configuration["Database:Provider"], "MongoDb", StringComparison.OrdinalIgnoreCase);
 
 public partial class Program { }

@@ -34,6 +34,8 @@ yarn-error.log*
 .env*
 # The committed example documents the variables; it holds no secrets.
 !.env.example
+/deploy/container.env
+/deploy/neon.env
 
 # vercel
 .vercel

@@ -1,0 +1,24 @@
+# The backend build needs only these repository files. Keep frontend dependencies,
+# test fixtures, local credentials and generated databases out of the build context.
+**
+!global.json
+!backend/
+!backend/Dockerfile
+!backend/src/
+!backend/src/ProCoderJi.Api/
+!backend/src/ProCoderJi.Api/**
+!shared/
+!shared/practice/
+!shared/practice/questions.json
+!shared/portfolio/
+!shared/portfolio/rules.json
+**/bin/**
+**/obj/**
+**/.data/**
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/appsettings.Local.json
+**/.env*
+**/*.user
+**/*.suo

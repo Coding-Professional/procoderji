@@ -1,0 +1,15 @@
+# Neon is the selected hosted database. No local database service or volume is needed.
+services:
+  api:
+    environment:
+      # Development/Testing auto-migrate; the pooled runtime must run in Production.
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__Provider: Postgres
+      Database__MigrateOnStartup: "false"
+      ConnectionStrings__Platform: ${NEON_RUNTIME_CONNECTION_STRING:?Set NEON_RUNTIME_CONNECTION_STRING in deploy/neon.env}
+  migrate:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__Provider: Postgres
+      Database__MigrateOnStartup: "false"
+      ConnectionStrings__Platform: ${NEON_MIGRATION_CONNECTION_STRING:?Set NEON_MIGRATION_CONNECTION_STRING in deploy/neon.env}
