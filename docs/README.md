@@ -16,6 +16,7 @@ synchronization is a separate capability; paid billing is future work.
 | Add original notes, guides, or career listings | [Content guide](content-guide.md) |
 | Run the .NET API, Google sign-in, and account persistence | [Backend setup](../backend/README.md) |
 | Configure production hosting and the site domain | [Deployment](deployment.md) |
+| Run the API and choose a database with Docker | [Containers](containers.md) |
 | Report a vulnerability privately | [Security policy](../SECURITY.md) |
 | Review implementation security notes | [Security notes](security.md) |
 | Understand optional coding-agent tools | [Agent tools](agent-tools.md) |
@@ -24,7 +25,8 @@ synchronization is a separate capability; paid billing is future work.
 
 Architecture decisions describe a problem, the chosen boundary, and its consequences. Start with
 [ADR 0001: student-product boundaries](decisions/0001-student-product-boundaries.md), then
-[ADR 0002: student portfolios](decisions/0002-student-portfolios.md) (proposed). Add a new
+[ADR 0002: student portfolios](decisions/0002-student-portfolios.md) (proposed), and
+[ADR 0003: containers and database options](decisions/0003-container-database-options.md). Add a new
 decision record when a change affects persistence, account requirements, payment handling, or
 other feature boundaries; update the architecture guide when the implementation changes.
 

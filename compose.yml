@@ -1,0 +1,39 @@
+# Add one provider override; see docs/containers.md. The base also supports an
+# externally hosted database through DATABASE_PROVIDER/PLATFORM_CONNECTION_STRING.
+x-api-environment: &api-environment
+  ASPNETCORE_ENVIRONMENT: ${API_ENVIRONMENT:-Development}
+  ASPNETCORE_HTTP_PORTS: "8080"
+  PublicOrigin: ${PUBLIC_ORIGIN:-http://localhost:3000}
+  Database__Provider: ${DATABASE_PROVIDER:-Postgres}
+  Database__Name: ${DATABASE_NAME:-procoderji}
+  Database__MigrateOnStartup: "false"
+  ConnectionStrings__Platform: ${PLATFORM_CONNECTION_STRING:-}
+  Authentication__Google__ClientId: ${GOOGLE_CLIENT_ID:-}
+  Authentication__Google__ClientSecret: ${GOOGLE_CLIENT_SECRET:-}
+
+x-api-image: &api-image
+  image: procoderji-api:local
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  init: true
+  read_only: true
+  tmpfs:
+    - /tmp
+
+services:
+  migrate:
+    <<: *api-image
+    environment: *api-environment
+    command: ["--migrate"]
+    restart: "no"
+
+  api:
+    <<: *api-image
+    environment: *api-environment
+    ports:
+      - "127.0.0.1:${API_PORT:-5100}:8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped

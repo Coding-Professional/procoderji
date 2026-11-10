@@ -38,7 +38,9 @@ public sealed class PlatformDbContext(DbContextOptions<PlatformDbContext> option
             {
                 table.HasCheckConstraint("CK_Attempt_Duration", "\"DurationSeconds\" >= 0 AND \"DurationSeconds\" <= 7200");
                 table.HasCheckConstraint("CK_Attempt_Topic", "\"TopicId\" IN ('quantitative', 'reasoning', 'verbal', 'programming')");
-                table.HasCheckConstraint("CK_Attempt_Payload", "length(\"QuestionIdsJson\") <= 4096 AND length(\"ResponsesJson\") <= 8192");
+                table.HasCheckConstraint("CK_Attempt_Payload", Database.IsSqlServer()
+                    ? "DATALENGTH([QuestionIdsJson]) <= 8192 AND DATALENGTH([ResponsesJson]) <= 16384"
+                    : "length(\"QuestionIdsJson\") <= 4096 AND length(\"ResponsesJson\") <= 8192");
             });
         });
     }

@@ -13,8 +13,10 @@ flowchart TD
   Frontend --> Local[Validated browser progress]
   Frontend --> BFF[Same-origin platform proxy]
   BFF --> API[ASP.NET Core API]
-  API --> EF[EF Core account persistence]
-  EF --> Database[SQLite development or PostgreSQL]
+  API --> Stores[Account and progress adapters]
+  Stores --> EF[EF Core]
+  EF --> Database[SQLite development or PostgreSQL or SQL Server]
+  Stores --> Mongo[MongoDB driver]
   API --> Google[Google sign-in]
   Questions[Shared question JSON] --> Practice
   Questions --> API
@@ -87,11 +89,17 @@ backend validates authentication, antiforgery state, attempt structure, and ques
 Private account responses must not be cached as public content. No privileged account credential
 belongs in a browser variable.
 
-EF Core uses SQLite for local development and supports PostgreSQL through explicit operator
-configuration. Data Protection keys are persisted through EF in the same database; deployments
-with replicas must share the configured persistence and protect its access. Database schema
+SQLite is the local-development default. Operators can select PostgreSQL or SQL Server through
+EF Core, or MongoDB through its document adapter. Account and progress endpoints depend on
+storage contracts rather than a provider. MongoDB uses single-document conditional writes for
+immutable sync, retention, and reset generations. Data Protection keys persist in the selected
+database; deployments with replicas share that store and protect its access. Database schema
 provisioning, Google setup, and production checks are documented in
 [Backend setup](../backend/README.md).
+
+The [container guide](containers.md) packages the API and starts it with one database in
+separate Compose services with persistent volumes. Vercel container hosting uses an external
+database. [ADR 0003](decisions/0003-container-database-options.md) records these boundaries.
 
 ## Reviewed content
 
@@ -138,6 +146,10 @@ CI retains failure screenshots for seven days. Backend CI restores, builds, and 
 `backend/ProCoderJi.slnx` with .NET 10 and checks PostgreSQL migrations. Controlled test
 authentication requires no Google credentials; live OAuth and production deployment checks
 remain operator tasks. See [Development](development.md#checks).
+
+The backend-container workflow runs the API contract against PostgreSQL, SQL Server and MongoDB,
+checks provider migrations and shared MongoDB keys, validates Compose options, and builds and
+smoke-tests the non-root API image. It runs when backend, shared data, or container files change.
 
 Student portfolios are planned but not implemented. [ADR 0002](decisions/0002-student-portfolios.md)
 records the proposed model, address scheme, and safety rules; [#40](https://github.com/procoderji-com/procoderji/issues/40)

@@ -64,7 +64,8 @@ site data removes that local history, and browser-only progress does not travel 
 The optional **ASP.NET Core 10** backend provides Google sign-in and account progress through
 the frontend's same-origin API. Account progress is kept separate from guest progress. The
 backend authenticates requests, validates attempts against the shared question bank, and stores
-each student's own history with Entity Framework Core. See [Backend setup](backend/README.md)
+each student's own history using PostgreSQL, SQL Server, MongoDB, or local-development SQLite.
+See [Backend setup](backend/README.md) and [Docker setup](docs/containers.md)
 for local persistence, Google credentials, and production integration checks.
 
 The free practice flow works without provider credentials. Paid plans, payment processing, and

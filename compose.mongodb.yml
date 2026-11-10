@@ -1,0 +1,32 @@
+x-database-environment: &database-environment
+  Database__Provider: MongoDb
+  Database__Name: procoderji
+  ConnectionStrings__Platform: mongodb://procoderji:${MONGO_PASSWORD:?Set MONGO_PASSWORD in deploy/container.env}@db:27017/procoderji?authSource=admin
+
+services:
+  api:
+    environment: *database-environment
+  migrate:
+    environment: *database-environment
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: procoderji
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?Set MONGO_PASSWORD in deploy/container.env}
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mongosh --quiet --username "$${MONGO_INITDB_ROOT_USERNAME}" --password "$${MONGO_INITDB_ROOT_PASSWORD}" --authenticationDatabase admin --eval 'if (db.adminCommand({ping:1}).ok !== 1) quit(1)'
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  mongodb-data:

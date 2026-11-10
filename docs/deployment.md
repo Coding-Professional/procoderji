@@ -6,6 +6,9 @@ read-only on 2026-10-14.
 
 ## Frontend and account service
 
+For a container image and local/VPS stacks with PostgreSQL, SQL Server or MongoDB, follow
+[Container setup](containers.md). Vercel containers still need an externally hosted database.
+
 Deploy the Next.js frontend with Node 24. Guest practice works on its own. To enable Google
 accounts, deploy the [.NET 10 backend](../backend/README.md), run its database migrations,
 and set the frontend's server-only `DOTNET_API_URL` to the reachable backend origin. Use

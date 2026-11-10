@@ -19,7 +19,7 @@ public sealed class InitialPlatform : Migration
         migration.CreateIndex("IX_Users_GoogleSubject", "Users", "GoogleSubject", unique: true);
         migration.CreateTable("DataProtectionKeys", columns: table => new
         {
-            Id = table.Column<int>(nullable: false).Annotation("Sqlite:Autoincrement", true).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            Id = table.Column<int>(nullable: false).Annotation("Sqlite:Autoincrement", true).Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn).Annotation("SqlServer:Identity", "1, 1"),
             FriendlyName = table.Column<string>(nullable: true), Xml = table.Column<string>(nullable: true),
         }, constraints: table => table.PrimaryKey("PK_DataProtectionKeys", key => key.Id));
         migration.CreateTable("ProgressStates", columns: table => new
@@ -41,7 +41,9 @@ public sealed class InitialPlatform : Migration
             table.ForeignKey("FK_Attempts_Users_UserId", attempt => attempt.UserId, "Users", "Id", onDelete: ReferentialAction.Cascade);
             table.CheckConstraint("CK_Attempt_Duration", "\"DurationSeconds\" >= 0 AND \"DurationSeconds\" <= 7200");
             table.CheckConstraint("CK_Attempt_Topic", "\"TopicId\" IN ('quantitative', 'reasoning', 'verbal', 'programming')");
-            table.CheckConstraint("CK_Attempt_Payload", "length(\"QuestionIdsJson\") <= 4096 AND length(\"ResponsesJson\") <= 8192");
+            table.CheckConstraint("CK_Attempt_Payload", ActiveProvider == "Microsoft.EntityFrameworkCore.SqlServer"
+                ? "DATALENGTH([QuestionIdsJson]) <= 8192 AND DATALENGTH([ResponsesJson]) <= 16384"
+                : "length(\"QuestionIdsJson\") <= 4096 AND length(\"ResponsesJson\") <= 8192");
         });
         migration.CreateIndex("IX_Attempts_UserId_CompletedAtUtc", "Attempts", ["UserId", "CompletedAtUtc"]);
     }

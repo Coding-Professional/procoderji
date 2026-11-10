@@ -1,0 +1,125 @@
+name: Backend containers
+
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'shared/**'
+      - 'global.json'
+      - '.dockerignore'
+      - 'compose*.yml'
+      - 'deploy/**'
+      - 'vercel.backend.json'
+      - '.github/workflows/backend-containers.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'shared/**'
+      - 'global.json'
+      - '.dockerignore'
+      - 'compose*.yml'
+      - 'deploy/**'
+      - 'vercel.backend.json'
+      - '.github/workflows/backend-containers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-containers-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  persistence:
+    name: Database contracts and container smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: procoderji_ci
+          POSTGRES_DB: procoderji_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d procoderji_test"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          # Developer edition and fixed credentials are only for disposable CI databases.
+          ACCEPT_EULA: Y
+          MSSQL_PID: Developer
+          MSSQL_MEMORY_LIMIT_MB: 2048
+          MSSQL_SA_PASSWORD: Procoderji_ci_2026!
+        ports: ['1433:1433']
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Procoderji_ci_2026!' -C -Q 'SELECT 1' -b"
+          --health-interval 5s --health-timeout 5s --health-retries 40
+          --health-start-period 20s
+      mongodb:
+        image: mongo:8.0
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore locked backend dependencies
+        run: dotnet restore backend/ProCoderJi.slnx --locked-mode
+      - name: Build backend
+        run: dotnet build backend/ProCoderJi.slnx --configuration Release --no-restore
+      - name: Test PostgreSQL contracts
+        env:
+          PROCODERJI_TEST_POSTGRES: 'Host=localhost;Database=procoderji_test;Username=postgres;Password=procoderji_ci'
+        run: dotnet test backend/ProCoderJi.slnx --configuration Release --no-build
+      - name: Test SQL Server contracts
+        env:
+          PROCODERJI_TEST_SQLSERVER: 'Server=127.0.0.1,1433;User Id=sa;Password=Procoderji_ci_2026!;Encrypt=True;TrustServerCertificate=True'
+        run: dotnet test backend/ProCoderJi.slnx --configuration Release --no-build
+      - name: Test MongoDB contracts
+        env:
+          PROCODERJI_TEST_MONGODB: mongodb://localhost:27017
+        run: dotnet test backend/ProCoderJi.slnx --configuration Release --no-build
+      - name: Validate Compose options
+        env:
+          POSTGRES_PASSWORD: Procoderji_ci_2026!
+          MSSQL_SA_PASSWORD: Procoderji_ci_2026!
+          MSSQL_ACCEPT_EULA: Y
+          MONGO_PASSWORD: Procoderji_ci_2026!
+        run: |
+          for provider in postgres sqlserver mongodb; do
+            docker compose --env-file deploy/container.env.example -f compose.yml -f compose.$provider.yml config --quiet
+          done
+      - name: Build backend container
+        run: docker build --file backend/Dockerfile --tag procoderji-api:ci .
+      - name: Smoke test the packaged API
+        run: |
+          docker run --detach --name api-smoke --read-only --tmpfs /tmp \
+            --publish 127.0.0.1:5100:8080 \
+            --env ASPNETCORE_ENVIRONMENT=Development \
+            --env PublicOrigin=http://localhost:3000 \
+            --env Database__Provider=Sqlite \
+            --env Database__MigrateOnStartup=true \
+            --env 'ConnectionStrings__Platform=Data Source=/tmp/container-smoke.db' \
+            procoderji-api:ci
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:5100/api/platform/health; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://localhost:5100/api/platform/auth/session | grep '"configured":false'
+          docker exec api-smoke sh -c 'test "$(id -u)" != 0 && test -f Data/questions.json && test -f Data/portfolio-rules.json'
+      - name: Container logs
+        if: failure()
+        run: docker logs api-smoke || true
+      - name: Stop smoke container
+        if: always()
+        run: docker rm --force api-smoke || true
