@@ -24,4 +24,18 @@ export const BACKEND_PATHS = new Set([
   "auth/logout",
   "signin-google",
   "progress",
+  "portfolio",
+  "portfolio/draft",
+  "portfolio/username",
+  "portfolio/publish",
+  "portfolio/unpublish",
 ]);
+
+/** Only a validated username may extend the public portfolio path. */
+export function isBackendPath(path: string): boolean {
+  if (BACKEND_PATHS.has(path)) return true;
+  const prefix = "portfolio/public/";
+  if (!path.startsWith(prefix)) return false;
+  const username = path.slice(prefix.length);
+  return username.length >= 3 && username.length <= 30 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(username);
+}

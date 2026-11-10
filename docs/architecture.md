@@ -151,9 +151,12 @@ The backend-container workflow runs the API contract against PostgreSQL, SQL Ser
 checks provider migrations and shared MongoDB keys, validates Compose options, and builds and
 smoke-tests the non-root API image. It runs when backend, shared data, or container files change.
 
-Student portfolios are planned but not implemented. [ADR 0002](decisions/0002-student-portfolios.md)
-records the proposed model, address scheme, and safety rules; [#40](https://github.com/procoderji-com/procoderji/issues/40)
-tracks the work.
+Portfolio storage and APIs support private drafts, username claims, publication snapshots and
+unpublishing through all configured database providers. The [portfolio API guide](portfolio-api.md)
+records the contract, revisions, rate limits and deletion behavior. Production publishing is
+disabled until the owner decisions and moderation/privacy launch work are complete. Public
+pages and the editor remain follow-up work under [#40](https://github.com/procoderji-com/procoderji/issues/40).
+[ADR 0002](decisions/0002-student-portfolios.md) records the proposal and outstanding owner decisions.
 
 Billing, checkout, and paid entitlements are not implemented. Razorpay or Paytm is a future
 provider decision that also needs server-verified payment state, cancellation/support behavior,

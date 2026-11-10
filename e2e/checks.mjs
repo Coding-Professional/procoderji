@@ -146,6 +146,13 @@ if (FULLSTACK) {
 
     const progress = await page.request.get(BASE + "/api/platform/progress");
     expectTrue(progress.status() === 401, `anonymous progress remains protected (got ${progress.status()})`);
+    const portfolio = await page.request.get(BASE + "/api/platform/portfolio");
+    expectTrue(portfolio.status() === 401, `anonymous portfolio drafts remain protected (got ${portfolio.status()})`);
+    const publicPortfolio = await page.request.get(BASE + "/api/platform/portfolio/public/riya-student");
+    expectTrue(publicPortfolio.status() === 404, "public portfolio reads stay disabled before launch");
+    expectTrue(publicPortfolio.headers()["x-robots-tag"] === "noindex", "public API responses cannot be indexed as portfolio pages");
+    const invalidPortfolioPath = await page.request.get(BASE + "/api/platform/portfolio/operator");
+    expectTrue(invalidPortfolioPath.status() === 404, "the frontend proxy rejects unknown portfolio actions");
     const logout = await page.request.post(BASE + "/api/platform/auth/logout", { headers: { Origin: new URL(BASE).origin }, maxRedirects: 0 });
     expectTrue(logout.status() === 403, `same-origin logout still requires an antiforgery token (got ${logout.status()})`);
   });
