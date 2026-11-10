@@ -1,0 +1,2286 @@
+{
+  "usernames": [
+    {
+      "name": "simple name",
+      "value": "riya",
+      "problems": []
+    },
+    {
+      "name": "hyphenated name",
+      "value": "riya-sharma",
+      "problems": []
+    },
+    {
+      "name": "digits",
+      "value": "a1b2c3",
+      "problems": []
+    },
+    {
+      "name": "shortest allowed",
+      "value": "abc",
+      "problems": []
+    },
+    {
+      "name": "longest allowed (30)",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "problems": []
+    },
+    {
+      "name": "digits and hyphen",
+      "value": "user-123",
+      "problems": []
+    },
+    {
+      "name": "empty",
+      "value": "",
+      "problems": [
+        "username:required"
+      ]
+    },
+    {
+      "name": "only spaces",
+      "value": "   ",
+      "problems": [
+        "username:required"
+      ]
+    },
+    {
+      "name": "number",
+      "value": 123,
+      "problems": [
+        "username:invalid-type"
+      ]
+    },
+    {
+      "name": "null",
+      "value": null,
+      "problems": [
+        "username:invalid-type"
+      ]
+    },
+    {
+      "name": "array",
+      "value": [
+        "riya"
+      ],
+      "problems": [
+        "username:invalid-type"
+      ]
+    },
+    {
+      "name": "too short",
+      "value": "ab",
+      "problems": [
+        "username:too-short"
+      ]
+    },
+    {
+      "name": "one letter that is also reserved",
+      "value": "u",
+      "problems": [
+        "username:too-short"
+      ]
+    },
+    {
+      "name": "31 characters",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "problems": [
+        "username:too-long"
+      ]
+    },
+    {
+      "name": "uppercase",
+      "value": "Riya",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "underscore",
+      "value": "riya_sharma",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "leading hyphen",
+      "value": "-riya",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "trailing hyphen",
+      "value": "riya-",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "double hyphen",
+      "value": "ri--ya",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "space inside",
+      "value": "riya sharma",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "trailing newline",
+      "value": "riya\n",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "dot",
+      "value": "riya.sharma",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "devanagari",
+      "value": "\u0930\u093f\u092f\u093e",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "Kelvin sign is not folded to k",
+      "value": "\u212ariya",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "full-width letters",
+      "value": "\uff52\uff49\uff59\uff41",
+      "problems": [
+        "username:invalid-format"
+      ]
+    },
+    {
+      "name": "reserved: admin",
+      "value": "admin",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "reserved: api",
+      "value": "api",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "reserved: www",
+      "value": "www",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "reserved: brand name",
+      "value": "procoderji",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "reserved: owner site",
+      "value": "satyam",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "reserved: existing route",
+      "value": "dashboard",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "reserved: hyphenated asset name",
+      "value": "apple-icon",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "reserved and blocked",
+      "value": "login",
+      "problems": [
+        "username:reserved"
+      ]
+    },
+    {
+      "name": "blocked word with suffix",
+      "value": "paytm-help",
+      "problems": [
+        "username:blocked-word"
+      ]
+    },
+    {
+      "name": "blocked word split by hyphen",
+      "value": "pay-tm",
+      "problems": [
+        "username:blocked-word"
+      ]
+    },
+    {
+      "name": "blocked word inside",
+      "value": "my-bank-guide",
+      "problems": [
+        "username:blocked-word"
+      ]
+    },
+    {
+      "name": "blocked word with name",
+      "value": "riya-login",
+      "problems": [
+        "username:blocked-word"
+      ]
+    },
+    {
+      "name": "reserved name as part of a longer name is allowed",
+      "value": "satyam-fan",
+      "problems": []
+    }
+  ],
+  "portfolios": [
+    {
+      "name": "publish: minimal portfolio",
+      "mode": "publish",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student"
+      },
+      "problems": []
+    },
+    {
+      "name": "publish: complete portfolio",
+      "mode": "publish",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student | Web developer",
+        "about": "I build small web apps.\nI am looking for a software internship.",
+        "skills": [
+          "JavaScript",
+          "React",
+          "Node.js"
+        ],
+        "projects": [
+          {
+            "title": "Expense Tracker",
+            "link": "https://github.com/riya-example/expense-tracker",
+            "technologies": [
+              "React",
+              "Firebase"
+            ],
+            "description": "Tracks monthly spending.\nLearned state management."
+          },
+          {
+            "title": "Notes App"
+          }
+        ],
+        "education": [
+          {
+            "institution": "Example Institute of Technology",
+            "degree": "B.Tech CSE",
+            "period": "2022-2026",
+            "details": "CGPA 8.4"
+          }
+        ],
+        "experience": [
+          {
+            "organization": "Example Labs",
+            "role": "Intern",
+            "period": "Jun-Aug 2025",
+            "description": "Fixed UI bugs."
+          }
+        ],
+        "achievements": [
+          "Finalist, Example Hackathon 2025"
+        ],
+        "links": {
+          "github": "https://github.com/riya-example",
+          "linkedin": "https://www.linkedin.com/in/riya-example",
+          "website": "https://riya.example.dev",
+          "email": "riya@example.com"
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "publish: empty object",
+      "mode": "publish",
+      "value": {},
+      "problems": [
+        "name:required",
+        "headline:required"
+      ]
+    },
+    {
+      "name": "draft: empty object",
+      "mode": "draft",
+      "value": {},
+      "problems": []
+    },
+    {
+      "name": "draft: blank required fields",
+      "mode": "draft",
+      "value": {
+        "name": "   ",
+        "headline": ""
+      },
+      "problems": []
+    },
+    {
+      "name": "publish: blank required fields",
+      "mode": "publish",
+      "value": {
+        "name": "   ",
+        "headline": "\n"
+      },
+      "problems": [
+        "name:required",
+        "headline:required"
+      ]
+    },
+    {
+      "name": "array instead of object",
+      "mode": "publish",
+      "value": [],
+      "problems": [
+        "$:invalid-type"
+      ]
+    },
+    {
+      "name": "null instead of object",
+      "mode": "publish",
+      "value": null,
+      "problems": [
+        "$:invalid-type"
+      ]
+    },
+    {
+      "name": "string instead of object",
+      "mode": "draft",
+      "value": "riya",
+      "problems": [
+        "$:invalid-type"
+      ]
+    },
+    {
+      "name": "unknown field",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "phone": "9999999999"
+      },
+      "problems": [
+        "phone:unknown-field"
+      ]
+    },
+    {
+      "name": "unknown field named __proto__",
+      "mode": "draft",
+      "value": {
+        "name": "Riya",
+        "__proto__": {
+          "admin": true
+        }
+      },
+      "problems": [
+        "__proto__:unknown-field"
+      ]
+    },
+    {
+      "name": "name has the wrong type",
+      "mode": "draft",
+      "value": {
+        "name": 5
+      },
+      "problems": [
+        "name:invalid-type"
+      ]
+    },
+    {
+      "name": "name is null",
+      "mode": "draft",
+      "value": {
+        "name": null
+      },
+      "problems": [
+        "name:invalid-type"
+      ]
+    },
+    {
+      "name": "name at the limit (80 UTF-16 units)",
+      "mode": "publish",
+      "value": {
+        "name": "\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00",
+        "headline": "Final-year B.Tech CSE student"
+      },
+      "problems": []
+    },
+    {
+      "name": "name over the limit (82 UTF-16 units)",
+      "mode": "publish",
+      "value": {
+        "name": "\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00\ud83d\ude00",
+        "headline": "Final-year B.Tech CSE student"
+      },
+      "problems": [
+        "name:too-long"
+      ]
+    },
+    {
+      "name": "name with a newline",
+      "mode": "draft",
+      "value": {
+        "name": "Riya\nSharma"
+      },
+      "problems": [
+        "name:invalid-characters"
+      ]
+    },
+    {
+      "name": "headline over the limit",
+      "mode": "draft",
+      "value": {
+        "headline": "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+      },
+      "problems": [
+        "headline:too-long"
+      ]
+    },
+    {
+      "name": "about at the limit",
+      "mode": "draft",
+      "value": {
+        "about": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "problems": []
+    },
+    {
+      "name": "about over the limit",
+      "mode": "draft",
+      "value": {
+        "about": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "problems": [
+        "about:too-long"
+      ]
+    },
+    {
+      "name": "about with a control character",
+      "mode": "draft",
+      "value": {
+        "about": "hello\u0007"
+      },
+      "problems": [
+        "about:invalid-characters"
+      ]
+    },
+    {
+      "name": "about with a right-to-left override",
+      "mode": "draft",
+      "value": {
+        "about": "hello\u202eolleh"
+      },
+      "problems": [
+        "about:invalid-characters"
+      ]
+    },
+    {
+      "name": "about with a zero-width space",
+      "mode": "draft",
+      "value": {
+        "about": "he\u200bllo"
+      },
+      "problems": [
+        "about:invalid-characters"
+      ]
+    },
+    {
+      "name": "about with an HTML tag",
+      "mode": "draft",
+      "value": {
+        "about": "Hi <script>alert(1)</script>"
+      },
+      "problems": [
+        "about:html-like"
+      ]
+    },
+    {
+      "name": "headline with a bold tag",
+      "mode": "draft",
+      "value": {
+        "headline": "<b>hi</b>"
+      },
+      "problems": [
+        "headline:html-like"
+      ]
+    },
+    {
+      "name": "comparison with spaces is fine",
+      "mode": "draft",
+      "value": {
+        "about": "I like it when x < y and a <= b."
+      },
+      "problems": []
+    },
+    {
+      "name": "comparison without spaces looks like a tag",
+      "mode": "draft",
+      "value": {
+        "about": "if x<y then"
+      },
+      "problems": [
+        "about:html-like"
+      ]
+    },
+    {
+      "name": "skills at the limit",
+      "mode": "draft",
+      "value": {
+        "skills": [
+          "skill 0",
+          "skill 1",
+          "skill 2",
+          "skill 3",
+          "skill 4",
+          "skill 5",
+          "skill 6",
+          "skill 7",
+          "skill 8",
+          "skill 9",
+          "skill 10",
+          "skill 11",
+          "skill 12",
+          "skill 13",
+          "skill 14",
+          "skill 15",
+          "skill 16",
+          "skill 17",
+          "skill 18",
+          "skill 19",
+          "skill 20",
+          "skill 21",
+          "skill 22",
+          "skill 23",
+          "skill 24",
+          "skill 25",
+          "skill 26",
+          "skill 27",
+          "skill 28",
+          "skill 29"
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "too many skills",
+      "mode": "draft",
+      "value": {
+        "skills": [
+          "skill 0",
+          "skill 1",
+          "skill 2",
+          "skill 3",
+          "skill 4",
+          "skill 5",
+          "skill 6",
+          "skill 7",
+          "skill 8",
+          "skill 9",
+          "skill 10",
+          "skill 11",
+          "skill 12",
+          "skill 13",
+          "skill 14",
+          "skill 15",
+          "skill 16",
+          "skill 17",
+          "skill 18",
+          "skill 19",
+          "skill 20",
+          "skill 21",
+          "skill 22",
+          "skill 23",
+          "skill 24",
+          "skill 25",
+          "skill 26",
+          "skill 27",
+          "skill 28",
+          "skill 29",
+          "skill 30"
+        ]
+      },
+      "problems": [
+        "skills:too-many"
+      ]
+    },
+    {
+      "name": "blank skill",
+      "mode": "draft",
+      "value": {
+        "skills": [
+          "React",
+          " "
+        ]
+      },
+      "problems": [
+        "skills[1]:required"
+      ]
+    },
+    {
+      "name": "skill too long",
+      "mode": "draft",
+      "value": {
+        "skills": [
+          "sssssssssssssssssssssssssssssssssssssssss"
+        ]
+      },
+      "problems": [
+        "skills[0]:too-long"
+      ]
+    },
+    {
+      "name": "skill with a newline",
+      "mode": "draft",
+      "value": {
+        "skills": [
+          "a\nb"
+        ]
+      },
+      "problems": [
+        "skills[0]:invalid-characters"
+      ]
+    },
+    {
+      "name": "skill is a number",
+      "mode": "draft",
+      "value": {
+        "skills": [
+          1
+        ]
+      },
+      "problems": [
+        "skills[0]:invalid-type"
+      ]
+    },
+    {
+      "name": "skills is not an array",
+      "mode": "draft",
+      "value": {
+        "skills": "React"
+      },
+      "problems": [
+        "skills:invalid-type"
+      ]
+    },
+    {
+      "name": "project without a title",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "description": "x"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].title:required"
+      ]
+    },
+    {
+      "name": "project with unknown field",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "stars": 5
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].stars:unknown-field"
+      ]
+    },
+    {
+      "name": "project is not an object",
+      "mode": "draft",
+      "value": {
+        "projects": [
+          "App"
+        ]
+      },
+      "problems": [
+        "projects[0]:invalid-type"
+      ]
+    },
+    {
+      "name": "too many projects",
+      "mode": "draft",
+      "value": {
+        "projects": [
+          {
+            "title": "P0"
+          },
+          {
+            "title": "P1"
+          },
+          {
+            "title": "P2"
+          },
+          {
+            "title": "P3"
+          },
+          {
+            "title": "P4"
+          },
+          {
+            "title": "P5"
+          },
+          {
+            "title": "P6"
+          },
+          {
+            "title": "P7"
+          },
+          {
+            "title": "P8"
+          }
+        ]
+      },
+      "problems": [
+        "projects:too-many"
+      ]
+    },
+    {
+      "name": "projects at the limit",
+      "mode": "draft",
+      "value": {
+        "projects": [
+          {
+            "title": "P0"
+          },
+          {
+            "title": "P1"
+          },
+          {
+            "title": "P2"
+          },
+          {
+            "title": "P3"
+          },
+          {
+            "title": "P4"
+          },
+          {
+            "title": "P5"
+          },
+          {
+            "title": "P6"
+          },
+          {
+            "title": "P7"
+          }
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "project description multiline is fine",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "description": "line one\nline two"
+          }
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "project title multiline is not",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App\nTwo"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].title:invalid-characters"
+      ]
+    },
+    {
+      "name": "too many technologies",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "technologies": [
+              "t0",
+              "t1",
+              "t2",
+              "t3",
+              "t4",
+              "t5",
+              "t6",
+              "t7",
+              "t8",
+              "t9",
+              "t10",
+              "t11",
+              "t12"
+            ]
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].technologies:too-many"
+      ]
+    },
+    {
+      "name": "technology too long",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "technologies": [
+              "ttttttttttttttttttttttttttttttttttttttttt"
+            ]
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].technologies[0]:too-long"
+      ]
+    },
+    {
+      "name": "second project reports its own index",
+      "mode": "draft",
+      "value": {
+        "projects": [
+          {
+            "title": "A"
+          },
+          {
+            "title": "B",
+            "description": "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        ]
+      },
+      "problems": [
+        "projects[1].description:too-long"
+      ]
+    },
+    {
+      "name": "project link with path, query and fragment",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com/path?x=1&y=2#top"
+          }
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "project link over 300 characters",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:too-long"
+      ]
+    },
+    {
+      "name": "project link at 300 characters",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "http link",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "http://example.com"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "javascript link",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "javascript:alert(1)"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "data link",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "data:text/html,hi"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "protocol-relative link",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "//example.com"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "relative link",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "/profile"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "scheme only",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with a space",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com/a b"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with a trailing newline",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com\n"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with a backslash",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com\\evil"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with a quote",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com/\"onmouseover=1"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with angle brackets",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com/<x>"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with credentials",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://user:pass@example.com/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link that hides the real host after @",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://github.com@evil.example/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with a port",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example.com:8443/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link to localhost",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://localhost/x"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link to an IPv4 address",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://192.168.0.1/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link to an IPv6 address",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://[::1]/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with a non-ASCII host",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://m\u00fcnchen.de/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with a punycode host",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://xn--mnchen-3ya.de/"
+          }
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "link with an uppercase scheme and host",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "HTTPS://Example.COM/Path"
+          }
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "link host with a Kelvin sign is not folded to k",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://\u212aanbal.com/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link with an empty label",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "https://example..com/"
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-link"
+      ]
+    },
+    {
+      "name": "link that is not a string",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": 42
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:invalid-type"
+      ]
+    },
+    {
+      "name": "blank link is treated as empty",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "  "
+          }
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "education without an institution",
+      "mode": "draft",
+      "value": {
+        "education": [
+          {
+            "degree": "B.Tech"
+          }
+        ]
+      },
+      "problems": [
+        "education[0].institution:required"
+      ]
+    },
+    {
+      "name": "too many education entries",
+      "mode": "draft",
+      "value": {
+        "education": [
+          {
+            "institution": "X"
+          },
+          {
+            "institution": "X"
+          },
+          {
+            "institution": "X"
+          },
+          {
+            "institution": "X"
+          },
+          {
+            "institution": "X"
+          },
+          {
+            "institution": "X"
+          }
+        ]
+      },
+      "problems": [
+        "education:too-many"
+      ]
+    },
+    {
+      "name": "education details over the limit",
+      "mode": "draft",
+      "value": {
+        "education": [
+          {
+            "institution": "X",
+            "details": "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        ]
+      },
+      "problems": [
+        "education[0].details:too-long"
+      ]
+    },
+    {
+      "name": "experience without a role",
+      "mode": "draft",
+      "value": {
+        "experience": [
+          {
+            "organization": "Acme"
+          }
+        ]
+      },
+      "problems": [
+        "experience[0].role:required"
+      ]
+    },
+    {
+      "name": "experience without an organization",
+      "mode": "draft",
+      "value": {
+        "experience": [
+          {
+            "role": "Intern"
+          }
+        ]
+      },
+      "problems": [
+        "experience[0].organization:required"
+      ]
+    },
+    {
+      "name": "too many experience entries",
+      "mode": "draft",
+      "value": {
+        "experience": [
+          {
+            "organization": "A",
+            "role": "B"
+          },
+          {
+            "organization": "A",
+            "role": "B"
+          },
+          {
+            "organization": "A",
+            "role": "B"
+          },
+          {
+            "organization": "A",
+            "role": "B"
+          },
+          {
+            "organization": "A",
+            "role": "B"
+          },
+          {
+            "organization": "A",
+            "role": "B"
+          },
+          {
+            "organization": "A",
+            "role": "B"
+          }
+        ]
+      },
+      "problems": [
+        "experience:too-many"
+      ]
+    },
+    {
+      "name": "experience description over the limit",
+      "mode": "draft",
+      "value": {
+        "experience": [
+          {
+            "organization": "A",
+            "role": "B",
+            "description": "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        ]
+      },
+      "problems": [
+        "experience[0].description:too-long"
+      ]
+    },
+    {
+      "name": "education entry with unknown field",
+      "mode": "draft",
+      "value": {
+        "education": [
+          {
+            "institution": "X",
+            "gpa": 9
+          }
+        ]
+      },
+      "problems": [
+        "education[0].gpa:unknown-field"
+      ]
+    },
+    {
+      "name": "achievements at the limit",
+      "mode": "draft",
+      "value": {
+        "achievements": [
+          "a0",
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5",
+          "a6",
+          "a7",
+          "a8",
+          "a9"
+        ]
+      },
+      "problems": []
+    },
+    {
+      "name": "too many achievements",
+      "mode": "draft",
+      "value": {
+        "achievements": [
+          "a0",
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5",
+          "a6",
+          "a7",
+          "a8",
+          "a9",
+          "a10"
+        ]
+      },
+      "problems": [
+        "achievements:too-many"
+      ]
+    },
+    {
+      "name": "achievement too long",
+      "mode": "draft",
+      "value": {
+        "achievements": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ]
+      },
+      "problems": [
+        "achievements[0]:too-long"
+      ]
+    },
+    {
+      "name": "blank achievement",
+      "mode": "draft",
+      "value": {
+        "achievements": [
+          ""
+        ]
+      },
+      "problems": [
+        "achievements[0]:required"
+      ]
+    },
+    {
+      "name": "github profile",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "github": "https://github.com/riya-example"
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "github subdomain",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "github": "https://gist.github.com/riya-example"
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "github on another site",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "github": "https://example.com/riya"
+        }
+      },
+      "problems": [
+        "links.github:invalid-host"
+      ]
+    },
+    {
+      "name": "github as a prefix of another host",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "github": "https://notgithub.com/riya"
+        }
+      },
+      "problems": [
+        "links.github:invalid-host"
+      ]
+    },
+    {
+      "name": "github as a subdomain of another host",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "github": "https://github.com.evil.example/riya"
+        }
+      },
+      "problems": [
+        "links.github:invalid-host"
+      ]
+    },
+    {
+      "name": "linkedin profile",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "linkedin": "https://www.linkedin.com/in/riya-example"
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "linkedin regional subdomain",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "linkedin": "https://in.linkedin.com/in/riya-example"
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "linkedin on another site",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "linkedin": "https://example.com/in/riya"
+        }
+      },
+      "problems": [
+        "links.linkedin:invalid-host"
+      ]
+    },
+    {
+      "name": "website on any host",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "website": "https://riya.example.dev"
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "website over http",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "website": "http://riya.example.dev"
+        }
+      },
+      "problems": [
+        "links.website:invalid-link"
+      ]
+    },
+    {
+      "name": "github link over 300 characters",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "github": "https://github.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      },
+      "problems": [
+        "links.github:too-long"
+      ]
+    },
+    {
+      "name": "links with an unknown key",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "twitter": "https://x.com/riya"
+        }
+      },
+      "problems": [
+        "links.twitter:unknown-field"
+      ]
+    },
+    {
+      "name": "links is not an object",
+      "mode": "draft",
+      "value": {
+        "links": [
+          "https://github.com/riya"
+        ]
+      },
+      "problems": [
+        "links:invalid-type"
+      ]
+    },
+    {
+      "name": "blank link entries are treated as empty",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "github": "",
+          "linkedin": " ",
+          "website": "",
+          "email": ""
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "valid email",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "riya.sharma+jobs@example.co.in"
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "email without a domain",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "riya@"
+        }
+      },
+      "problems": [
+        "links.email:invalid-email"
+      ]
+    },
+    {
+      "name": "email without a top-level domain",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "riya@example"
+        }
+      },
+      "problems": [
+        "links.email:invalid-email"
+      ]
+    },
+    {
+      "name": "email with a mailto prefix",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "mailto:riya@example.com"
+        }
+      },
+      "problems": [
+        "links.email:invalid-email"
+      ]
+    },
+    {
+      "name": "email with a space",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "riya @example.com"
+        }
+      },
+      "problems": [
+        "links.email:invalid-email"
+      ]
+    },
+    {
+      "name": "email with a trailing newline",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "riya@example.com\n"
+        }
+      },
+      "problems": [
+        "links.email:invalid-email"
+      ]
+    },
+    {
+      "name": "email with two at signs",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "a@b@example.com"
+        }
+      },
+      "problems": [
+        "links.email:invalid-email"
+      ]
+    },
+    {
+      "name": "email over 254 characters",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "a@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.com"
+        }
+      },
+      "problems": [
+        "links.email:too-long"
+      ]
+    },
+    {
+      "name": "email local part over 64 characters",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com"
+        }
+      },
+      "problems": [
+        "links.email:invalid-email"
+      ]
+    },
+    {
+      "name": "about of only spaces at the limit",
+      "mode": "draft",
+      "value": {
+        "about": "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "
+      },
+      "problems": []
+    },
+    {
+      "name": "about of only spaces over the limit",
+      "mode": "draft",
+      "value": {
+        "about": "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "
+      },
+      "problems": [
+        "about:too-long"
+      ]
+    },
+    {
+      "name": "name of only spaces over the limit (draft)",
+      "mode": "draft",
+      "value": {
+        "name": "                                                                                 "
+      },
+      "problems": [
+        "name:too-long"
+      ]
+    },
+    {
+      "name": "name of only spaces over the limit (publish)",
+      "mode": "publish",
+      "value": {
+        "name": "                                                                                 ",
+        "headline": "Student"
+      },
+      "problems": [
+        "name:too-long"
+      ]
+    },
+    {
+      "name": "name of only spaces at the limit is still required to publish",
+      "mode": "publish",
+      "value": {
+        "name": "                                                                                ",
+        "headline": "Student"
+      },
+      "problems": [
+        "name:required"
+      ]
+    },
+    {
+      "name": "skill of only spaces over the limit",
+      "mode": "draft",
+      "value": {
+        "skills": [
+          "                                         "
+        ]
+      },
+      "problems": [
+        "skills[0]:too-long"
+      ]
+    },
+    {
+      "name": "project link of only spaces over the limit",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "projects": [
+          {
+            "title": "App",
+            "link": "                                                                                                                                                                                                                                                                                                             "
+          }
+        ]
+      },
+      "problems": [
+        "projects[0].link:too-long"
+      ]
+    },
+    {
+      "name": "website of only spaces over the limit",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "website": "                                                                                                                                                                                                                                                                                                             "
+        }
+      },
+      "problems": [
+        "links.website:too-long"
+      ]
+    },
+    {
+      "name": "website of only spaces at the limit",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "website": "                                                                                                                                                                                                                                                                                                            "
+        }
+      },
+      "problems": []
+    },
+    {
+      "name": "email of only spaces over the limit",
+      "mode": "draft",
+      "value": {
+        "name": "Riya Sharma",
+        "headline": "Final-year B.Tech CSE student",
+        "links": {
+          "email": "                                                                                                                                                                                                                                                               "
+        }
+      },
+      "problems": [
+        "links.email:too-long"
+      ]
+    },
+    {
+      "name": "several problems are all reported",
+      "mode": "publish",
+      "value": {
+        "name": "",
+        "headline": "<i>x</i>",
+        "skills": [
+          "",
+          "ok"
+        ],
+        "projects": [
+          {
+            "link": "http://x.example"
+          }
+        ],
+        "links": {
+          "github": "https://example.com"
+        }
+      },
+      "problems": [
+        "name:required",
+        "headline:html-like",
+        "skills[0]:required",
+        "projects[0].title:required",
+        "projects[0].link:invalid-link",
+        "links.github:invalid-host"
+      ]
+    }
+  ],
+  "malformedText": [
+    {
+      "name": "lone high surrogate in a name",
+      "field": "name",
+      "codeUnits": [
+        97,
+        55296,
+        98
+      ],
+      "problems": [
+        "name:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone high surrogate at the end",
+      "field": "name",
+      "codeUnits": [
+        97,
+        55296
+      ],
+      "problems": [
+        "name:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone low surrogate",
+      "field": "name",
+      "codeUnits": [
+        56320
+      ],
+      "problems": [
+        "name:invalid-characters"
+      ]
+    },
+    {
+      "name": "low surrogate before a high one",
+      "field": "name",
+      "codeUnits": [
+        56320,
+        55296
+      ],
+      "problems": [
+        "name:invalid-characters"
+      ]
+    },
+    {
+      "name": "valid surrogate pair is fine",
+      "field": "name",
+      "codeUnits": [
+        97,
+        55357,
+        56832,
+        98
+      ],
+      "problems": []
+    },
+    {
+      "name": "lone surrogate in a multi-line field",
+      "field": "about",
+      "codeUnits": [
+        108,
+        105,
+        110,
+        101,
+        32,
+        111,
+        110,
+        101,
+        10,
+        55296
+      ],
+      "problems": [
+        "about:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in a skill",
+      "field": "skill",
+      "codeUnits": [
+        56320
+      ],
+      "problems": [
+        "skills[0]:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in a project link",
+      "field": "projectLink",
+      "codeUnits": [
+        104,
+        116,
+        116,
+        112,
+        115,
+        58,
+        47,
+        47,
+        101,
+        120,
+        97,
+        109,
+        112,
+        108,
+        101,
+        46,
+        99,
+        111,
+        109,
+        47,
+        55296
+      ],
+      "problems": [
+        "projects[0].link:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in a website",
+      "field": "website",
+      "codeUnits": [
+        104,
+        116,
+        116,
+        112,
+        115,
+        58,
+        47,
+        47,
+        101,
+        120,
+        97,
+        109,
+        112,
+        108,
+        101,
+        46,
+        99,
+        111,
+        109,
+        47,
+        56320
+      ],
+      "problems": [
+        "links.website:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in an email",
+      "field": "email",
+      "codeUnits": [
+        114,
+        105,
+        121,
+        97,
+        64,
+        101,
+        120,
+        97,
+        109,
+        112,
+        108,
+        101,
+        46,
+        99,
+        111,
+        109,
+        55296
+      ],
+      "problems": [
+        "links.email:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in a username",
+      "field": "username",
+      "codeUnits": [
+        97,
+        98,
+        99,
+        55296
+      ],
+      "problems": [
+        "username:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in a field name",
+      "field": "key",
+      "codeUnits": [
+        97,
+        55296
+      ],
+      "problems": [
+        "$:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone low surrogate as a whole field name",
+      "field": "key",
+      "codeUnits": [
+        56320
+      ],
+      "problems": [
+        "$:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in a field name inside links",
+      "field": "linksKey",
+      "codeUnits": [
+        55296
+      ],
+      "problems": [
+        "links:invalid-characters"
+      ]
+    },
+    {
+      "name": "lone surrogate in a project field name",
+      "field": "projectKey",
+      "codeUnits": [
+        56320
+      ],
+      "problems": [
+        "projects[0]:invalid-characters"
+      ]
+    },
+    {
+      "name": "valid pair in a field name is only an unknown field",
+      "field": "key",
+      "codeUnits": [
+        97,
+        55357,
+        56832
+      ],
+      "problems": [
+        "a\ud83d\ude00:unknown-field"
+      ]
+    },
+    {
+      "name": "valid pair in a username is well-formed but not allowed",
+      "field": "username",
+      "codeUnits": [
+        97,
+        98,
+        55357,
+        56832
+      ],
+      "problems": [
+        "username:invalid-format"
+      ]
+    }
+  ]
+}

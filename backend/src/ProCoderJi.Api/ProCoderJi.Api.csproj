@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Content Include="../../../shared/practice/questions.json" Link="Data/questions.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../../../shared/portfolio/rules.json" Link="Data/portfolio-rules.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

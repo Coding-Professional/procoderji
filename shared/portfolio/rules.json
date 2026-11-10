@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "requiredForPublish": ["name", "headline"],
+  "maxItems": {
+    "skills": 30,
+    "projects": 8,
+    "projects.technologies": 12,
+    "education": 5,
+    "experience": 6,
+    "achievements": 10
+  },
+  "maxLength": {
+    "name": 80,
+    "headline": 120,
+    "about": 1000,
+    "skills.item": 40,
+    "projects.title": 80,
+    "projects.description": 500,
+    "projects.technologies.item": 40,
+    "education.institution": 120,
+    "education.degree": 120,
+    "education.period": 40,
+    "education.details": 300,
+    "experience.organization": 120,
+    "experience.role": 120,
+    "experience.period": 40,
+    "experience.description": 500,
+    "achievements.item": 200,
+    "link": 300,
+    "email": 254
+  },
+  "multilineFields": [
+    "about",
+    "projects.description",
+    "education.details",
+    "experience.description"
+  ],
+  "text": {
+    "controlCharacters": "[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f-\\u009f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2066-\\u2069\\ufeff]",
+    "htmlLike": "<[A-Za-z/!?]"
+  },
+  "link": {
+    "scheme": "https://",
+    "forbiddenCharacters": "[\\u0000-\\u0020\\u0022\\u003c\\u003e\\u005c\\u0060\\u007f-\\u009f\\u200b-\\u200f\\u2028\\u2029\\u202a-\\u202e\\u2066-\\u2069\\ufeff]",
+    "hostPattern": "^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+(?:[a-z]{2,}|xn--[a-z0-9]+(?:-[a-z0-9]+)*)$",
+    "hostRestrictions": {
+      "links.github": ["github.com"],
+      "links.linkedin": ["linkedin.com"]
+    }
+  },
+  "emailPattern": "^[A-Za-z0-9._%+-]{1,64}@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z]{2,}$",
+  "username": {
+    "minLength": 3,
+    "maxLength": 30,
+    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+    "reserved": [
+      "u", "www", "api", "app", "admin", "administrator", "root", "mail", "email", "smtp", "ftp",
+      "docs", "blog", "login", "logout", "signin", "signup", "register", "auth", "account",
+      "support", "help", "contact", "about", "status", "static", "assets", "cdn", "dev", "test",
+      "staging", "preview", "dashboard", "courses", "learn", "practice", "games", "guides", "jobs",
+      "privacy", "terms", "disclaimer", "copyright", "portfolio", "portfolios", "procoderji",
+      "satyam", "robots", "sitemap", "favicon", "icon", "apple-icon", "logo", "brand", "og",
+      "new", "edit", "settings", "profile", "me", "null", "undefined"
+    ],
+    "blockedWords": ["paytm", "phonepe", "razorpay", "bank", "login", "verify", "password", "otp", "wallet"]
+  }
+}

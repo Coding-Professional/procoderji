@@ -102,6 +102,9 @@ by Git.
   synchronization.
 - `shared/practice/questions.json` is the canonical question bank consumed by the frontend and
   backend. Keep IDs stable when improving wording; use a new ID when a question's meaning changes.
+- `shared/portfolio/` holds the student-portfolio rules and test fixtures used by both runtimes
+  (see its [README](../shared/portfolio/README.md)); the validators live in
+  `src/features/portfolio/` and `backend/src/ProCoderJi.Api/Features/Portfolio/`.
 - `backend/src/ProCoderJi.Api/` owns Google sign-in, cookie/antiforgery handling, account progress,
   and EF persistence. Backend tests live under `backend/tests/`.
 - `src/content/` and `src/data/` publish reviewed notes, guides, and listings; see the
