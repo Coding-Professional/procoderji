@@ -10,6 +10,9 @@ remains available for local development without Docker.
 
 ## API and database are separate containers
 
+The hosted product uses [Neon PostgreSQL](neon.md). Its dedicated `compose.neon.yml` override
+uses a direct connection for migrations and a pooled connection for the API.
+
 On a development machine or a VPS, Docker Compose runs the API and the selected database on the
 same Docker network. The database has its own container and a named volume. Replacing the API
 image does not replace the data. The database port is not published to the host.

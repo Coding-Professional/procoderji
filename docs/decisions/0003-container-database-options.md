@@ -21,6 +21,10 @@ EF Core; `MongoDb` uses the MongoDB .NET driver. Authentication uses `IAccountSt
 endpoints use `IProgressStore`. Identity is derived from Google's stable subject and an internal
 UUID. The HTTP contracts do not expose database selection to students.
 
+The owner selected **Neon PostgreSQL** for the hosted product. Its API connection uses the
+transaction pooler, while the release migration uses the direct endpoint. Other adapters remain
+available as deployment alternatives. [Neon setup](../neon.md) records the operator steps.
+
 Relational stores retain serializable transactions and bounded transaction retries. Shared
 migrations handle provider-specific identity and constraint SQL, with a SQL Server snapshot
 alongside the original SQLite/PostgreSQL snapshot. Model-difference tests protect both paths.

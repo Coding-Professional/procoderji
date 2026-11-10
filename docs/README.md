@@ -17,6 +17,7 @@ synchronization is a separate capability; paid billing is future work.
 | Run the .NET API, Google sign-in, and account persistence | [Backend setup](../backend/README.md) |
 | Configure production hosting and the site domain | [Deployment](deployment.md) |
 | Run the API and choose a database with Docker | [Containers](containers.md) |
+| Configure the selected hosted PostgreSQL database | [Neon setup](neon.md) |
 | Report a vulnerability privately | [Security policy](../SECURITY.md) |
 | Review implementation security notes | [Security notes](security.md) |
 | Understand optional coding-agent tools | [Agent tools](agent-tools.md) |

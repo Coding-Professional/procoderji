@@ -68,6 +68,9 @@ each student's own history using PostgreSQL, SQL Server, MongoDB, or local-devel
 See [Backend setup](backend/README.md) and [Docker setup](docs/containers.md)
 for local persistence, Google credentials, and production integration checks.
 
+The hosted product uses [Neon PostgreSQL](docs/neon.md), with separate runtime and migration
+connections.
+
 The free practice flow works without provider credentials. Paid plans, payment processing, and
 commercial account entitlements require separate product and provider decisions; this repository
 does not currently enable them.

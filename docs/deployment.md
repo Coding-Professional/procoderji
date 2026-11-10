@@ -6,6 +6,9 @@ read-only on 2026-10-14.
 
 ## Frontend and account service
 
+The selected hosted database is **Neon PostgreSQL**. Follow the [Neon setup](neon.md) for pooled
+runtime connections, direct migration connections, and backend environment variables.
+
 For a container image and local/VPS stacks with PostgreSQL, SQL Server or MongoDB, follow
 [Container setup](containers.md). Vercel containers still need an externally hosted database.
 

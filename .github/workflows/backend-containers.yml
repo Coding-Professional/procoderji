@@ -102,6 +102,7 @@ jobs:
           for provider in postgres sqlserver mongodb; do
             docker compose --env-file deploy/container.env.example -f compose.yml -f compose.$provider.yml config --quiet
           done
+          docker compose --env-file deploy/neon.env.example -f compose.yml -f compose.neon.yml config --quiet
       - name: Build backend container
         run: docker build --file backend/Dockerfile --tag procoderji-api:ci .
       - name: Smoke test the packaged API

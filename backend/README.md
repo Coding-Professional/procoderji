@@ -56,6 +56,9 @@ Serializable transactions and a state concurrency token serialize sync/reset rac
 
 ## Choose a database
 
+**Neon PostgreSQL is the selected hosted database.** Follow [Neon setup](../docs/neon.md) for
+the runtime and migration connections. The other providers remain available for contributors.
+
 Choose one provider per deployment. These are operator settings; students use the same account
 and progress API with every provider. SQLite remains the default for development without Docker.
 
