@@ -6,6 +6,11 @@ documentation, accessibility improvements, original questions, and clear bug rep
 ## Find a useful change
 
 - Read the [project overview](README.md) and [documentation index](docs/README.md).
+- New to the project? Pick an issue labelled
+  [good first issue](https://github.com/procoderji-com/procoderji/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22).
+  Each one names the files to change and the checks to run. Issues labelled
+  [help wanted](https://github.com/procoderji-com/procoderji/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22help%20wanted%22)
+  are larger.
 - Check existing [issues](https://github.com/procoderji-com/procoderji/issues) and
   [pull requests](https://github.com/procoderji-com/procoderji/pulls) before starting.
 - Discuss larger features, paid features, data collection, or dependency changes in an issue first.
