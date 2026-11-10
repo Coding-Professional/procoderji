@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="../../../shared/portfolio/fixtures.json" Link="Data/portfolio-fixtures.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ProCoderJi.Api\ProCoderJi.Api.csproj" />
   </ItemGroup>
 
