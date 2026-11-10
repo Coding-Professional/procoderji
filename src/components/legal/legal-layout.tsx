@@ -66,10 +66,10 @@ export function LegalLayout({ title, children }: { title: string; children: Reac
                 <header className="mb-8 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 text-lg font-bold text-gray-900">
                         <Image src="/logo.png" alt="" width={28} height={28} className="rounded-lg" />
-                        ProCoderJii Notes
+                        ProCoderJii
                     </Link>
-                    <Link href="/dashboard" className="text-sm font-semibold text-gray-700 underline">
-                        Browse notes
+                    <Link href="/practice" className="inline-flex min-h-11 items-center text-sm font-semibold text-gray-700 underline">
+                        Start practice
                     </Link>
                 </header>
 

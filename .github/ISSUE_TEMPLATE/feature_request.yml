@@ -3,6 +3,12 @@ description: Suggest an improvement for students or contributors.
 title: "feature: "
 labels: [enhancement]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the roadmap, existing issues and open pull requests first. Describe the student
+        problem and the smallest useful outcome. Small bug fixes or documentation corrections
+        can go straight to a pull request without a separate feature request.
   - type: textarea
     id: problem
     attributes:

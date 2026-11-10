@@ -2,7 +2,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/mdx-components";
 import { SAFE_MDX_OPTIONS } from "@/lib/mdx-safe";
 
-/** A note or guide rendered from Markdown: raw HTML/JSX and expressions are removed first. */
+/** A note or guide rendered from Markdown: raw HTML/JSX and expressions are rejected at compile time. */
 export function NoteBody({ source }: { source: string }) {
     return (
         // overflow-wrap:anywhere keeps long URLs and unbroken words inside the card on small screens.

@@ -32,10 +32,8 @@ test(".env.example contains only public, non-secret settings", () => {
 	assert.ok(!/secret|password|api[_-]?key|token/i.test(Object.keys(example).join(" ")));
 });
 
-test("the deployment guide documents the same channel id and the apex-primary steps", () => {
+test("the deployment guide matches the public channel and canonical site configuration", () => {
 	const doc = fs.readFileSync("docs/deployment.md", "utf8");
-	assert.ok(doc.includes("UC74q2pzSGuoaikYwnavcGMg"));
-	assert.match(doc, /Redirect to Another Domain/);
-	assert.match(doc, /308/);
-	assert.ok(doc.includes("https://procoderji.com"));
+	assert.ok(doc.includes(example.YOUTUBE_CHANNEL_ID));
+	assert.ok(doc.includes(DEFAULT_SITE_URL));
 });

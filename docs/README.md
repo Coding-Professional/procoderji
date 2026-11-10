@@ -10,7 +10,10 @@ synchronization is a separate capability; paid billing is future work.
 | --- | --- |
 | Understand the product and current content | [Project README](../README.md) |
 | Review student value, scaling, and future monetization | [Product roadmap](product-roadmap.md) |
+| Review repository readiness and remaining owner decisions | [Repository audit](repository-audit.md) |
 | Make your first contribution | [Contributing](../CONTRIBUTING.md) |
+| Ask a question or choose a reporting channel | [Support](../SUPPORT.md) |
+| Triage issues, review changes, or handle dependency updates | [Maintainer guide](maintainer-guide.md) |
 | Run the app and choose checks | [Development](development.md) |
 | Understand routes, content, and feature boundaries | [Architecture](architecture.md) |
 | Add original notes, guides, or career listings | [Content guide](content-guide.md) |
