@@ -35,6 +35,12 @@ cp deploy/container.env.example deploy/container.env
 
 PowerShell uses `Copy-Item deploy/container.env.example deploy/container.env` instead.
 
+MongoDB 8 needs a compatible host kernel; a container shares its host's kernel. MongoDB documents
+a startup incompatibility with Linux 6.19 through 7.0.13, and some newer Ubuntu kernels also hit
+its version check. The database CI job currently uses Ubuntu 22.04. Check the
+[MongoDB release notes](https://www.mongodb.com/docs/manual/release-notes/8.0/) when selecting a
+Linux host or upgrading MongoDB.
+
 Set the password for the database you choose in `deploy/container.env`. This command generates
 a password that meets SQL Server's complexity rules and uses characters safe in all three
 example connection strings:

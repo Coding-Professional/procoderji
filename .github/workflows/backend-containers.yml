@@ -34,7 +34,10 @@ concurrency:
 jobs:
   persistence:
     name: Database contracts and container smoke
-    runs-on: ubuntu-24.04
+    # mongo:8.0 rejects the current Ubuntu 24.04 runner kernel at startup.
+    # Keep this integration job on a compatible host until MongoDB fixes its check:
+    # https://jira.mongodb.org/browse/SERVER-136848
+    runs-on: ubuntu-22.04
     timeout-minutes: 25
     services:
       postgres:
