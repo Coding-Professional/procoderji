@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { LEGAL, missingLegalFields, isLegalComplete, legalSitemapRoutes, LEGAL_PAGES, type LegalDetails } from "./legal.ts";
+import { LEGAL, missingLegalFields, isLegalComplete, legalSitemapRoutes, LEGAL_PAGES, policyEffectiveDates, type LegalDetails } from "./legal.ts";
 import { CONTACT_EMAIL } from "./contact.ts";
 import { isRealIsoDate } from "./dates.ts";
 
@@ -52,7 +52,22 @@ test("legal pages stay out of the sitemap until complete", () => {
 	assert.deepEqual(legalSitemapRoutes({ ...complete, effectiveDate: null }), []);
 	const routes = legalSitemapRoutes(complete);
 	assert.deepEqual(routes.map((r) => r.path), LEGAL_PAGES.map((p) => p.path));
-	assert.ok(routes.every((r) => r.lastModified === "2026-11-01"));
+	assert.equal(routes.find((r) => r.path === "/privacy")?.lastModified, policyEffectiveDates["/privacy"]);
+	assert.equal(routes.find((r) => r.path === "/terms")?.lastModified, policyEffectiveDates["/terms"]);
+	assert.ok(routes.filter((r) => !["/privacy", "/terms"].includes(r.path)).every((r) => r.lastModified === "2026-11-01"));
+});
+
+test("revised policy dates do not change the existing operator details or other legal pages", () => {
+	assert.equal(LEGAL.effectiveDate, "2023-01-01");
+	assert.deepEqual(policyEffectiveDates, { "/privacy": "2026-11-11", "/terms": "2026-11-11" });
+	assert.ok(Object.values(policyEffectiveDates).every(isRealIsoDate));
+	assert.deepEqual(Object.fromEntries(legalSitemapRoutes().map((route) => [route.path, route.lastModified])), {
+		"/about": "2023-01-01",
+		"/privacy": "2026-11-11",
+		"/terms": "2026-11-11",
+		"/disclaimer": "2023-01-01",
+		"/copyright": "2023-01-01",
+	});
 });
 
 test("an impossible effective date such as 30 February is still missing", () => {

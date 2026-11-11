@@ -56,7 +56,7 @@ public sealed class RelationalPortfolioStore(IDbContextFactory<PlatformDbContext
             return Record(row);
         }, cancellationToken);
 
-    public Task<PortfolioRecord> Publish(Guid userId, Guid revision, CancellationToken cancellationToken) =>
+    public Task<PortfolioRecord> Publish(Guid userId, Guid revision, CancellationToken cancellationToken, string? policyVersion = null) =>
         InTransaction(async db =>
         {
             var row = await Editable(db, userId, revision, create: false, cancellationToken);
@@ -66,6 +66,8 @@ public sealed class RelationalPortfolioStore(IDbContextFactory<PlatformDbContext
             row.PublishedSearchVisible = row.SearchVisible;
             row.Status = PortfolioStatus.Published;
             row.PublishedAtUtc = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            row.PublishingPolicyVersion = policyVersion;
+            row.EligibilityConfirmedAtUtc = policyVersion is null ? null : row.PublishedAtUtc;
             Touch(row);
             await db.SaveChangesAsync(cancellationToken);
             return Record(row);
@@ -120,7 +122,19 @@ public sealed class RelationalPortfolioStore(IDbContextFactory<PlatformDbContext
     }
 
     private static PortfolioRecord Record(PortfolioEntity row) => new(row.UserId, row.Username, row.DraftJson, row.PublishedJson,
-        row.SearchVisible, row.PublishedSearchVisible, row.Status, row.Revision, row.CreatedAtUtc, row.UpdatedAtUtc, row.PublishedAtUtc);
+        row.SearchVisible, row.PublishedSearchVisible, row.Status, row.Revision, row.CreatedAtUtc, row.UpdatedAtUtc, row.PublishedAtUtc,
+        row.PublishingPolicyVersion, row.EligibilityConfirmedAtUtc);
+
+    public async Task<IReadOnlyList<PortfolioIndexEntry>> ListSearchVisible(string? after, int limit, CancellationToken cancellationToken)
+    {
+        await using var db = await factory.CreateDbContextAsync(cancellationToken);
+        return await db.Portfolios.AsNoTracking().Where(row => row.Status == PortfolioStatus.Published
+            && row.PublishedJson != null && row.Username != null && row.PublishedSearchVisible
+            && row.PublishingPolicyVersion == PortfolioPublishingPolicy.Version && row.EligibilityConfirmedAtUtc != null && row.PublishedAtUtc != null
+            && (after == null || string.Compare(row.Username, after) > 0))
+            .OrderBy(row => row.Username).Take(limit)
+            .Select(row => new PortfolioIndexEntry(row.Username!, row.PublishedAtUtc!.Value)).ToListAsync(cancellationToken);
+    }
 
     private async Task<T> InTransaction<T>(Func<PlatformDbContext, Task<T>> operation, CancellationToken cancellationToken)
     {

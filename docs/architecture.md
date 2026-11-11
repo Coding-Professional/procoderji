@@ -13,7 +13,7 @@ flowchart TD
   Frontend --> Local[Validated browser progress]
   Frontend --> BFF[Same-origin platform proxy]
   BFF --> API[ASP.NET Core API]
-  API --> Stores[Account and progress adapters]
+  API --> Stores[Account, progress and portfolio adapters]
   Stores --> EF[EF Core]
   EF --> Database[SQLite development or PostgreSQL or SQL Server]
   Stores --> Mongo[MongoDB driver]
@@ -34,6 +34,8 @@ site origin. See [ADR 0001](decisions/0001-student-product-boundaries.md) for th
 | `/practice` | Discover the four practice topics. |
 | `/practice/[topic]` | Complete questions and review answers and explanations. |
 | `/account` | Optional Google sign-in and progress/data controls. |
+| `/learn/portfolio` | In-memory editor/preview, Markdown import and authenticated private-draft controls. |
+| `/u/[username]` | Server-rendered published portfolio and published visibility metadata. |
 | `/api/platform/*` | Next.js forwarding layer for the configured backend. |
 | `/api/platform/auth/session` | Current account, account configuration status, and antiforgery token. |
 | `/api/platform/signin-google` | Public Google callback forwarded to ASP.NET Core. |
@@ -101,6 +103,40 @@ The [container guide](containers.md) packages the API and starts it with one dat
 separate Compose services with persistent volumes. Vercel container hosting uses an external
 database. [ADR 0003](decisions/0003-container-database-options.md) records these boundaries.
 
+## Student portfolios
+
+Phase 1 uses one fixed field model for the form, live preview, Markdown import and both owned
+themes (Simple and Developer). Rules v2 in `shared/portfolio/` define the fields, themes, limits,
+username policy, and publishing age/version. TypeScript supplies editor feedback; .NET validates
+trusted writes. The browser parser accepts up to 50 KiB of UTF-8 Markdown and only fills the
+form. Student Markdown, HTML, CSS and JavaScript are never rendered as pages.
+
+Guests can try an in-memory preview. A Google session is required for one saved portfolio per
+account. Account changes clear private editor state. The backend controls revisions and the
+draft/published/suspended state; a claimed username stays fixed while the portfolio exists.
+Explicit publication copies the validated draft and search preference, so later edits cannot
+change the public page until the student publishes again. Every publish requires 18+
+self-declaration and current-policy acceptance; version `2026-11-11` and its confirmation time
+are stored privately, with no birth date or independent age verification.
+
+Public `/u/<username>` requests check uncached backend publication state before reading a
+version-keyed, published-only snapshot cache. BFF publish/unpublish/delete invalidates the
+username tag. Fresh state also hides operator-suspended pages without a cache callback.
+Restoring a suspension clears the public copy and acceptance and returns a private draft;
+the student must publish again. Moderation uses an operator CLI, not a public admin endpoint.
+
+Public data excludes account IDs, Google profile data, private edits and acceptance metadata.
+Themes use initials and no external image/font requests. Search is opt-in and belongs to the
+published snapshot: opted-out pages are `noindex`; the fresh sitemap index includes only
+currently eligible opted-in publications. Its 45,000-portfolio cap requires sitemap partitioning
+before further growth. An unlisted public address can still be shared and opened.
+
+SQLite/PostgreSQL/SQL Server store one relational portfolio row per account; MongoDB embeds it
+in the account document. Shared revisions and conditional writes enforce ownership and claims.
+See the [API contract](portfolio-api.md), [workspace/runbook](portfolio-workspace.md),
+[Markdown guide](portfolio-markdown.md) and [ADR 0002](decisions/0002-student-portfolios.md).
+Publishing defaults off; repository implementation does not establish production rollout.
+
 ## Reviewed content
 
 Course notes, guides, and jobs use JSON catalogues pointing to repository content files. Only
@@ -120,8 +156,10 @@ Sample notes are intentionally unregistered. Empty pages stay out of the index a
 | `src/features/practice/` | TypeScript practice rules, shared-bank adapter, and student views. |
 | `src/features/progress/` | Attempt model, browser storage, and sync coordination. |
 | `src/features/account/` | Frontend account API client and controls. |
+| `src/features/portfolio/` | Editor/client, Markdown parser, validators, owned themes and public delivery. |
 | `src/components/` | Shared shell, landing sections, and reusable UI. |
 | `shared/practice/questions.json` | Canonical original practice bank used by both runtimes. |
+| `shared/portfolio/` | Rules v2, publishing policy and cross-runtime fixtures. |
 | `backend/src/ProCoderJi.Api/` | ASP.NET Core account API, Google auth, and EF persistence. |
 | `backend/tests/` | Backend integration and validation tests. |
 | `src/content/` and `src/data/` | Reviewed notes, guides, listings, and their catalogues. |
@@ -138,9 +176,11 @@ YouTube feed only when `YOUTUBE_CHANNEL_ID` is configured.
 
 Frontend CI checks types, domain/store behavior, content rules, production builds, desktop/mobile
 flows, and real-site links/metadata. Browser CI also starts a real .NET process with isolated
-SQLite persistence and exercises the Next.js proxy and Google sign-in challenge/public callback
-URL. It uses test client configuration and does not complete Google consent or token exchange.
-Default local browser checks stay frontend-only unless `E2E_DOTNET=1` is set.
+SQLite persistence through the test-only `ProCoderJi.BrowserHost`, exercising the real API/BFF,
+portfolio editor/publication/moderation, and Google challenge/public callback URL. Disposable
+cookie authentication and loopback fixture controls exist only in that test executable; the
+production API/image has no fixture login. The suite does not complete Google consent or token
+exchange. Local browser checks stay frontend-only unless `E2E_DOTNET=1` is set.
 
 CI retains failure screenshots for seven days. Backend CI restores, builds, and tests
 `backend/ProCoderJi.slnx` with .NET 10 and checks PostgreSQL migrations. Controlled test
@@ -151,12 +191,11 @@ The backend-container workflow runs the API contract against PostgreSQL, SQL Ser
 checks provider migrations and shared MongoDB keys, validates Compose options, and builds and
 smoke-tests the non-root API image. It runs when backend, shared data, or container files change.
 
-Portfolio storage and APIs support private drafts, username claims, publication snapshots and
-unpublishing through all configured database providers. The [portfolio API guide](portfolio-api.md)
-records the contract, revisions, rate limits and deletion behavior. Production publishing is
-disabled until the owner decisions and moderation/privacy launch work are complete. Public
-pages and the editor remain follow-up work under [#40](https://github.com/procoderji-com/procoderji/issues/40).
-[ADR 0002](decisions/0002-student-portfolios.md) records the proposal and outstanding owner decisions.
+Portfolio launch requires a configured production API, durable storage, migrations, real Google
+credentials, verified policies/reporting and operator readiness before enabling the publishing
+flag. The [deployment guide](deployment.md) and
+[#74](https://github.com/procoderji-com/procoderji/issues/74) describe the separate outstanding
+production hosting work. Passing CI does not establish that the live service runs this commit.
 
 Billing, checkout, and paid entitlements are not implemented. Razorpay or Paytm is a future
 provider decision that also needs server-verified payment state, cancellation/support behavior,

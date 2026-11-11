@@ -15,6 +15,7 @@ import { useProgress } from "@/features/progress/progress-provider";
 
 const navigation = [
   { href: "/learn", label: "My learning", icon: LayoutDashboard },
+  { href: "/learn/portfolio", label: "My portfolio", icon: UserRound },
   { href: "/practice", label: "Placement practice", icon: Target },
   { href: "/games", label: "Warm-up games", icon: Puzzle },
   { href: "/dashboard", label: "Course notes", icon: BookOpen },

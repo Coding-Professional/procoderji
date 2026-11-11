@@ -1,6 +1,8 @@
-# ProCoderJii account and progress API
+# ProCoderJii account, progress and portfolio API
 
-ASP.NET Core 10 provides Google sign-in, server-managed cookie sessions, and durable learner progress. The Next.js app forwards `/api/platform/*` to this service through its server-only BFF. Anonymous browser practice stays available when the backend or Google credentials are not configured.
+ASP.NET Core 10 provides Google sign-in, server-managed cookie sessions, durable learner progress,
+and portfolio drafts/publication. Next.js forwards `/api/platform/*` through its server-only
+BFF. Guest practice and the in-memory portfolio preview work without backend credentials.
 
 ## Run locally
 
@@ -39,8 +41,12 @@ Users are linked by Google's stable provider subject, never by matching email ad
 ## API contract
 
 Portfolio storage and authenticated/public endpoints are documented in the
-[portfolio API guide](../docs/portfolio-api.md). Public publishing is disabled by default until
-the owner decisions and launch work in #47/#48 are complete.
+[portfolio API guide](../docs/portfolio-api.md). The editor, two themes, Markdown import,
+moderation and 18+ publishing policy are implemented. `Portfolio__PublishingEnabled` remains
+false by default; use the [workspace launch runbook](../docs/portfolio-workspace.md) before
+enabling it. Frontend production hosting remains separate work under
+[#74](https://github.com/procoderji-com/procoderji/issues/74); this guide does not establish a
+deployed production service.
 
 | Endpoint | Behavior |
 | --- | --- |
@@ -101,8 +107,9 @@ dotnet run --project backend/src/ProCoderJi.Api --no-launch-profile -- --migrate
 ```
 
 This command uses the current environment's database/provider settings and exits after
-provisioning. It applies EF migrations for relational databases and creates MongoDB's unique
-Google-subject index for MongoDB. Development and Testing provision automatically; production
+provisioning. It applies EF migrations, including portfolio publishing-policy fields, for
+relational databases and creates MongoDB's Google-subject and portfolio-username indexes.
+Development and Testing provision automatically; production
 does so only for `--migrate` or explicit `Database__MigrateOnStartup=true`. Back up the database
 before schema changes. Shared relational migrations contain provider-specific SQL where needed;
 keep both the default and SQL Server model snapshots current and run the provider checks.
@@ -120,6 +127,53 @@ replica set or multi-document transactions. See [ADR 0003](../docs/decisions/000
 
 Razorpay or Paytm integration is planned for a later billing slice. No payment, subscription activation, or live checkout is implemented in this API yet.
 
+## Portfolio moderation
+
+Each public portfolio's **Report this page** link opens an email to `procoderji@gmail.com` with
+its canonical address. Operators review reports and can run these commands using the deployed
+API's database environment and authorised database credentials:
+
+```bash
+dotnet ProCoderJi.Api.dll --portfolio suspend --username riya-student
+dotnet ProCoderJi.Api.dll --portfolio restore --username riya-student
+```
+
+For a local development database, use
+`dotnet run --project backend/src/ProCoderJi.Api --no-launch-profile -- --portfolio suspend --username riya-student`.
+Run `--migrate` separately before these commands when the schema needs updating. Moderation
+does not start an HTTP server or migrate a database. It prints only username, status and new
+revision, excluding student content and provider connection details. Exit codes are 0 success
+(including an already-applied state), 2 invalid arguments, 3 missing portfolio, 1 operation
+failure, and 130 cancellation. `--portfolio help` prints syntax.
+
+Suspend removes the public snapshot, search visibility and publishing acceptance while
+retaining the owner's private draft. Owners may edit/unpublish, but cannot publish or delete
+to bypass suspension. Restore returns a private **draft**, not a live page: the student must
+review and explicitly accept the current policy and publish again. The CLI uses revision/status
+checks and supports relational providers and MongoDB. There is no production moderation HTTP
+endpoint or student-supplied admin flag.
+
+Next.js checks fresh publication state before serving cached snapshots, so suspension becomes
+404 on the next request without a CLI cache-invalidation callback. Verify the public URL and
+sitemap after changes. Keep report decisions and operator access in the deployment's operating
+process. Requests to remove a suspended portfolio or an account go to the operator contact;
+practice-history deletion is separate.
+
+## Portfolio publishing configuration
+
+Phase 1 fixes usernames while the portfolio exists and requires 18+ self-declaration plus
+current Terms/Privacy acceptance for every publication. The server privately stores policy
+version `2026-11-11` and confirmation time; it collects no birth date. This product policy does
+not establish independent age verification or qualified legal review. Existing snapshots
+without current acceptance stay unavailable until the student republishes.
+
+After configuring production Google OAuth, HTTPS `PublicOrigin`, BFF connectivity, durable
+storage, migrations, backup/restore, reporting and operator access, set
+`Portfolio__PublishingEnabled=true` on the backend to enable publication. Keep it false while
+preparing drafts or investigating a public-content incident; disabling it makes public
+snapshot/state reads return 404 and empties the public index without deleting drafts. Consult
+the [runbook](../docs/portfolio-workspace.md#deployment-runbook) for release checks.
+
 ## Tests
 
 ```bash
@@ -127,6 +181,14 @@ dotnet test backend/ProCoderJi.slnx --no-restore
 ```
 
 The default suite creates isolated SQLite databases and uses test-only authentication registered by `WebApplicationFactory` in the test assembly. The API has no test-header login path. Tests cover anonymous behavior, Google challenge URL construction, CSRF/origin checks, account isolation, immutable sync, generation resets, stale requests, question validation, and retention.
+
+Full-stack frontend checks (`E2E_DOTNET=1 npm run e2e`) build the separate
+`backend/tests/ProCoderJi.BrowserHost` executable. It hosts the real API on loopback with an
+owned temporary SQLite database, seeded disposable-account cookies and fixture-only publishing
+controls. Origin, CSRF, ownership and persistence still use the real application pipeline.
+Its `/__e2e__` endpoints and authentication scheme exist only in the test executable; the
+production API Dockerfile publishes `backend/src/ProCoderJi.Api` only. Never deploy BrowserHost.
+See [browser checks](../docs/development.md#browser-checks) for coverage and configuration.
 
 To run the same API contract tests against a disposable server, set exactly one of
 `PROCODERJI_TEST_POSTGRES`, `PROCODERJI_TEST_SQLSERVER`, or `PROCODERJI_TEST_MONGODB` to its

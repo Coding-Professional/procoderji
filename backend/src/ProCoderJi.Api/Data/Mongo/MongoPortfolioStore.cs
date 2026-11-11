@@ -38,7 +38,7 @@ public sealed class MongoPortfolioStore(MongoPlatformDatabase database) : IPortf
             return current with { Username = username };
         }, cancellationToken);
 
-    public Task<PortfolioRecord> Publish(Guid userId, Guid revision, CancellationToken cancellationToken) =>
+    public Task<PortfolioRecord> Publish(Guid userId, Guid revision, CancellationToken cancellationToken, string? policyVersion = null) =>
         Write(userId, revision, allowCreate: false, (current, now) =>
         {
             if (current.Status == PortfolioStatus.Suspended) throw new PortfolioConflictException("suspended");
@@ -46,9 +46,23 @@ public sealed class MongoPortfolioStore(MongoPlatformDatabase database) : IPortf
             return current with
             {
                 Status = PortfolioStatus.Published, PublishedJson = current.DraftJson,
-                PublishedSearchVisible = current.SearchVisible, PublishedAtUtc = now
+                PublishedSearchVisible = current.SearchVisible, PublishedAtUtc = now,
+                PublishingPolicyVersion = policyVersion, EligibilityConfirmedAtUtc = policyVersion is null ? null : now
             };
         }, cancellationToken);
+
+    public async Task<IReadOnlyList<PortfolioIndexEntry>> ListSearchVisible(string? after, int limit, CancellationToken cancellationToken)
+    {
+        var filter = Builders<MongoUserDocument>.Filter.Where(row => row.Portfolio != null
+            && row.Portfolio.Status == PortfolioStatus.Published && row.Portfolio.PublishedJson != null
+            && row.Portfolio.Username != null && row.Portfolio.PublishedSearchVisible
+            && row.Portfolio.PublishingPolicyVersion == PortfolioPublishingPolicy.Version
+            && row.Portfolio.EligibilityConfirmedAtUtc != null && row.Portfolio.PublishedAtUtc != null);
+        if (after is not null) filter &= Builders<MongoUserDocument>.Filter.Gt("Portfolio.Username", after);
+        return await database.Users.Find(filter).SortBy(row => row.Portfolio!.Username).Limit(limit)
+            .Project(row => new PortfolioIndexEntry(row.Portfolio!.Username!, row.Portfolio.PublishedAtUtc!.Value))
+            .ToListAsync(cancellationToken);
+    }
 
     public Task<PortfolioRecord> Unpublish(Guid userId, Guid revision, CancellationToken cancellationToken) =>
         Write(userId, revision, allowCreate: false, (current, _) => current with

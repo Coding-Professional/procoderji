@@ -1,11 +1,11 @@
 # Portfolio rules
 
-The rules for student portfolios, shared by the frontend and the backend. The decisions behind
+Version **2** of the student-portfolio rules is shared by the frontend and backend. The decisions behind
 them are in [ADR 0002](../../docs/decisions/0002-student-portfolios.md).
 
 | File | Purpose |
 | --- | --- |
-| `rules.json` | Limits, reserved names, blocked words, and the patterns for links, hosts and email. The only place these numbers live. |
+| `rules.json` | Version, themes, publishing policy, limits, reserved names, blocked words and patterns. Canonical configuration for both runtimes. |
 | `fixtures.json` | Example usernames and portfolios with the problems each must produce. Both validators run all of them. |
 
 The TypeScript validator is `src/features/portfolio/validation.ts`; the .NET validator is
@@ -14,9 +14,14 @@ gives quick feedback in the editor; the backend is the trusted check before anyt
 
 ## What is checked
 
-A portfolio has fixed fields: `name`, `headline`, `about`, `skills`, `projects`, `education`,
+A portfolio has fixed fields: `theme`, `name`, `headline`, `about`, `skills`, `projects`, `education`,
 `experience`, `achievements`, and `links` (`github`, `linkedin`, `website`, `email`). Anything else is
 rejected as an `unknown-field`.
+
+`theme` is optional for older drafts and publications; omission renders Simple. The only values
+are `simple` and `developer`. Theme selection changes presentation, not allowed content. The
+[Markdown importer](../../docs/portfolio-markdown.md) produces the same data and validator
+results as the form; its source file is never rendered publicly.
 
 - **Modes.** A *draft* only has to be well-formed, so a student can save half-finished work. *Publish* also
   requires `name` and `headline`. Entries inside a list (a project's title, an
@@ -46,6 +51,18 @@ reported as `invalid-characters` on the object that holds it, and that object's 
 System.Text.Json decodes strings and field names lazily, so the .NET validator reads them without throwing and
 reports the same problem. A lone surrogate escape is not portable JSON (editors and many parsers reject it), so the
 `malformedText` fixtures list UTF-16 code units and each runtime builds the string itself.
+
+## Publishing policy
+
+`rules.json` also defines `publishing.minimumAge: 18` and
+`publishing.policyVersion: "2026-11-11"`. The editor requires explicit age/Terms/Privacy
+confirmation before each publish; the backend validates the current version and stores the
+acceptance version and server time privately. This is self-declaration, not age verification;
+no birth date is collected. These values are not student-authored portfolio fields.
+
+Usernames stay fixed while the portfolio exists. Publishing, moderation, revisions and search
+visibility are backend state rules, separate from field validation. See the
+[API contract](../../docs/portfolio-api.md) and [workspace guide](../../docs/portfolio-workspace.md).
 
 ## Limits
 
@@ -96,6 +113,11 @@ Lengths count UTF-16 code units, the unit both JavaScript and .NET use, so one e
 3. Change both validators if the logic changes, and keep them identical in behaviour. The validators avoid URL
    parsers and locale-aware string functions on purpose, because JavaScript and .NET disagree about them.
 4. Run `npm test` and `dotnet test backend/ProCoderJi.slnx --configuration Release`. Both must pass.
+
+For a publishing policy change, update policy wording, shared configuration, client/backend
+tests and rollout guidance together. The backend rejects old acceptance on public reads until
+the student reviews and republishes under the current version. Do not silently accept on
+their behalf.
 
 The fixture file is plain ASCII: write any other character as a Unicode escape (a backslash, `u`, and four hex
 digits) so reviewers can see exactly which character it is.

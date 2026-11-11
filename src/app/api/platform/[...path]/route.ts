@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isBackendPath, parseBackendOrigin } from "@/features/account/config";
+import { revalidateTag } from "next/cache";
+import { portfolioCacheTag } from "@/features/portfolio/public-model";
+import { validateUsername } from "@/features/portfolio/validation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -94,6 +97,13 @@ async function proxy(
     }
     for (const cookie of upstream.headers.getSetCookie())
       responseHeaders.append("set-cookie", cookie);
+    if (upstream.ok && request.method !== "GET" && ["portfolio/publish", "portfolio/unpublish", "portfolio"].includes(path)) {
+      const username = upstream.headers.get("x-portfolio-username");
+      if (username && validateUsername(username).length === 0) {
+        try { revalidateTag(portfolioCacheTag(username), { expire: 0 }); }
+        catch { console.error("Portfolio cache invalidation was unavailable; fresh publication checks remain active."); }
+      }
+    }
     return new Response(upstream.body, {
       status: upstream.status,
       headers: responseHeaders,

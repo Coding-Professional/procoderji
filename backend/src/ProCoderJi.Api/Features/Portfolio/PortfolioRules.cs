@@ -15,6 +15,8 @@ public sealed class PortfolioRules
     };
 
     public required IReadOnlyList<string> RequiredForPublish { get; init; }
+    public required IReadOnlyList<string> Themes { get; init; }
+    public required PublishingRules Publishing { get; init; }
     public required IReadOnlyDictionary<string, int> MaxItems { get; init; }
     public required IReadOnlyDictionary<string, int> MaxLength { get; init; }
     public required IReadOnlyList<string> MultilineFields { get; init; }
@@ -24,6 +26,7 @@ public sealed class PortfolioRules
     public required UsernameRules Username { get; init; }
 
     public sealed record TextRules(string ControlCharacters, string HtmlLike);
+    public sealed record PublishingRules(string PolicyVersion, int MinimumAge);
 
     public sealed record LinkRules(
         string Scheme,
@@ -40,6 +43,8 @@ public sealed class PortfolioRules
 
     private sealed record RulesDocument(
         int Version,
+        List<string>? Themes,
+        PublishingRules? Publishing,
         List<string>? RequiredForPublish,
         Dictionary<string, int>? MaxItems,
         Dictionary<string, int>? MaxLength,
@@ -54,7 +59,9 @@ public sealed class PortfolioRules
         RulesDocument? document;
         try { document = JsonSerializer.Deserialize<RulesDocument>(json, RulesJson); }
         catch (JsonException cause) { throw new InvalidDataException("The shared portfolio rules are not valid JSON.", cause); }
-        if (document is not { Version: 1 } || document.RequiredForPublish is null || document.MaxItems is null
+        if (document is not { Version: 2 } || document.Themes is not { Count: > 0 }
+            || document.Publishing is not { MinimumAge: 18 } || !DateOnly.TryParseExact(document.Publishing.PolicyVersion, "yyyy-MM-dd", out _)
+            || document.RequiredForPublish is null || document.MaxItems is null
             || document.MaxLength is null || document.MultilineFields is null || document.Text is null
             || document.Link is null || document.EmailPattern is null || document.Username is null
             || document.Username.Reserved is null || document.Username.BlockedWords is null
@@ -63,6 +70,8 @@ public sealed class PortfolioRules
         return new PortfolioRules
         {
             RequiredForPublish = document.RequiredForPublish,
+            Themes = document.Themes,
+            Publishing = document.Publishing,
             MaxItems = document.MaxItems,
             MaxLength = document.MaxLength,
             MultilineFields = document.MultilineFields,

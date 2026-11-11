@@ -54,6 +54,9 @@ public sealed class PlatformDbContext(DbContextOptions<PlatformDbContext> option
                 .HasFilter(Database.IsSqlServer() ? "[Username] IS NOT NULL" : null);
             entity.Property(portfolio => portfolio.DraftJson).HasMaxLength(262144);
             entity.Property(portfolio => portfolio.PublishedJson).HasMaxLength(262144);
+            entity.Property(portfolio => portfolio.PublishingPolicyVersion).HasMaxLength(16);
+            entity.HasIndex(portfolio => new { portfolio.Status, portfolio.PublishedSearchVisible, portfolio.PublishingPolicyVersion, portfolio.Username })
+                .HasDatabaseName("IX_Portfolios_PublicIndex");
             entity.Property(portfolio => portfolio.Status).HasConversion<string>().HasMaxLength(16).IsConcurrencyToken();
             entity.Property(portfolio => portfolio.Revision).IsConcurrencyToken();
             entity.HasOne<LearnerUser>().WithOne().HasForeignKey<PortfolioEntity>(portfolio => portfolio.UserId).OnDelete(DeleteBehavior.Cascade);
@@ -107,4 +110,6 @@ public sealed class PortfolioEntity
     public long CreatedAtUtc { get; set; }
     public long UpdatedAtUtc { get; set; }
     public long? PublishedAtUtc { get; set; }
+    public string? PublishingPolicyVersion { get; set; }
+    public long? EligibilityConfirmedAtUtc { get; set; }
 }

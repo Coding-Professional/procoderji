@@ -89,7 +89,10 @@ public sealed class PortfolioRelationalTests
         var migration = migrations.CreateMigration(portfolioMigration.Value, db.Database.ProviderName!);
         foreach (var command in db.GetService<IMigrationsSqlGenerator>().Generate(migration.DownOperations))
             await db.Database.ExecuteSqlRawAsync(command.CommandText);
-        await db.Database.ExecuteSqlRawAsync(db.GetService<IHistoryRepository>().GetDeleteScript(portfolioMigration.Key));
+        // Later portfolio migrations add metadata/indexes to the same table. Its removal
+        // restores the original account-only schema; remove their history together.
+        foreach (var applied in migrations.Migrations.Keys.Where(key => string.CompareOrdinal(key, portfolioMigration.Key) >= 0))
+            await db.Database.ExecuteSqlRawAsync(db.GetService<IHistoryRepository>().GetDeleteScript(applied));
         var userId = Guid.NewGuid();
         var generation = Guid.NewGuid();
         db.Users.Add(new LearnerUser { Id = userId, GoogleSubject = "existing-subject", Email = "existing@example.test", Name = "Existing", CreatedAtUtc = 1 });

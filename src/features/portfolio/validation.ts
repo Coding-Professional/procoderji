@@ -202,6 +202,7 @@ export function validatePortfolio(
   const problems: Problems = [];
   if (!isObject(value)) return [{ path: "$", code: "invalid-type" }];
   const rootOk = checkUnknownFields(problems, "", value, [
+    "theme",
     "name",
     "headline",
     "about",
@@ -217,6 +218,12 @@ export function validatePortfolio(
   const requiredOnPublish = (key: string) =>
     mode === "publish" && RULES.requiredForPublish.includes(key);
   checkText(problems, "name", get(value, "name"), "name", requiredOnPublish("name"));
+  const theme = get(value, "theme");
+  if (theme !== undefined) {
+    if (typeof theme !== "string") add(problems, "theme", "invalid-type");
+    else if (!isWellFormed(theme)) add(problems, "theme", "invalid-characters");
+    else if (!RULES.themes.includes(theme)) add(problems, "theme", "invalid-format");
+  }
   checkText(problems, "headline", get(value, "headline"), "headline", requiredOnPublish("headline"));
   checkText(problems, "about", get(value, "about"), "about", false);
 
