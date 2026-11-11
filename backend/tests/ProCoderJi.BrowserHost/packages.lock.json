@@ -429,8 +429,8 @@
       },
       "xunit.runner.visualstudio": {
         "type": "Transitive",
-        "resolved": "3.1.5",
-        "contentHash": "tKi7dSTwP4m5m9eXPM2Ime4Kn7xNf4x4zT9sdLO/G4hZVnQCRiMTWoSZqI/pYTVeI27oPPqHBKYI/DjJ9GsYgA=="
+        "resolved": "4.0.1",
+        "contentHash": "8CoAaZkniVekR1ycJyxn+hOz+6ZQCDPcoIsIs6ujd4WyFcBMlxGNU15Qb8Uxd4iO4UmOuETb0M6vzBbwX/mfLA=="
       },
       "ZstdSharp.Port": {
         "type": "Transitive",
@@ -457,7 +457,7 @@
           "ProCoderJi.Api": "[1.0.0, )",
           "coverlet.collector": "[10.1.0, )",
           "xunit": "[2.9.3, )",
-          "xunit.runner.visualstudio": "[3.1.5, )"
+          "xunit.runner.visualstudio": "[4.0.1, )"
         }
       }
     }
