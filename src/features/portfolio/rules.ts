@@ -6,6 +6,8 @@ import rulesData from "../../../shared/portfolio/rules.json" with { type: "json"
  */
 export interface PortfolioRules {
   version: number;
+  themes: readonly string[];
+  publishing: { policyVersion: string; minimumAge: number };
   requiredForPublish: readonly string[];
   maxItems: Readonly<Record<string, number>>;
   maxLength: Readonly<Record<string, number>>;

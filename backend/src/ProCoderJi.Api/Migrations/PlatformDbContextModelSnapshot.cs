@@ -74,8 +74,11 @@ public sealed class PlatformDbContextModelSnapshot : ModelSnapshot
             entity.Property<long>("CreatedAtUtc");
             entity.Property<long>("UpdatedAtUtc");
             entity.Property<long?>("PublishedAtUtc");
+            entity.Property<string>("PublishingPolicyVersion").HasMaxLength(16);
+            entity.Property<long?>("EligibilityConfirmedAtUtc");
             entity.HasKey("UserId");
             entity.HasIndex("Username").IsUnique();
+            entity.HasIndex("Status", "PublishedSearchVisible", "PublishingPolicyVersion", "Username").HasDatabaseName("IX_Portfolios_PublicIndex");
             entity.ToTable("Portfolios", table =>
             {
                 table.HasCheckConstraint("CK_Portfolio_Status", "\"Status\" IN ('Draft', 'Published', 'Suspended')");

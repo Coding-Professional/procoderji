@@ -1,6 +1,7 @@
 import { chromium, devices } from "playwright-core";
 import fs from "node:fs";
 import path from "node:path";
+import { runPortfolioChecks } from "./portfolio-checks.mjs";
 
 const BASE = process.env.BASE || "http://localhost:3150";
 const CHANNEL = process.env.E2E_CHANNEL || "chrome";
@@ -446,6 +447,14 @@ await interaction("privacy page discloses every third-party host the site contac
   const missing = [...hosts].filter((h) => !text.includes((DISCLOSED_AS[h] ?? h).toLowerCase()));
   expectTrue(missing.length === 0, "undisclosed third-party host(s): " + missing.join(", "));
 });
+
+if (FULLSTACK) {
+  try {
+    findings.push(...await runPortfolioChecks({ browser, base: BASE, backendOrigin: process.env.E2E_BACKEND_ORIGIN || "http://127.0.0.1:5151" }));
+  } catch (error) {
+    note("all", "/learn/portfolio", "portfolio", `Fixture setup failed: ${String(error.message ?? error)}`);
+  }
+}
 
 await browser.close();
 

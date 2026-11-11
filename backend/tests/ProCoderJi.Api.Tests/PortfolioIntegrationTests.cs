@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -335,6 +336,13 @@ public sealed class PortfolioIntegrationTests
     private static Task<HttpResponseMessage> Write(HttpClient browser, Guid user, string? token, object body, string action, HttpMethod? method = null, string origin = "http://localhost:3000")
     {
         var request = Request(user, token, action, method ?? HttpMethod.Post, origin);
+        if (action == "publish")
+        {
+            var publish = JsonSerializer.SerializeToNode(body, Json)!.AsObject();
+            if (!publish.ContainsKey("eligibility"))
+                publish["eligibility"] = JsonSerializer.SerializeToNode(new { atLeast18 = true, policyVersion = PortfolioPublishingPolicy.Version }, Json);
+            body = publish;
+        }
         request.Content = JsonContent.Create(body, options: Json);
         return browser.SendAsync(request);
     }

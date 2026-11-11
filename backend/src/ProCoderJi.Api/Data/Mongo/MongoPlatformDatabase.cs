@@ -29,6 +29,16 @@ public sealed class MongoPlatformDatabase(IMongoDatabase database)
                     Unique = true,
                     Name = "IX_users_Portfolio_Username",
                     PartialFilterExpression = Builders<MongoUserDocument>.Filter.Type("Portfolio.Username", BsonType.String)
+                }),
+            new CreateIndexModel<MongoUserDocument>(Builders<MongoUserDocument>.IndexKeys
+                .Ascending("Portfolio.Status").Ascending("Portfolio.PublishedSearchVisible")
+                .Ascending("Portfolio.PublishingPolicyVersion").Ascending("Portfolio.Username"),
+                new CreateIndexOptions<MongoUserDocument>
+                {
+                    Name = "IX_users_Portfolio_PublicIndex",
+                    PartialFilterExpression = Builders<MongoUserDocument>.Filter.And(
+                        Builders<MongoUserDocument>.Filter.Eq(user => user.Portfolio!.Status, PortfolioStatus.Published),
+                        Builders<MongoUserDocument>.Filter.Eq(user => user.Portfolio!.PublishedSearchVisible, true))
                 })
         ], cancellationToken: cancellationToken);
     }
@@ -93,16 +103,20 @@ public sealed class MongoPortfolioDocument
     public long CreatedAtUtc { get; set; }
     public long UpdatedAtUtc { get; set; }
     public long? PublishedAtUtc { get; set; }
+    [BsonIgnoreIfNull] public string? PublishingPolicyVersion { get; set; }
+    [BsonIgnoreIfNull] public long? EligibilityConfirmedAtUtc { get; set; }
 
     public PortfolioRecord ToRecord(Guid userId) => new(userId, Username, DraftJson, PublishedJson,
-        SearchVisible, PublishedSearchVisible, Status, Guid.Parse(Revision), CreatedAtUtc, UpdatedAtUtc, PublishedAtUtc);
+        SearchVisible, PublishedSearchVisible, Status, Guid.Parse(Revision), CreatedAtUtc, UpdatedAtUtc, PublishedAtUtc,
+        PublishingPolicyVersion, EligibilityConfirmedAtUtc);
 
     public static MongoPortfolioDocument From(PortfolioRecord record) => new()
     {
         Username = record.Username, DraftJson = record.DraftJson, PublishedJson = record.PublishedJson,
         SearchVisible = record.SearchVisible, PublishedSearchVisible = record.PublishedSearchVisible,
         Status = record.Status, Revision = record.Revision.ToString("D"), CreatedAtUtc = record.CreatedAtUtc,
-        UpdatedAtUtc = record.UpdatedAtUtc, PublishedAtUtc = record.PublishedAtUtc
+        UpdatedAtUtc = record.UpdatedAtUtc, PublishedAtUtc = record.PublishedAtUtc,
+        PublishingPolicyVersion = record.PublishingPolicyVersion, EligibilityConfirmedAtUtc = record.EligibilityConfirmedAtUtc
     };
 }
 
