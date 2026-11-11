@@ -1,7 +1,9 @@
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using ProCoderJi.Api.Features.Practice;
 using ProCoderJi.Api.Features.Progress;
+using ProCoderJi.Api.Features.Portfolio;
 
 namespace ProCoderJi.Api.Data.Mongo;
 
@@ -15,10 +17,31 @@ public sealed class MongoPlatformDatabase(IMongoDatabase database)
     public IMongoCollection<MongoProgressDocument> Progress => Database.GetCollection<MongoProgressDocument>("progress");
     public IMongoCollection<MongoKeyDocument> Keys => Database.GetCollection<MongoKeyDocument>("dataProtectionKeys");
 
-    /// <summary>MongoDB has no EF migrations; provisioning creates the identity uniqueness boundary.</summary>
-    public Task InitializeAsync(CancellationToken cancellationToken = default) => Users.Indexes.CreateOneAsync(
-        new CreateIndexModel<MongoUserDocument>(Builders<MongoUserDocument>.IndexKeys.Ascending(user => user.GoogleSubject),
-            new CreateIndexOptions { Unique = true, Name = "IX_users_GoogleSubject" }), cancellationToken: cancellationToken);
+    /// <summary>MongoDB has no EF migrations; provisioning creates the identity and username boundaries.</summary>
+    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        await Users.Indexes.CreateManyAsync([
+            new CreateIndexModel<MongoUserDocument>(Builders<MongoUserDocument>.IndexKeys.Ascending(user => user.GoogleSubject),
+                new CreateIndexOptions { Unique = true, Name = "IX_users_GoogleSubject" }),
+            new CreateIndexModel<MongoUserDocument>(Builders<MongoUserDocument>.IndexKeys.Ascending("Portfolio.Username"),
+                new CreateIndexOptions<MongoUserDocument>
+                {
+                    Unique = true,
+                    Name = "IX_users_Portfolio_Username",
+                    PartialFilterExpression = Builders<MongoUserDocument>.Filter.Type("Portfolio.Username", BsonType.String)
+                }),
+            new CreateIndexModel<MongoUserDocument>(Builders<MongoUserDocument>.IndexKeys
+                .Ascending("Portfolio.Status").Ascending("Portfolio.PublishedSearchVisible")
+                .Ascending("Portfolio.PublishingPolicyVersion").Ascending("Portfolio.Username"),
+                new CreateIndexOptions<MongoUserDocument>
+                {
+                    Name = "IX_users_Portfolio_PublicIndex",
+                    PartialFilterExpression = Builders<MongoUserDocument>.Filter.And(
+                        Builders<MongoUserDocument>.Filter.Eq(user => user.Portfolio!.Status, PortfolioStatus.Published),
+                        Builders<MongoUserDocument>.Filter.Eq(user => user.Portfolio!.PublishedSearchVisible, true))
+                })
+        ], cancellationToken: cancellationToken);
+    }
 }
 
 public static class MongoDatabaseRegistration
@@ -46,6 +69,7 @@ public static class MongoDatabaseRegistration
         services.AddSingleton<MongoPlatformDatabase>();
         services.AddSingleton<MongoAccountStore>();
         services.AddSingleton<MongoProgressStore>();
+        services.AddSingleton<MongoPortfolioStore>();
         services.AddSingleton<MongoXmlRepository>();
         return services;
     }
@@ -58,10 +82,41 @@ public sealed class MongoUserDocument
     public required string Email { get; set; }
     public required string Name { get; set; }
     public long CreatedAtUtc { get; set; }
+    [BsonIgnoreIfNull] public MongoPortfolioDocument? Portfolio { get; set; }
 
     public LearnerUser ToUser() => new()
     {
         Id = Guid.Parse(Id), GoogleSubject = GoogleSubject, Email = Email, Name = Name, CreatedAtUtc = CreatedAtUtc
+    };
+}
+
+/// <summary>Embedded in the owning account so deleting it also removes its private and public portfolio.</summary>
+public sealed class MongoPortfolioDocument
+{
+    [BsonIgnoreIfNull] public string? Username { get; set; }
+    public required string DraftJson { get; set; }
+    [BsonIgnoreIfNull] public string? PublishedJson { get; set; }
+    public bool SearchVisible { get; set; }
+    public bool PublishedSearchVisible { get; set; }
+    [BsonRepresentation(BsonType.String)] public PortfolioStatus Status { get; set; }
+    public required string Revision { get; set; }
+    public long CreatedAtUtc { get; set; }
+    public long UpdatedAtUtc { get; set; }
+    public long? PublishedAtUtc { get; set; }
+    [BsonIgnoreIfNull] public string? PublishingPolicyVersion { get; set; }
+    [BsonIgnoreIfNull] public long? EligibilityConfirmedAtUtc { get; set; }
+
+    public PortfolioRecord ToRecord(Guid userId) => new(userId, Username, DraftJson, PublishedJson,
+        SearchVisible, PublishedSearchVisible, Status, Guid.Parse(Revision), CreatedAtUtc, UpdatedAtUtc, PublishedAtUtc,
+        PublishingPolicyVersion, EligibilityConfirmedAtUtc);
+
+    public static MongoPortfolioDocument From(PortfolioRecord record) => new()
+    {
+        Username = record.Username, DraftJson = record.DraftJson, PublishedJson = record.PublishedJson,
+        SearchVisible = record.SearchVisible, PublishedSearchVisible = record.PublishedSearchVisible,
+        Status = record.Status, Revision = record.Revision.ToString("D"), CreatedAtUtc = record.CreatedAtUtc,
+        UpdatedAtUtc = record.UpdatedAtUtc, PublishedAtUtc = record.PublishedAtUtc,
+        PublishingPolicyVersion = record.PublishingPolicyVersion, EligibilityConfirmedAtUtc = record.EligibilityConfirmedAtUtc
     };
 }
 

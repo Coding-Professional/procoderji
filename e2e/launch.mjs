@@ -157,7 +157,7 @@ try {
 	}
 
 	// ---------- empty content stays hidden ----------
-	const mustBeNoindex = ["/dashboard/btech/cse/sem1", "/dashboard/btech/cse/sem8", "/dashboard/btech/aiml/sem3"];
+	const mustBeNoindex = ["/dashboard/btech/cse/sem1", "/dashboard/btech/cse/sem8", "/dashboard/btech/aiml/sem3", "/learn/portfolio"];
 	for (const p of mustBeNoindex) {
 		const res = await get(p);
 		if (res.status === 200 && !/noindex/i.test(analyse(res.text).robots ?? "")) bad(p, "empty page is indexable (should be noindex)");
@@ -180,6 +180,16 @@ try {
 	}
 	const notFound = await get("/this/page/does/not/exist");
 	if (notFound.status !== 404) bad("/this/page/does/not/exist", `expected 404, got ${notFound.status}`);
+	for (const p of ["/u/qa-unpublished-student", "/u/admin"]) {
+		const res = await get(p);
+		if (res.status !== 404) bad(p, `unpublished portfolio expected 404, got ${res.status}`);
+		if (!/noindex/i.test(analyse(res.text).robots ?? "")) bad(p, "portfolio 404 must be noindex");
+		if (sitemapPaths.has(p)) bad(p, "unpublished portfolio is in the sitemap");
+	}
+	const template = await get("/templates/portfolio.md");
+	if (template.status !== 200 || !/^---\r?\n/.test(template.text) || !template.text.includes("## Projects"))
+		bad("/templates/portfolio.md", "the downloadable Markdown template is missing or malformed");
+	if (Buffer.byteLength(template.text, "utf8") > 50 * 1024) bad("/templates/portfolio.md", "template exceeds the import limit");
 
 	// ---------- latest videos: visible only when YOUTUBE_CHANNEL_ID is set ----------
 	{

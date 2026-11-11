@@ -81,8 +81,17 @@ export const LEGAL_PAGES = [
 	{ path: "/copyright", label: "Copyright & Takedown" },
 ] as const;
 
+/** Publication dates for revised policies; other legal pages keep the owner's existing date. */
+export const policyEffectiveDates: Readonly<Partial<Record<(typeof LEGAL_PAGES)[number]["path"], string>>> = {
+	"/privacy": "2026-11-11",
+	"/terms": "2026-11-11",
+};
+
 /** Sitemap entries for the legal pages; empty until the owner's details are complete. */
 export function legalSitemapRoutes(details: LegalDetails = LEGAL): { path: string; lastModified?: string }[] {
 	if (!isLegalComplete(details)) return [];
-	return LEGAL_PAGES.map((p) => ({ path: p.path, lastModified: details.effectiveDate as string }));
+	return LEGAL_PAGES.map((p) => ({
+		path: p.path,
+		lastModified: policyEffectiveDates[p.path] ?? details.effectiveDate as string,
+	}));
 }
