@@ -96,5 +96,7 @@ public sealed class ProgressService(IDbContextFactory<PlatformDbContext> factory
         || error is SqliteException { SqliteErrorCode: 5 or 6 }
         || error is PostgresException { SqlState: "40001" or "40P01" or "23505" }
         || error is SqlException { Number: 1205 or 2601 or 2627 or 3960 }
-        || error is DbUpdateException { InnerException: not null } update && IsRetryable(update.InnerException!);
+        // EF provider strategies can add an InvalidOperationException wrapper around a
+        // transient save failure. Preserve whole-transaction retries through that wrapper.
+        || error.InnerException is not null && IsRetryable(error.InnerException);
 }

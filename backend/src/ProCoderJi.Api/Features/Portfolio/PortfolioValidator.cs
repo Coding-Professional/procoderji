@@ -22,7 +22,7 @@ public readonly record struct PortfolioProblem(string Path, string Code)
 public sealed class PortfolioValidator
 {
     private static readonly string[] TopLevelFields =
-        ["name", "headline", "about", "skills", "projects", "education", "experience", "achievements", "links"];
+        ["theme", "name", "headline", "about", "skills", "projects", "education", "experience", "achievements", "links"];
 
     private readonly PortfolioRules rules;
     private readonly Regex control;
@@ -85,6 +85,14 @@ public sealed class PortfolioValidator
         if (!CheckUnknownFields(problems, "", root, TopLevelFields)) return problems;
 
         bool RequiredOnPublish(string key) => mode == PortfolioMode.Publish && rules.RequiredForPublish.Contains(key);
+        var theme = Get(root, "theme");
+        if (theme.Present)
+        {
+            var read = TryString(theme.Node, out var name);
+            if (read == StringRead.NotAString) problems.Add(new("theme", "invalid-type"));
+            else if (read == StringRead.Malformed) problems.Add(new("theme", "invalid-characters"));
+            else if (!rules.Themes.Contains(name)) problems.Add(new("theme", "invalid-format"));
+        }
         CheckText(problems, "name", Get(root, "name"), "name", RequiredOnPublish("name"));
         CheckText(problems, "headline", Get(root, "headline"), "headline", RequiredOnPublish("headline"));
         CheckText(problems, "about", Get(root, "about"), "about", false);

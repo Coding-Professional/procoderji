@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using ProCoderJi.Api.Features.Portfolio;
 
 namespace ProCoderJi.Api.Data;
 
@@ -8,6 +9,7 @@ public sealed class PlatformDbContext(DbContextOptions<PlatformDbContext> option
     public DbSet<LearnerUser> Users => Set<LearnerUser>();
     public DbSet<ProgressState> ProgressStates => Set<ProgressState>();
     public DbSet<PracticeAttemptEntity> Attempts => Set<PracticeAttemptEntity>();
+    public DbSet<PortfolioEntity> Portfolios => Set<PortfolioEntity>();
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder model)
@@ -43,6 +45,27 @@ public sealed class PlatformDbContext(DbContextOptions<PlatformDbContext> option
                     : "length(\"QuestionIdsJson\") <= 4096 AND length(\"ResponsesJson\") <= 8192");
             });
         });
+        model.Entity<PortfolioEntity>(entity =>
+        {
+            entity.HasKey(portfolio => portfolio.UserId);
+            entity.Property(portfolio => portfolio.UserId).ValueGeneratedNever();
+            entity.Property(portfolio => portfolio.Username).HasMaxLength(30);
+            entity.HasIndex(portfolio => portfolio.Username).IsUnique()
+                .HasFilter(Database.IsSqlServer() ? "[Username] IS NOT NULL" : null);
+            entity.Property(portfolio => portfolio.DraftJson).HasMaxLength(262144);
+            entity.Property(portfolio => portfolio.PublishedJson).HasMaxLength(262144);
+            entity.Property(portfolio => portfolio.PublishingPolicyVersion).HasMaxLength(16);
+            entity.HasIndex(portfolio => new { portfolio.Status, portfolio.PublishedSearchVisible, portfolio.PublishingPolicyVersion, portfolio.Username })
+                .HasDatabaseName("IX_Portfolios_PublicIndex");
+            entity.Property(portfolio => portfolio.Status).HasConversion<string>().HasMaxLength(16).IsConcurrencyToken();
+            entity.Property(portfolio => portfolio.Revision).IsConcurrencyToken();
+            entity.HasOne<LearnerUser>().WithOne().HasForeignKey<PortfolioEntity>(portfolio => portfolio.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.ToTable(table =>
+            {
+                table.HasCheckConstraint("CK_Portfolio_Status", "\"Status\" IN ('Draft', 'Published', 'Suspended')");
+                table.HasCheckConstraint("CK_Portfolio_Publication", "\"Status\" <> 'Published' OR (\"Username\" IS NOT NULL AND \"PublishedJson\" IS NOT NULL)");
+            });
+        });
     }
 }
 
@@ -72,4 +95,21 @@ public sealed class PracticeAttemptEntity
     public required string ResponsesJson { get; set; }
     public int DurationSeconds { get; set; }
     public long CompletedAtUtc { get; set; }
+}
+
+public sealed class PortfolioEntity
+{
+    public Guid UserId { get; set; }
+    public string? Username { get; set; }
+    public required string DraftJson { get; set; }
+    public string? PublishedJson { get; set; }
+    public bool SearchVisible { get; set; }
+    public bool PublishedSearchVisible { get; set; }
+    public PortfolioStatus Status { get; set; }
+    public Guid Revision { get; set; }
+    public long CreatedAtUtc { get; set; }
+    public long UpdatedAtUtc { get; set; }
+    public long? PublishedAtUtc { get; set; }
+    public string? PublishingPolicyVersion { get; set; }
+    public long? EligibilityConfirmedAtUtc { get; set; }
 }

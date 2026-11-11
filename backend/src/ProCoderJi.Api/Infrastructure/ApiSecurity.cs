@@ -10,7 +10,7 @@ public static class ApiSecurity
 
     public static IResult? CheckAccount(HttpContext context, Guid id)
         => !Guid.TryParse(context.Request.Headers["x-account-id"], out var expected) || expected != id
-            ? Results.Json(new { error = "The signed-in account changed. Refresh before syncing progress." }, statusCode: 409) : null;
+            ? Results.Json(new { error = "The signed-in account changed. Refresh before trying again." }, statusCode: 409) : null;
 
     public static async Task<IResult?> CheckWrite(HttpContext context, PlatformConfiguration configuration, IAntiforgery antiforgery)
     {

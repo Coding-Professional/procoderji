@@ -1,5 +1,7 @@
 {
-  "version": 1,
+  "version": 2,
+  "themes": ["simple", "developer"],
+  "publishing": { "policyVersion": "2026-11-11", "minimumAge": 18 },
   "requiredForPublish": ["name", "headline"],
   "maxItems": {
     "skills": 30,

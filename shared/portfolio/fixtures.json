@@ -256,6 +256,10 @@
     }
   ],
   "portfolios": [
+    { "name": "simple theme", "mode": "publish", "value": { "name": "Riya", "headline": "Student", "theme": "simple" }, "problems": [] },
+    { "name": "developer theme", "mode": "draft", "value": { "theme": "developer" }, "problems": [] },
+    { "name": "unknown theme", "mode": "draft", "value": { "theme": "custom" }, "problems": ["theme:invalid-format"] },
+    { "name": "theme has wrong type", "mode": "draft", "value": { "theme": null }, "problems": ["theme:invalid-type"] },
     {
       "name": "publish: minimal portfolio",
       "mode": "publish",

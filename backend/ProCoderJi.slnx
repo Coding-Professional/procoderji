@@ -4,5 +4,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ProCoderJi.Api.Tests/ProCoderJi.Api.Tests.csproj" />
+    <Project Path="tests/ProCoderJi.BrowserHost/ProCoderJi.BrowserHost.csproj" />
   </Folder>
 </Solution>

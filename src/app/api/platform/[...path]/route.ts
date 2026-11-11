@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BACKEND_PATHS, parseBackendOrigin } from "@/features/account/config";
+import { isBackendPath, parseBackendOrigin } from "@/features/account/config";
+import { revalidateTag } from "next/cache";
+import { portfolioCacheTag } from "@/features/portfolio/public-model";
+import { validateUsername } from "@/features/portfolio/validation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const privateHeaders = {
   "Cache-Control": "private, no-store",
   Vary: "Cookie, Origin",
+  "X-Robots-Tag": "noindex",
 };
 const error = (message: string, status: number) =>
   NextResponse.json({ error: message }, { status, headers: privateHeaders });
@@ -16,7 +20,7 @@ async function proxy(
   context: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await context.params).path.join("/");
-  if (!BACKEND_PATHS.has(path)) return error("Unknown learner endpoint.", 404);
+  if (!isBackendPath(path)) return error("Unknown learner endpoint.", 404);
   const backend = parseBackendOrigin(process.env.DOTNET_API_URL);
   if (!backend) {
     if (path === "auth/session" && request.method === "GET")
@@ -87,12 +91,19 @@ async function proxy(
       },
     );
     const responseHeaders = new Headers(privateHeaders);
-    for (const name of ["content-type", "location"]) {
+    for (const name of ["content-type", "location", "retry-after"]) {
       const value = upstream.headers.get(name);
       if (value) responseHeaders.set(name, value);
     }
     for (const cookie of upstream.headers.getSetCookie())
       responseHeaders.append("set-cookie", cookie);
+    if (upstream.ok && request.method !== "GET" && ["portfolio/publish", "portfolio/unpublish", "portfolio"].includes(path)) {
+      const username = upstream.headers.get("x-portfolio-username");
+      if (username && validateUsername(username).length === 0) {
+        try { revalidateTag(portfolioCacheTag(username), { expire: 0 }); }
+        catch { console.error("Portfolio cache invalidation was unavailable; fresh publication checks remain active."); }
+      }
+    }
     return new Response(upstream.body, {
       status: upstream.status,
       headers: responseHeaders,
