@@ -18,6 +18,9 @@ synchronization is a separate capability; paid billing is future work.
 | Understand routes, content, and feature boundaries | [Architecture](architecture.md) |
 | Add original notes, guides, or career listings | [Content guide](content-guide.md) |
 | Run the .NET API, Google sign-in, and account persistence | [Backend setup](../backend/README.md) |
+| Try portfolios or prepare their deployment | [Portfolio workspace and runbook](portfolio-workspace.md) |
+| Import a portfolio from a text template | [Markdown import](portfolio-markdown.md), [template](../public/templates/portfolio.md) |
+| Work on portfolio fields, policy, publication, or storage | [Shared rules](../shared/portfolio/README.md), [Portfolio API](portfolio-api.md) |
 | Configure production hosting and the site domain | [Deployment](deployment.md) |
 | Run the API and choose a database with Docker | [Containers](containers.md) |
 | Configure the selected hosted PostgreSQL database | [Neon setup](neon.md) |
@@ -29,7 +32,7 @@ synchronization is a separate capability; paid billing is future work.
 
 Architecture decisions describe a problem, the chosen boundary, and its consequences. Start with
 [ADR 0001: student-product boundaries](decisions/0001-student-product-boundaries.md), then
-[ADR 0002: student portfolios](decisions/0002-student-portfolios.md) (proposed), and
+[ADR 0002: student portfolios](decisions/0002-student-portfolios.md) (accepted for Phase 1), and
 [ADR 0003: containers and database options](decisions/0003-container-database-options.md). Add a new
 decision record when a change affects persistence, account requirements, payment handling, or
 other feature boundaries; update the architecture guide when the implementation changes.

@@ -11,8 +11,10 @@ using ProCoderJi.Api.Data.Mongo;
 using ProCoderJi.Api.Features.Accounts;
 using ProCoderJi.Api.Features.Practice;
 using ProCoderJi.Api.Features.Progress;
+using ProCoderJi.Api.Features.Portfolio;
 
-var builder = WebApplication.CreateBuilder(args);
+var operatorCommand = PortfolioModerationCommand.IsRequested(args);
+var builder = WebApplication.CreateBuilder(operatorCommand ? [] : args);
 builder.Services.AddSingleton(services => PlatformConfiguration.From(services.GetRequiredService<IConfiguration>(), services.GetRequiredService<IHostEnvironment>()));
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow);
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 256 * 1024);
@@ -23,10 +25,14 @@ builder.Services.AddRelationalDatabase();
 builder.Services.AddMongoDatabase();
 builder.Services.AddScoped<RelationalAccountStore>();
 builder.Services.AddScoped<ProgressService>();
+builder.Services.AddScoped<RelationalPortfolioStore>();
 builder.Services.AddScoped<IAccountStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
     ? services.GetRequiredService<MongoAccountStore>() : services.GetRequiredService<RelationalAccountStore>());
 builder.Services.AddScoped<IProgressStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
     ? services.GetRequiredService<MongoProgressStore>() : services.GetRequiredService<ProgressService>());
+builder.Services.AddScoped<IPortfolioStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
+    ? services.GetRequiredService<MongoPortfolioStore>() : services.GetRequiredService<RelationalPortfolioStore>());
+builder.Services.AddPortfolioApi();
 builder.Services.AddDataProtection().SetApplicationName("ProCoderJi.Platform");
 builder.Services.AddOptions<KeyManagementOptions>().Configure<IServiceProvider>((options, services) =>
     options.XmlRepository = IsMongo(services.GetRequiredService<IConfiguration>())
@@ -96,6 +102,11 @@ builder.Services.AddAntiforgery(options =>
 });
 
 var app = builder.Build();
+if (operatorCommand)
+{
+    Environment.ExitCode = await PortfolioModerationCommand.TryRun(args, app.Services) ?? 2;
+    return;
+}
 var platform = app.Services.GetRequiredService<PlatformConfiguration>();
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing") || builder.Configuration.GetValue<bool>("Database:MigrateOnStartup") || args.Contains("--migrate"))
 {
@@ -123,10 +134,12 @@ app.Use(async (context, next) =>
     await next();
 });
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 app.UseAntiforgery();
 app.MapAccountEndpoints();
 app.MapProgressEndpoints();
+app.MapPortfolioEndpoints();
 app.MapGet("/api/platform/health", () => Results.Json(new { status = "ok" }));
 app.Run();
 

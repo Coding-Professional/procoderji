@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using ProCoderJi.Api.Data;
 using Microsoft.EntityFrameworkCore.Metadata;
+using ProCoderJi.Api.Features.Portfolio;
 
 namespace ProCoderJi.Api.Migrations;
 
@@ -60,6 +61,31 @@ public sealed class SqlServerPlatformDbContextModelSnapshot : ModelSnapshot
                 table.HasCheckConstraint("CK_Attempt_Payload", "DATALENGTH([QuestionIdsJson]) <= 8192 AND DATALENGTH([ResponsesJson]) <= 16384");
             });
             entity.HasOne("ProCoderJi.Api.Data.LearnerUser", null).WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.Cascade).IsRequired();
+        });
+        model.Entity("ProCoderJi.Api.Data.PortfolioEntity", entity =>
+        {
+            entity.Property<Guid>("UserId").ValueGeneratedNever();
+            entity.Property<string>("Username").HasMaxLength(30);
+            entity.Property<string>("DraftJson").IsRequired().HasMaxLength(262144);
+            entity.Property<string>("PublishedJson").HasMaxLength(262144);
+            entity.Property<bool>("SearchVisible");
+            entity.Property<bool>("PublishedSearchVisible");
+            entity.Property<PortfolioStatus>("Status").HasConversion<string>().HasMaxLength(16).IsConcurrencyToken();
+            entity.Property<Guid>("Revision").IsConcurrencyToken();
+            entity.Property<long>("CreatedAtUtc");
+            entity.Property<long>("UpdatedAtUtc");
+            entity.Property<long?>("PublishedAtUtc");
+            entity.Property<string>("PublishingPolicyVersion").HasMaxLength(16);
+            entity.Property<long?>("EligibilityConfirmedAtUtc");
+            entity.HasKey("UserId");
+            entity.HasIndex("Username").IsUnique().HasFilter("[Username] IS NOT NULL");
+            entity.HasIndex("Status", "PublishedSearchVisible", "PublishingPolicyVersion", "Username").HasDatabaseName("IX_Portfolios_PublicIndex");
+            entity.ToTable("Portfolios", table =>
+            {
+                table.HasCheckConstraint("CK_Portfolio_Status", "\"Status\" IN ('Draft', 'Published', 'Suspended')");
+                table.HasCheckConstraint("CK_Portfolio_Publication", "\"Status\" <> 'Published' OR (\"Username\" IS NOT NULL AND \"PublishedJson\" IS NOT NULL)");
+            });
+            entity.HasOne("ProCoderJi.Api.Data.LearnerUser", null).WithOne().HasForeignKey("ProCoderJi.Api.Data.PortfolioEntity", "UserId").OnDelete(DeleteBehavior.Cascade).IsRequired();
         });
     }
 }

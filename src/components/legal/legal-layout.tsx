@@ -58,7 +58,12 @@ export function EmailLink() {
     );
 }
 
-export function LegalLayout({ title, children }: { title: string; children: React.ReactNode }) {
+export function LegalLayout({ title, children, effectiveDate }: {
+    title: string;
+    children: React.ReactNode;
+    /** A trusted publication date supplied by the policy page, never visitor input. */
+    effectiveDate?: string;
+}) {
     const missing = missingLegalFields();
     return (
         <div className="min-h-screen px-4 py-8 sm:px-6">
@@ -92,7 +97,7 @@ export function LegalLayout({ title, children }: { title: string; children: Reac
                     <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">{title}</h1>
                     <p className="mb-8 text-sm text-gray-500">
                         Effective date:{" "}
-                        {LEGAL.effectiveDate ? LEGAL.effectiveDate : <Fill field="effectiveDate" />}
+                        {effectiveDate ?? (LEGAL.effectiveDate ? LEGAL.effectiveDate : <Fill field="effectiveDate" />)}
                     </p>
                     {children}
                 </main>

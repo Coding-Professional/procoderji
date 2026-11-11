@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { BACKEND_PATHS, parseBackendOrigin } from "./config.ts";
+import { BACKEND_PATHS, isBackendPath, parseBackendOrigin } from "./config.ts";
 
 test("backend proxy accepts explicit root origins for local and hosted .NET services", () => {
   assert.equal(
@@ -41,4 +41,17 @@ test("backend proxy exposes only the learner API paths", () => {
     "billing/checkout",
   ])
     assert.ok(!BACKEND_PATHS.has(path));
+});
+
+test("portfolio proxy paths stay bounded to owner actions and one public username", () => {
+  for (const path of [
+    "portfolio", "portfolio/draft", "portfolio/username", "portfolio/publish",
+    "portfolio/unpublish", "portfolio/public/riya-sharma", "portfolio/public/abc",
+  ]) assert.ok(isBackendPath(path), path);
+  for (const path of [
+    "portfolio/admin", "portfolio/public/", "portfolio/public/ab", "portfolio/public/Abc",
+    "portfolio/public/abc/extra", "portfolio/public/../account", "portfolio/public/abc%2fadmin",
+    "portfolio/public/abc?other=path", "portfolio/public/-abc", "portfolio/public/abc--def",
+    `portfolio/public/${"a".repeat(31)}`, "portfolio/public/abc\\admin",
+  ]) assert.ok(!isBackendPath(path), path);
 });

@@ -19,7 +19,7 @@ A student learning workspace with original practice questions, explanations, and
 </div>
 
 > [!NOTE]
-> This is an early student-product foundation. Four practice topics contain 24 original multiple-choice questions. Practice and browser-saved progress work without login. An optional ASP.NET Core backend provides Google sign-in and account progress when configured. Billing and checkout are not enabled. Course notes, guides, and job listings are still awaiting published content.
+> This is an early student-product foundation. Four practice topics contain 24 original multiple-choice questions. Practice and browser-saved progress work without login. An optional ASP.NET Core backend provides Google sign-in, account progress, and private portfolio drafts. The portfolio editor, two themes, Markdown import, and public-page support are implemented; public publishing is off by default pending deployment configuration. Billing and checkout are not enabled. Course notes, guides, and job listings are awaiting published content.
 
 ![Guest learning workspace before the first session](docs/images/learning-workspace.png)
 
@@ -49,6 +49,8 @@ their answers. Run the app locally to explore the implemented routes:
 | `/practice/[topic]` | Multiple-choice practice sessions with scores, correct answers, and explanations. |
 | `/games` | Pattern Sprint and Digit Recall: short reasoning and memory exercises. |
 | `/account` | Optional Google sign-in and cloud progress controls when the backend is configured. |
+| `/learn/portfolio` | In-memory guest preview; signed-in private drafts, Markdown import, theme choice, and explicit publication when enabled. |
+| `/u/[username]` | A student's published snapshot; drafts, suspended or withdrawn pages return 404. |
 | `/dashboard` | Engineering course, branch, and semester navigation for future reviewed notes. |
 
 Questions are original learning exercises. They are independent of employer assessments and do
@@ -56,9 +58,16 @@ not predict or guarantee hiring outcomes. The first question bank is intentional
 can be reviewed and improved before expanding.
 
 The expanded [placement-game catalogue](https://github.com/procoderji-com/procoderji/issues/24)
-and [student portfolios](https://github.com/procoderji-com/procoderji/issues/40) are tracked as
-separate work. Check those issues for delivery status; the table above describes the current
-student experience.
+remains separate work. For portfolios, start with the [student journey and deployment
+runbook](docs/portfolio-workspace.md): guests can try the form, Google accounts save drafts,
+and students aged 18 or older can explicitly accept the publishing policy. Usernames stay
+fixed while the portfolio exists; draft edits remain private until published again. Search
+indexing is opt-in. Import the [Markdown template](public/templates/portfolio.md) or fill the
+same fields directly; both Simple and Developer themes use that model.
+
+Repository features do not establish that the live site has been updated.
+[Issue #74](https://github.com/procoderji-com/procoderji/issues/74) tracks the outstanding
+production hosting work; see the [deployment guide](docs/deployment.md).
 
 ## Progress and optional accounts
 
@@ -86,6 +95,7 @@ does not currently enable them.
 | --- | --- |
 | Placement practice | 24 questions across four topics, explanations, and saved session history. |
 | Short games | Pattern Sprint and Digit Recall are playable without login; their scores are not saved. |
+| Student portfolios | Form/live preview, Simple and Developer themes, Markdown import, authenticated drafts, and gated public pages with moderation. |
 | Course catalogue | Course, branch, and semester navigation exists; no subjects or notes are published yet. |
 | Guides | No reviewed guides published yet. |
 | Jobs and internships | No reviewed listings published yet. |
@@ -131,7 +141,7 @@ troubleshooting, [backend guide](backend/README.md) for accounts, and
 | `npm run dev` | Start the local development server. |
 | `npm run lint` | Run ESLint. |
 | `npm run typecheck` | Check TypeScript types. |
-| `npm test` | Run unit tests, including practice-domain, progress-model/store, and content-validation tests. |
+| `npm test` | Run practice/progress, portfolio rules/import/client, content-validation and helper tests. |
 | `npm run build` | Create the production build. |
 | `npm run e2e` | Build with synthetic content and check frontend browser behavior; opt into the backend with `E2E_DOTNET=1`. |
 | `npm run launch-check` | Build the real site and crawl links, sitemap, metadata, and SEO rules. |
@@ -140,7 +150,7 @@ troubleshooting, [backend guide](backend/README.md) for accounts, and
 | CI job | Coverage |
 | --- | --- |
 | Lint, typecheck, tests and build | TypeScript, code quality, domain/store tests, and the production build. |
-| Browser and SEO checks | Desktop/mobile flows, a real .NET process and frontend proxy, the Google sign-in challenge, and a crawl of links/metadata. |
+| Browser and SEO checks | Desktop/mobile flows, test-only .NET host using the real API/BFF, portfolio publication/moderation, Google challenge, and links/metadata. |
 | Backend build and tests | The .NET solution build and tests for backend rules and access behavior. |
 | Database contracts and container smoke | PostgreSQL, SQL Server and MongoDB contracts, Compose configuration, and the packaged API image. |
 | Dependency review | Pull-request dependency changes checked for newly introduced high or critical vulnerabilities. |
@@ -149,7 +159,9 @@ These jobs need no Google credentials or other external secrets. Browser screens
 retained for seven days when the site-quality job fails. A deployed Google sign-in flow still
 needs the configured-provider checks in [Backend setup](backend/README.md). Browser CI verifies
 the challenge and public callback URL with test client configuration; it does not complete real
-Google consent or token exchange.
+Google consent or token exchange. Full-stack portfolio checks use disposable accounts and
+loopback-only fixtures in `backend/tests/ProCoderJi.BrowserHost`, which is excluded from the
+production API image. The production API has no fixture login or moderation HTTP endpoint.
 
 The E2E runner refuses to run when `src/data` or `src/content` has local changes because it
 temporarily installs synthetic fixtures. See [Development](docs/development.md#checks).
@@ -161,7 +173,7 @@ src/app/                Next.js routes, metadata, and backend-for-frontend API
 src/features/practice/  Pure practice rules, question-bank adapter, and practice UI
 src/features/progress/  Validated attempt records and browser progress storage
 src/features/account/   Optional account-provider clients and controls
-src/features/portfolio/ Shared-rule validation for portfolio fields and usernames
+src/features/portfolio/ Portfolio rules, editor, Markdown import, themes, and public delivery
 src/components/         Shared UI and landing-page sections
 src/content/            Markdown and MDX learning content
 src/data/               Course, guide, and job catalogues
@@ -193,7 +205,7 @@ The [maintainer guide](docs/maintainer-guide.md) explains triage, review and dep
 | Saved progress behavior | [Progress feature](src/features/progress/) and its model/store tests. |
 | Student interface and accessibility | [Practice views](src/features/practice/client/) and shared components. |
 | Optional accounts, synchronization, or persistence | [Backend setup](backend/README.md), [account feature](src/features/account/), and the Next.js `/api/platform/*` proxy. |
-| Portfolio field and username validation | [Shared rules](shared/portfolio/README.md) and the [portfolio roadmap](https://github.com/procoderji-com/procoderji/issues/40). |
+| Portfolio editor, themes, import, or publication | [Workspace guide](docs/portfolio-workspace.md), [shared rules](shared/portfolio/README.md), and [API contract](docs/portfolio-api.md). |
 | Original notes, guides, and listings | [Content guide](docs/content-guide.md). |
 | Setup and contributor guidance | `docs/` and the [contribution guide](CONTRIBUTING.md). |
 

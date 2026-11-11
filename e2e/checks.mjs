@@ -1,6 +1,7 @@
 import { chromium, devices } from "playwright-core";
 import fs from "node:fs";
 import path from "node:path";
+import { runPortfolioChecks } from "./portfolio-checks.mjs";
 
 const BASE = process.env.BASE || "http://localhost:3150";
 const CHANNEL = process.env.E2E_CHANNEL || "chrome";
@@ -146,6 +147,13 @@ if (FULLSTACK) {
 
     const progress = await page.request.get(BASE + "/api/platform/progress");
     expectTrue(progress.status() === 401, `anonymous progress remains protected (got ${progress.status()})`);
+    const portfolio = await page.request.get(BASE + "/api/platform/portfolio");
+    expectTrue(portfolio.status() === 401, `anonymous portfolio drafts remain protected (got ${portfolio.status()})`);
+    const publicPortfolio = await page.request.get(BASE + "/api/platform/portfolio/public/riya-student");
+    expectTrue(publicPortfolio.status() === 404, "public portfolio reads stay disabled before launch");
+    expectTrue(publicPortfolio.headers()["x-robots-tag"] === "noindex", "public API responses cannot be indexed as portfolio pages");
+    const invalidPortfolioPath = await page.request.get(BASE + "/api/platform/portfolio/operator");
+    expectTrue(invalidPortfolioPath.status() === 404, "the frontend proxy rejects unknown portfolio actions");
     const logout = await page.request.post(BASE + "/api/platform/auth/logout", { headers: { Origin: new URL(BASE).origin }, maxRedirects: 0 });
     expectTrue(logout.status() === 403, `same-origin logout still requires an antiforgery token (got ${logout.status()})`);
   });
@@ -439,6 +447,14 @@ await interaction("privacy page discloses every third-party host the site contac
   const missing = [...hosts].filter((h) => !text.includes((DISCLOSED_AS[h] ?? h).toLowerCase()));
   expectTrue(missing.length === 0, "undisclosed third-party host(s): " + missing.join(", "));
 });
+
+if (FULLSTACK) {
+  try {
+    findings.push(...await runPortfolioChecks({ browser, base: BASE, backendOrigin: process.env.E2E_BACKEND_ORIGIN || "http://127.0.0.1:5151" }));
+  } catch (error) {
+    note("all", "/learn/portfolio", "portfolio", `Fixture setup failed: ${String(error.message ?? error)}`);
+  }
+}
 
 await browser.close();
 

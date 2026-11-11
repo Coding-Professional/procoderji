@@ -30,10 +30,18 @@ changes when updating a dependency.
 | `/games` | Existing short reasoning and memory exercises. |
 | `/dashboard` | Engineering course catalogue and notes. |
 | `/account` | Optional Google sign-in and progress controls when the backend is configured. |
+| `/learn/portfolio` | Guest preview or signed-in portfolio form, Markdown import, and private drafts. |
+| `/u/[username]` | Explicitly published portfolio snapshot when publishing is enabled. |
 
 Practice works without login. The current browser retains up to 100 completed attempts; clearing
 its site data can remove that history. Account progress is separate from guest history, with an
 explicit import action. The account page can export visible history.
+
+The [portfolio workspace](portfolio-workspace.md) supports Simple and Developer themes and
+[Markdown import](portfolio-markdown.md). Guest portfolio details stay in the open page only;
+saving/claiming needs a Google session. Publishing is disabled by default. Once an operator
+enables it, publication requires a claimed fixed username and explicit 18+ policy acceptance.
+Private draft saves do not change an existing public snapshot. Search visibility is opt-in.
 
 ## Optional backend and Google accounts
 
@@ -104,9 +112,14 @@ by Git.
   synchronization.
 - `shared/practice/questions.json` is the canonical question bank consumed by the frontend and
   backend. Keep IDs stable when improving wording; use a new ID when a question's meaning changes.
-- `shared/portfolio/` holds the student-portfolio rules and test fixtures used by both runtimes
+- `src/features/portfolio/` owns the form, API client, Markdown parser, themes, and public
+  delivery. The parser fills the form only; public pages render validated fields, not Markdown.
+- `shared/portfolio/` holds rules v2, theme choices, the minimum publishing age/policy version,
+  and test fixtures used by both runtimes
   (see its [README](../shared/portfolio/README.md)); the validators live in
   `src/features/portfolio/` and `backend/src/ProCoderJi.Api/Features/Portfolio/`.
+  Read the [portfolio API guide](portfolio-api.md) for storage, revisions, request protection and
+  the publishing launch setting before changing these endpoints.
 - `backend/src/ProCoderJi.Api/` owns Google sign-in, cookie/antiforgery handling, account progress,
   and EF persistence. Backend tests live under `backend/tests/`.
 - `src/content/` and `src/data/` publish reviewed notes, guides, and listings; see the
@@ -122,7 +135,7 @@ working on student portfolios. The [architecture guide](architecture.md) describ
 | --- | --- |
 | `npm run lint` | Frontend code quality and accessibility lint rules. |
 | `npm run typecheck` | TypeScript compatibility. |
-| `npm test` | Practice rules, progress model/store, content validation, and helpers. |
+| `npm test` | Practice/progress, portfolio rules/parser/client/presentation, content validation, and helpers. |
 | `npm run build` | Production frontend compilation and generated routes. |
 | `npm run e2e` | Frontend desktop/mobile browser routes and interactions; optional backend integration is described below. |
 | `npm run launch-check` | Real production links, metadata, sitemap, and indexing rules. |
@@ -155,10 +168,24 @@ $env:E2E_DOTNET = "1"
 npm run e2e
 ```
 
-This mode builds and starts a real .NET process with an isolated SQLite database, connects the
-Next.js proxy, and checks the Google sign-in challenge and public callback URL with test client
-configuration. It does not complete external Google consent or token exchange. Those live
-provider checks remain part of [Backend setup](../backend/README.md).
+This mode builds and starts `backend/tests/ProCoderJi.BrowserHost`, a test-only executable
+hosting the real API with disposable SQLite data, and connects the Next.js BFF. The runner owns
+the temporary directory, removes external database-test connections, and cleans up its process
+and data afterward. Defaults are frontend port 3150 and backend port 5151; use `E2E_PORT` and
+`E2E_BACKEND_PORT` to choose distinct alternatives.
+
+BrowserHost enables publishing internally and exposes loopback-only account-seeding,
+moderation and publishing-switch fixtures under `/__e2e__`. Its registered disposable-account
+cookie is test authentication only; ownership, session, Origin and CSRF checks still run in the
+real API. These controls are not Next.js routes and are absent from the production API/image.
+Never deploy BrowserHost or substitute it for a development Google account service.
+
+Coverage includes phone/desktop editors and both themes, save/claim/publish, explicit age
+confirmation, Markdown import without autosave, private/public snapshot isolation, account
+changes, opt-in sitemap/metadata, and fresh 404 responses after moderation/unpublishing even
+with a warmed public cache. It also checks the Google challenge and public callback URL using
+test client configuration. External Google consent/token exchange remains a live-provider
+check in [Backend setup](../backend/README.md).
 
 To use Edge instead of Chrome:
 

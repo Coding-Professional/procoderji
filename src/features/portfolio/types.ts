@@ -53,6 +53,7 @@ export interface PortfolioLinks {
 
 /** A valid portfolio. A draft may omit `name` and `headline`; a published one may not. */
 export interface PortfolioData {
+  theme?: "simple" | "developer";
   name?: string;
   headline?: string;
   about?: string;
