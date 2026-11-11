@@ -24,8 +24,8 @@
       },
       "coverlet.collector": {
         "type": "Transitive",
-        "resolved": "6.0.4",
-        "contentHash": "lkhqpF8Pu2Y7IiN7OntbsTtdbpR1syMsm2F3IgX6ootA4ffRqWL5jF7XipHuZQTdVuWG/gVAAcf8mjk8Tz0xPg=="
+        "resolved": "10.1.0",
+        "contentHash": "SlYCIHnBYxINSUpR75SiM5JEmnx11pqT+Ac/C/fUqTTA0dLPl9eYzmFXKKuxmQhL3ZdTQl4PBD3YdAxAauaKLQ=="
       },
       "DnsClient": {
         "type": "Transitive",
@@ -455,7 +455,7 @@
           "Microsoft.AspNetCore.Mvc.Testing": "[10.0.15, )",
           "Microsoft.NET.Test.Sdk": "[18.11.0, )",
           "ProCoderJi.Api": "[1.0.0, )",
-          "coverlet.collector": "[6.0.4, )",
+          "coverlet.collector": "[10.1.0, )",
           "xunit": "[2.9.3, )",
           "xunit.runner.visualstudio": "[3.1.5, )"
         }

@@ -118,7 +118,27 @@ jobs:
         run: dotnet build backend/ProCoderJi.slnx --configuration Release --no-restore
 
       - name: Test backend
-        run: dotnet test backend/ProCoderJi.slnx --configuration Release --no-build
+        run: dotnet test backend/ProCoderJi.slnx --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory "$RUNNER_TEMP/backend-test-results"
+
+      - name: Verify API coverage collection
+        run: |
+          python3 - "$RUNNER_TEMP/backend-test-results" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          reports = list(Path(sys.argv[1]).rglob("coverage.cobertura.xml"))
+          covered = any(
+              int(line.get("hits", "0")) > 0
+              for report in reports
+              for package in ET.parse(report).findall("./packages/package")
+              if package.get("name") == "ProCoderJi.Api"
+              for line in package.findall(".//line")
+          )
+          if not covered:
+              raise SystemExit("Coverage collection did not record executed ProCoderJi.Api lines.")
+          print("Coverage collection recorded executed ProCoderJi.Api lines.")
+          PY
 
       - name: Verify PostgreSQL migrations
         # Validates the PostgreSQL schema path; Google sign-in needs separate live checks.
