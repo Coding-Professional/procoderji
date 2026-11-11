@@ -101,6 +101,13 @@ Merge one overlapping dependency change at a time. Let remaining branches refres
 their current diff and CI. Close a superseded update only after confirming that its changes are
 already included. Keep security updates visible; fewer routine PRs should not hide an urgent fix.
 
+For NuGet updates, refresh the complete solution with
+`dotnet restore backend/ProCoderJi.slnx --force-evaluate`, then verify
+`dotnet restore backend/ProCoderJi.slnx --locked-mode`. API or test dependencies also affect
+referencing projects, including `backend/tests/ProCoderJi.BrowserHost/`. Commit every changed
+`packages.lock.json` so clean CI restores use the same graph. Check the collector's required
+Test SDK version when updating Coverlet, and verify that CI records executed API lines.
+
 Follow [Security notes](security.md) for current known findings. Do not use `npm audit fix --force`,
 unrelated downgrades or broad overrides just to obtain a clean summary. New runtime dependencies
 need a concrete use and a discussion of their maintenance cost.
