@@ -38,6 +38,10 @@ Users are linked by Google's stable provider subject, never by matching email ad
 
 ## API contract
 
+Portfolio storage and authenticated/public endpoints are documented in the
+[portfolio API guide](../docs/portfolio-api.md). Public publishing is disabled by default until
+the owner decisions and launch work in #47/#48 are complete.
+
 | Endpoint | Behavior |
 | --- | --- |
 | `GET /api/platform/auth/session` | Returns `{ configured, user, csrfToken }` and issues the antiforgery cookie. |

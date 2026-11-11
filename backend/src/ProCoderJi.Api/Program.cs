@@ -11,6 +11,7 @@ using ProCoderJi.Api.Data.Mongo;
 using ProCoderJi.Api.Features.Accounts;
 using ProCoderJi.Api.Features.Practice;
 using ProCoderJi.Api.Features.Progress;
+using ProCoderJi.Api.Features.Portfolio;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(services => PlatformConfiguration.From(services.GetRequiredService<IConfiguration>(), services.GetRequiredService<IHostEnvironment>()));
@@ -23,10 +24,14 @@ builder.Services.AddRelationalDatabase();
 builder.Services.AddMongoDatabase();
 builder.Services.AddScoped<RelationalAccountStore>();
 builder.Services.AddScoped<ProgressService>();
+builder.Services.AddScoped<RelationalPortfolioStore>();
 builder.Services.AddScoped<IAccountStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
     ? services.GetRequiredService<MongoAccountStore>() : services.GetRequiredService<RelationalAccountStore>());
 builder.Services.AddScoped<IProgressStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
     ? services.GetRequiredService<MongoProgressStore>() : services.GetRequiredService<ProgressService>());
+builder.Services.AddScoped<IPortfolioStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
+    ? services.GetRequiredService<MongoPortfolioStore>() : services.GetRequiredService<RelationalPortfolioStore>());
+builder.Services.AddPortfolioApi();
 builder.Services.AddDataProtection().SetApplicationName("ProCoderJi.Platform");
 builder.Services.AddOptions<KeyManagementOptions>().Configure<IServiceProvider>((options, services) =>
     options.XmlRepository = IsMongo(services.GetRequiredService<IConfiguration>())
@@ -123,10 +128,12 @@ app.Use(async (context, next) =>
     await next();
 });
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 app.UseAntiforgery();
 app.MapAccountEndpoints();
 app.MapProgressEndpoints();
+app.MapPortfolioEndpoints();
 app.MapGet("/api/platform/health", () => Results.Json(new { status = "ok" }));
 app.Run();
 

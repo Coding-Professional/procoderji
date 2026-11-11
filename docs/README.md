@@ -18,6 +18,7 @@ synchronization is a separate capability; paid billing is future work.
 | Understand routes, content, and feature boundaries | [Architecture](architecture.md) |
 | Add original notes, guides, or career listings | [Content guide](content-guide.md) |
 | Run the .NET API, Google sign-in, and account persistence | [Backend setup](../backend/README.md) |
+| Work on private portfolio drafts, publication, and storage | [Portfolio API](portfolio-api.md) |
 | Configure production hosting and the site domain | [Deployment](deployment.md) |
 | Run the API and choose a database with Docker | [Containers](containers.md) |
 | Configure the selected hosted PostgreSQL database | [Neon setup](neon.md) |

@@ -17,7 +17,7 @@ using ProCoderJi.Api.Data.Mongo;
 
 namespace ProCoderJi.Api.Tests;
 
-public sealed class PlatformFactory(bool googleConfigured = false, string publicOrigin = "http://localhost:3000", bool testAuthentication = true) : WebApplicationFactory<Program>
+public sealed class PlatformFactory(bool googleConfigured = false, string publicOrigin = "http://localhost:3000", bool testAuthentication = true, IReadOnlyDictionary<string, string?>? overrides = null) : WebApplicationFactory<Program>
 {
     private readonly string sqlitePath = Path.Combine(Path.GetTempPath(), $"procoderji-{Guid.NewGuid():N}.db");
     private readonly string? postgresConnection = Environment.GetEnvironmentVariable("PROCODERJI_TEST_POSTGRES");
@@ -61,7 +61,7 @@ public sealed class PlatformFactory(bool googleConfigured = false, string public
             mongoDatabase = "procoderji_test_" + Guid.NewGuid().ToString("N");
             connection = mongoConnection;
         }
-        builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        var settings = new Dictionary<string, string?>
         {
             ["PublicOrigin"] = publicOrigin,
             ["Database:Provider"] = provider,
@@ -69,7 +69,10 @@ public sealed class PlatformFactory(bool googleConfigured = false, string public
             ["Database:Name"] = mongoDatabase,
             ["Authentication:Google:ClientId"] = googleConfigured ? "test-client.apps.googleusercontent.com" : "",
             ["Authentication:Google:ClientSecret"] = googleConfigured ? "test-only-not-a-real-secret" : "",
-        }));
+        };
+        if (overrides is not null)
+            foreach (var (key, value) in overrides) settings[key] = value;
+        builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(settings));
         if (testAuthentication)
             builder.ConfigureTestServices(services => services.AddAuthentication(options =>
             {
