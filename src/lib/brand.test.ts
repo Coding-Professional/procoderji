@@ -73,8 +73,7 @@ test("the old RGPV logo is gone and nothing references it", () => {
 	assert.deepEqual(hits, []);
 });
 
-test("the shared brand uses the supplied logo and navigation reuses it", () => {
-	assert.match(read("src/components/brand.tsx").toString("utf8"), /\/logo\.png/);
-	const users = ["src/components/landing/navbar.tsx", "src/components/app-sidebar.tsx", "src/components/legal/legal-layout.tsx", "src/features/practice/client/learning-shell.tsx"];
-	for (const f of users) assert.match(read(f).toString("utf8"), /<Brand\b/, `${f} should reuse the shared brand`);
+test("every component that shows the logo uses the ProCoderJii logo file", () => {
+	const users = ["src/components/landing/navbar.tsx", "src/components/app-sidebar.tsx", "src/components/floating-logo.tsx", "src/components/site-shell.tsx", "src/components/legal/legal-layout.tsx"];
+	for (const f of users) assert.match(read(f).toString("utf8"), /\/logo\.png/, `${f} should use /logo.png`);
 });

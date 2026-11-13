@@ -4,7 +4,8 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { waitForDeployment } from "./deployment-status.mjs";
+import { randomUUID } from "node:crypto";
+import { findDeployment, waitForDeployment } from "./deployment-status.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const localStaging = process.argv.includes("--local-staging");
@@ -57,22 +58,29 @@ function authentication(tokenKey) {
   return requireValue(tokenKey);
 }
 
-async function confirmReady(result, cwd, project, token, label) {
-  return waitForDeployment(result.deployment?.id, {
+async function providerApi(endpoint, cwd, project, token, label) {
+  const url = new URL(endpoint, "https://api.vercel.com");
+  url.searchParams.set("teamId", requireValue("VERCEL_ORG_ID"));
+  if (!token) return vercel(["api", `${url.pathname}${url.search}`, "--method", "GET"], cwd, project);
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) throw new Error(`${label} provider lookup failed (${response.status}).`);
+  return response.json();
+}
+
+async function confirmReady(cwd, project, token, label, commit, run) {
+  // CLI JSON envelopes differ across platforms. Resolve this exact invocation
+  // from provider metadata, then verify its project and live readiness state.
+  const id = await findDeployment({
+    label, commit, run,
+    read: async () => (await providerApi(`/v6/deployments?projectId=${project}&limit=20`, cwd, project, token, label)).deployments,
+  });
+  return waitForDeployment(id, {
     label,
     read: async id => {
-      if (!token) {
-        const inspected = vercel(["inspect", id, "--json"], cwd, project);
-        return inspected.deployment ?? inspected;
-      }
-      const endpoint = new URL(`https://api.vercel.com/v13/deployments/${id}`);
-      endpoint.searchParams.set("teamId", requireValue("VERCEL_ORG_ID"));
-      const response = await fetch(endpoint, {
-        headers: { Authorization: `Bearer ${token}` },
-        signal: AbortSignal.timeout(30_000),
-      });
-      if (!response.ok) throw new Error(`${label} status lookup failed (${response.status}).`);
-      const deployment = await response.json();
+      const deployment = await providerApi(`/v13/deployments/${id}`, cwd, project, token, label);
       if (deployment.projectId !== project) throw new Error(`${label} deployment belongs to a different project.`);
       return { id: deployment.id, readyState: deployment.readyState };
     },
@@ -125,10 +133,11 @@ async function main() {
   const backendSource = deploySource();
   const frontendSource = deploySource();
   fs.copyFileSync(path.join(backendSource, "vercel.backend.json"), path.join(backendSource, "vercel.json"));
-  const deployArgs = ["deploy", "--prod", "--yes", "--json", "--meta", `sourceCommit=${sha}`, "--meta", `sourceBranch=${branch}`];
+  const run = randomUUID();
+  const deployArgs = ["deploy", "--prod", "--yes", "--json", "--meta", `sourceCommit=${sha}`, "--meta", `sourceBranch=${branch}`, "--meta", `sourceRun=${run}`];
   const backendToken = authentication("VERCEL_BACKEND_TOKEN");
-  const backend = vercel([...deployArgs, "--project", backendProject], backendSource, backendProject, backendToken);
-  await confirmReady(backend, backendSource, backendProject, backendToken, "Backend");
+  vercel([...deployArgs, "--project", backendProject], backendSource, backendProject, backendToken);
+  await confirmReady(backendSource, backendProject, backendToken, "Backend", sha, run);
   await check(`${backendOrigin}/api/platform/health`, async r => r.ok && (await r.json()).status === "ok");
   await check(`${backendOrigin}/api/platform/auth/session`, async r => {
     if (!r.ok) return false;
@@ -138,8 +147,8 @@ async function main() {
   console.log("Backend is ready; database-backed session check passed.");
 
   const frontendToken = authentication("VERCEL_FRONTEND_TOKEN");
-  const frontend = vercel([...deployArgs, "--project", frontendProject], frontendSource, frontendProject, frontendToken);
-  await confirmReady(frontend, frontendSource, frontendProject, frontendToken, "Frontend");
+  vercel([...deployArgs, "--project", frontendProject], frontendSource, frontendProject, frontendToken);
+  await confirmReady(frontendSource, frontendProject, frontendToken, "Frontend", sha, run);
   await check(publicOrigin, async r => r.ok && (branch === "main" || r.headers.get("x-robots-tag")?.includes("noindex")));
   console.log(`Frontend is ready: ${publicOrigin}`);
   const summary = `### ${branch === "main" ? "Production" : "Staging"} deployment\n\nCommit: \`${sha}\`\n\n- Frontend: ${publicOrigin}\n- Backend: ${backendOrigin}\n- Health and database-backed session checks passed.\n`;

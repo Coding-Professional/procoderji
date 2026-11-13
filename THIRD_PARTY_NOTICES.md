@@ -20,14 +20,6 @@ is distributed. Preserve applicable package licenses and component notices when 
 frontend archive or image, and inspect that actual artifact against the upstream terms. The
 backend-only container does not bundle the Next.js image-processing dependencies.
 
-## DM Sans
-
-Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts).
-
-The self-hosted font in `public/fonts/dm-sans-variable.ttf` is distributed under the
-[SIL Open Font License 1.1](public/fonts/OFL.txt). Its full notice is included alongside
-the font. See [the source and usage notes](public/fonts/README.md).
-
 ## UI/UX Pro Max
 
 Source: [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)

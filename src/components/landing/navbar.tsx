@@ -1,102 +1,120 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ArrowUpRight, Menu, X } from "lucide-react";
-import { Brand } from "@/components/brand";
+import Image from "next/image";
+import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { getGuides, getJobs } from "@/lib/content-data";
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggle = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
-  const links = [
-    { href: "/practice", label: "Practice" },
-    { href: "/dashboard", label: "Browse Notes" },
-    { href: "/games", label: "Games" },
-    { href: "/learn/portfolio", label: "Portfolio" },
-    { href: "/#about", label: "About" },
-    { href: "/#contact", label: "Contact" },
-    ...(getGuides().length ? [{ href: "/guides", label: "Guides" }] : []),
-    ...(getJobs().length ? [{ href: "/jobs", label: "Jobs" }] : []),
-  ];
-  useEffect(() => {
-    if (!isOpen) return;
-    const close = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-        toggle.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", close);
-    return () => document.removeEventListener("keydown", close);
-  }, [isOpen]);
-  return (
-    <header className="site-header">
-      <div className="page-container site-header-inner">
-        <Brand />
-        <nav aria-label="Main" className="site-navigation hidden xl:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-current={pathname === link.href ? "page" : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
+    const [isOpen, setIsOpen] = useState(false);
+    // Only link sections that have content.
+    const sections = [
+        ...(getGuides().length > 0 ? [{ href: "/guides", label: "Guides" }] : []),
+        ...(getJobs().length > 0 ? [{ href: "/jobs", label: "Jobs" }] : []),
+    ];
+
+    return (
+        <nav aria-label="Main" className="sticky top-0 z-50 border-b border-gray-100">
+            <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
+                <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900">
+                    <Image
+                        src="/logo.png"
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="rounded-lg"
+                    />
+                    ProCoderJii
+                </div>
+
+                {/* Desktop Menu */}
+                <div className="hidden xl:flex items-center gap-5 text-sm font-medium text-gray-600">
+                    <Link href="/practice" className="inline-flex min-h-11 items-center font-semibold hover:text-primary">Placement practice</Link>
+                    <Link href="/learn" className="inline-flex min-h-11 items-center font-semibold hover:text-primary">My learning</Link>
+                    <a href="#about" className="hover:text-primary transition-colors">About</a>
+                    <Link href="/games" className="hover:text-primary transition-colors">Games</Link>
+                    <a href="#contact" className="hover:text-primary transition-colors">Contact</a>
+                    {sections.map((s) => (
+                        <Link key={s.href} href={s.href} className="hover:text-primary transition-colors">{s.label}</Link>
+                    ))}
+                    <Link
+                        href="/dashboard"
+                        className="px-5 py-2.5 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl font-semibold"
+                    >
+                        Browse Notes
+                    </Link>
+                </div>
+
+                {/* Mobile Menu Button */}
+                <button
+                    type="button"
+                    className="xl:hidden min-h-11 min-w-11 p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-label={isOpen ? "Close menu" : "Open menu"}
+                    aria-expanded={isOpen}
+                    aria-controls="mobile-menu"
+                >
+                    {isOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
+                </button>
+            </div>
+
+            {/* Mobile Menu Overlay */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        id="mobile-menu"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="xl:hidden border-t border-gray-100 bg-white overflow-hidden"
+                    >
+                        <div className="px-6 py-8 flex flex-col gap-6 text-lg font-medium text-gray-600">
+                            <Link href="/practice" onClick={() => setIsOpen(false)} className="inline-flex min-h-11 items-center font-semibold">Placement practice</Link>
+                            <Link href="/learn" onClick={() => setIsOpen(false)} className="inline-flex min-h-11 items-center font-semibold">My learning</Link>
+                            <a
+                                href="#about"
+                                className="hover:text-primary transition-colors"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                About
+                            </a>
+                            <Link
+                                href="/games"
+                                className="hover:text-primary transition-colors"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Games
+                            </Link>
+                            <a
+                                href="#contact"
+                                className="hover:text-primary transition-colors"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Contact
+                            </a>
+                            {sections.map((s) => (
+                                <Link
+                                    key={s.href}
+                                    href={s.href}
+                                    className="hover:text-primary transition-colors"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    {s.label}
+                                </Link>
+                            ))}
+                            <Link
+                                href="/dashboard"
+                                className="px-5 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all shadow-lg text-center"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                Browse Notes
+                            </Link>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </nav>
-        <Link
-          href="/learn"
-          className="pcj-button pcj-button-primary hidden xl:inline-flex"
-        >
-          My learning <ArrowUpRight aria-hidden="true" size={16} />
-        </Link>
-        <button
-          ref={toggle}
-          type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-border xl:hidden"
-          aria-label={isOpen ? "Close menu" : "Open menu"}
-          aria-controls="mobile-menu"
-          aria-expanded={isOpen}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? (
-            <X aria-hidden="true" size={21} />
-          ) : (
-            <Menu aria-hidden="true" size={21} />
-          )}
-        </button>
-      </div>
-      {isOpen && (
-        <nav
-          id="mobile-menu"
-          aria-label="Mobile main"
-          className="page-container border-t border-border py-4 xl:hidden"
-        >
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                aria-current={pathname === link.href ? "page" : undefined}
-                className="flex min-h-12 items-center rounded-md px-2 text-sm font-medium hover:bg-accent"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          <Link
-            href="/learn"
-            onClick={() => setIsOpen(false)}
-            className="pcj-button pcj-button-primary mt-3 w-full"
-          >
-            My learning <ArrowUpRight aria-hidden="true" size={16} />
-          </Link>
-        </nav>
-      )}
-    </header>
-  );
+    );
 }
