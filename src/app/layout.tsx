@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { getSiteUrl } from "@/lib/site";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
-import { MotionProvider } from "@/components/motion-provider";
 import { isNonProductionDeployment } from "@/lib/deployment";
 
 const siteUrl = getSiteUrl();
@@ -61,9 +60,7 @@ export default function RootLayout({
             separate from production.
           </div>
         )}
-        <MotionProvider>
-          <div className="app-root">{children}</div>
-        </MotionProvider>
+        <div className="app-root">{children}</div>
       </body>
     </html>
   );
