@@ -83,7 +83,7 @@ export const LEGAL_PAGES = [
 
 /** Publication dates for revised policies; other legal pages keep the owner's existing date. */
 export const policyEffectiveDates: Readonly<Partial<Record<(typeof LEGAL_PAGES)[number]["path"], string>>> = {
-	"/privacy": "2026-11-11",
+	"/privacy": "2026-11-13",
 	"/terms": "2026-11-11",
 };
 

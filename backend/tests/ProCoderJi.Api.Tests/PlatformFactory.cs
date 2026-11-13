@@ -42,7 +42,19 @@ public sealed class PlatformFactory(bool googleConfigured = false, string public
             admin.Open();
             using var command = new NpgsqlCommand($"CREATE SCHEMA \"{schema}\"", admin);
             command.ExecuteNonQuery();
-            connection = new NpgsqlConnectionStringBuilder(postgresConnection) { SearchPath = schema }.ConnectionString;
+            connection = new NpgsqlConnectionStringBuilder(postgresConnection)
+            {
+                SearchPath = schema,
+                Options = $"-c search_path={schema}",
+                Pooling = false
+            }.ConnectionString;
+            // Verify isolation before migrations or fixtures can write. Some hosted proxies
+            // ignore the startup search_path parameter; the options form must also be honored.
+            using var isolated = new NpgsqlConnection(connection);
+            isolated.Open();
+            using var currentSchema = new NpgsqlCommand("SELECT current_schema()", isolated);
+            if (!string.Equals(currentSchema.ExecuteScalar() as string, schema, StringComparison.Ordinal))
+                throw new InvalidOperationException("The test connection did not honor its isolated schema. No fixtures were written.");
         }
         else if (!string.IsNullOrWhiteSpace(sqlServerConnection))
         {
@@ -69,6 +81,9 @@ public sealed class PlatformFactory(bool googleConfigured = false, string public
             ["Database:Name"] = mongoDatabase,
             ["Authentication:Google:ClientId"] = googleConfigured ? "test-client.apps.googleusercontent.com" : "",
             ["Authentication:Google:ClientSecret"] = googleConfigured ? "test-only-not-a-real-secret" : "",
+            ["Contact:TurnstileSiteKey"] = "",
+            ["Contact:TurnstileSecretKey"] = "",
+            ["Contact:ProxyKey"] = "",
         };
         if (overrides is not null)
             foreach (var (key, value) in overrides) settings[key] = value;

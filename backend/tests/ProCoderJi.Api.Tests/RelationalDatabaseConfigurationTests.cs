@@ -25,6 +25,8 @@ public sealed class RelationalDatabaseConfigurationTests
         using var db = Context("SqlServer", "Server=localhost;Database=script_only;User Id=sa;Password=unused");
         var sql = db.GetService<IMigrator>().GenerateScript();
         Assert.Contains("CREATE TABLE [Users]", sql);
+        Assert.Contains("CREATE TABLE [ContactMessages]", sql);
+        Assert.Contains("CREATE UNIQUE INDEX [IX_ContactMessages_CaptchaTokenHash]", sql);
         Assert.Contains("IDENTITY", sql);
         Assert.Contains("DATALENGTH([QuestionIdsJson]) <= 8192", sql);
         Assert.Contains("DATALENGTH([ResponsesJson]) <= 16384", sql);

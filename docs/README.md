@@ -25,6 +25,7 @@ synchronization is a separate capability; paid billing is future work.
 | Contribute to dev, test staging and promote a production release | [Branches and releases](branching-and-releases.md) |
 | Run the API and choose a database with Docker | [Containers](containers.md) |
 | Configure the selected hosted PostgreSQL database | [Neon setup](neon.md) |
+| Configure private contact submissions and CAPTCHA | [Contact form](contact-form.md) |
 | Report a vulnerability privately | [Security policy](../SECURITY.md) |
 | Review implementation security notes | [Security notes](security.md) |
 | Understand optional coding-agent tools | [Agent tools](agent-tools.md) |

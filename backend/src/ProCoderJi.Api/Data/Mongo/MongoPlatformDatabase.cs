@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using ProCoderJi.Api.Features.Practice;
 using ProCoderJi.Api.Features.Progress;
 using ProCoderJi.Api.Features.Portfolio;
+using ProCoderJi.Api.Features.Contact;
 
 namespace ProCoderJi.Api.Data.Mongo;
 
@@ -16,10 +17,16 @@ public sealed class MongoPlatformDatabase(IMongoDatabase database)
     public IMongoCollection<MongoUserDocument> Users => Database.GetCollection<MongoUserDocument>("users");
     public IMongoCollection<MongoProgressDocument> Progress => Database.GetCollection<MongoProgressDocument>("progress");
     public IMongoCollection<MongoKeyDocument> Keys => Database.GetCollection<MongoKeyDocument>("dataProtectionKeys");
+    public IMongoCollection<ContactMessage> ContactMessages => Database.GetCollection<ContactMessage>("contactMessages");
 
     /// <summary>MongoDB has no EF migrations; provisioning creates the identity and username boundaries.</summary>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
+        await ContactMessages.Indexes.CreateManyAsync([
+            new CreateIndexModel<ContactMessage>(Builders<ContactMessage>.IndexKeys.Ascending(message => message.CaptchaTokenHash),
+                new CreateIndexOptions { Unique = true, Name = "IX_contactMessages_CaptchaTokenHash" }),
+            new CreateIndexModel<ContactMessage>(Builders<ContactMessage>.IndexKeys.Ascending(message => message.CreatedAtUtc))
+        ], cancellationToken: cancellationToken);
         await Users.Indexes.CreateManyAsync([
             new CreateIndexModel<MongoUserDocument>(Builders<MongoUserDocument>.IndexKeys.Ascending(user => user.GoogleSubject),
                 new CreateIndexOptions { Unique = true, Name = "IX_users_GoogleSubject" }),

@@ -59,11 +59,11 @@ test("legal pages stay out of the sitemap until complete", () => {
 
 test("revised policy dates do not change the existing operator details or other legal pages", () => {
 	assert.equal(LEGAL.effectiveDate, "2023-01-01");
-	assert.deepEqual(policyEffectiveDates, { "/privacy": "2026-11-11", "/terms": "2026-11-11" });
+	assert.deepEqual(policyEffectiveDates, { "/privacy": "2026-11-13", "/terms": "2026-11-11" });
 	assert.ok(Object.values(policyEffectiveDates).every(isRealIsoDate));
 	assert.deepEqual(Object.fromEntries(legalSitemapRoutes().map((route) => [route.path, route.lastModified])), {
 		"/about": "2023-01-01",
-		"/privacy": "2026-11-11",
+		"/privacy": "2026-11-13",
 		"/terms": "2026-11-11",
 		"/disclaimer": "2023-01-01",
 		"/copyright": "2023-01-01",

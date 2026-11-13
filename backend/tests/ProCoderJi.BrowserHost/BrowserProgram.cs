@@ -10,6 +10,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Options;
 using ProCoderJi.Api.Data;
 using ProCoderJi.Api.Features.Portfolio;
+using ProCoderJi.Api.Features.Contact;
 using ProCoderJi.Api.Tests;
 
 namespace ProCoderJi.BrowserHost;
@@ -31,6 +32,9 @@ internal static class BrowserProgram
             {
                 ["Portfolio:PublishingEnabled"] = "true",
                 ["Logging:LogLevel:Default"] = "Warning",
+                ["Contact:TurnstileSiteKey"] = "browser-fixture-site-key",
+                ["Contact:TurnstileSecretKey"] = "browser-fixture-secret-key",
+                ["Contact:ProxyKey"] = "browser-fixture-contact-proxy-key-123456789",
             };
             if (options.DataDirectory is not null)
                 settings["ConnectionStrings:Platform"] = new SqliteConnectionStringBuilder
@@ -47,6 +51,7 @@ internal static class BrowserProgram
                 builder.ConfigureTestServices(services =>
                 {
                     services.AddSingleton(state);
+                    services.AddSingleton<ITurnstileVerifier, BrowserCaptchaVerifier>();
                     services.AddSingleton<IStartupFilter, BrowserFixtureStartupFilter>();
                     services.AddAuthentication(authentication =>
                     {

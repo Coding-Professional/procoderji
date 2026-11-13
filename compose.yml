@@ -10,6 +10,9 @@ x-api-environment: &api-environment
   ConnectionStrings__Platform: ${PLATFORM_CONNECTION_STRING:-}
   Authentication__Google__ClientId: ${GOOGLE_CLIENT_ID:-}
   Authentication__Google__ClientSecret: ${GOOGLE_CLIENT_SECRET:-}
+  Contact__TurnstileSiteKey: ${TURNSTILE_SITE_KEY:-}
+  Contact__TurnstileSecretKey: ${TURNSTILE_SECRET_KEY:-}
+  Contact__ProxyKey: ${CONTACT_PROXY_KEY:-}
 
 x-api-image: &api-image
   image: procoderji-api:local

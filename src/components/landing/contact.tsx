@@ -24,7 +24,7 @@ export function Contact() {
                                 <span className="text-primary">ProCoderJii Team</span>
                             </h2>
                             <p className="text-gray-500 text-lg leading-relaxed max-w-md">
-                                For note requests, collaboration, or study material queries, send us an email.
+                                For note requests, collaboration, or study material queries, leave a message for our team.
                             </p>
                         </div>
 

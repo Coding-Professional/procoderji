@@ -2,6 +2,7 @@ import { chromium, devices } from "playwright-core";
 import fs from "node:fs";
 import path from "node:path";
 import { runPortfolioChecks } from "./portfolio-checks.mjs";
+import { installCaptchaFixture, runContactChecks } from "./contact-checks.mjs";
 
 const BASE = process.env.BASE || "http://localhost:3150";
 const CHANNEL = process.env.E2E_CHANNEL || "chrome";
@@ -34,6 +35,7 @@ const browser = await chromium.launch({ channel: CHANNEL, headless: true });
 
 for (const [vpName, opts] of Object.entries(VIEWPORTS)) {
   const context = await browser.newContext(opts);
+  if (FULLSTACK) await installCaptchaFixture(context);
   for (const url of PAGES) {
     const page = await context.newPage();
     const errors = [];
@@ -103,6 +105,7 @@ for (const [vpName, opts] of Object.entries(VIEWPORTS)) {
 // ---------- interactions ----------
 async function interaction(name, vpName, fn) {
   const context = await browser.newContext(VIEWPORTS[vpName]);
+  if (FULLSTACK) await installCaptchaFixture(context);
   const page = await context.newPage();
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message));
@@ -284,7 +287,7 @@ await interaction("skip link is first tab stop and works", "desktop", async (pag
   expectTrue(page.url().endsWith("#main-content"), "skip link jumps to main");
 });
 
-await interaction("contact form: required validation, labels, mailto target", "desktop", async (page) => {
+await interaction("contact form: required fields and CAPTCHA gate", "desktop", async (page) => {
   await page.goto(BASE + "/", { waitUntil: "networkidle" });
   const form = page.locator("form").first();
   expectTrue(!(await form.evaluate((f) => f.checkValidity())), "empty form should be invalid");
@@ -294,6 +297,7 @@ await interaction("contact form: required validation, labels, mailto target", "d
   await page.fill("#contact-name", "QA"); await page.fill("#contact-email", "qa@example.com");
   await page.fill("#contact-subject", "Hi"); await page.fill("#contact-message", "Hello");
   expectTrue(await form.evaluate((f) => f.checkValidity()), "filled form valid");
+  expectTrue(await page.getByRole("button", { name: "Send message", exact: true }).isDisabled(), "sending requires a verified CAPTCHA");
 });
 
 await interaction("dashboard: mobile drawer opens, Escape closes", "mobile", async (page) => {
@@ -465,6 +469,7 @@ await interaction("privacy page discloses every third-party host the site contac
 });
 
 if (FULLSTACK) {
+  findings.push(...await runContactChecks({ browser, base: BASE }));
   try {
     findings.push(...await runPortfolioChecks({ browser, base: BASE, backendOrigin: process.env.E2E_BACKEND_ORIGIN || "http://127.0.0.1:5151" }));
   } catch (error) {

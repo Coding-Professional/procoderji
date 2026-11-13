@@ -52,11 +52,19 @@ export default function PrivacyPage() {
                     document for this step; it is your declaration, not independent age verification.
                 </li>
                 <li>
-                    <strong>Messages you send us.</strong> The contact form on the home page does not send anything
-                    by itself. It opens your own email app with a message addressed to {LEGAL.contactEmail}. If you
-                    choose to send it, we receive the name, email address and message you wrote, through your email
-                    provider. We use them only to reply to you and to improve the site, and we keep them for as long as
-                    needed for that purpose.
+                    <strong>Messages you send us.</strong> When you submit the contact form, we store your name,
+                    email address, subject, message and submission time in our database so our team can review
+                    and reply. Messages are private and are not published. We keep them for as long as needed
+                    to handle your request. To request deletion, email {LEGAL.contactEmail} from the address you used.
+                    Please do not include passwords or sensitive documents.
+                </li>
+                <li>
+                    <strong>Contact form security.</strong> Cloudflare Turnstile checks for automated submissions.
+                    Your browser connects to challenges.cloudflare.com and Cloudflare may process your IP address
+                    and browser information for this check. Our server verifies the security token with Cloudflare
+                    and uses your IP address for temporary rate limiting; it is not stored with your message.
+                    We store a one-way hash of the token to prevent replay, never the token itself. See{" "}
+                    <a className="underline" href="https://www.cloudflare.com/privacypolicy/">Cloudflare&apos;s privacy policy</a>.
                 </li>
                 <li>
                     <strong>Technical data processed by our hosting provider.</strong> The site is delivered by a

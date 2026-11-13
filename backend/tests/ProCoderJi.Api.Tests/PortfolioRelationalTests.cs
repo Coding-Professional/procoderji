@@ -86,13 +86,17 @@ public sealed class PortfolioRelationalTests
         // This disposable database remains scoped to this test's factory throughout.
         var migrations = db.GetService<IMigrationsAssembly>();
         var portfolioMigration = migrations.Migrations.Single(item => item.Key.EndsWith("_StudentPortfolios", StringComparison.Ordinal));
-        var migration = migrations.CreateMigration(portfolioMigration.Value, db.Database.ProviderName!);
-        foreach (var command in db.GetService<IMigrationsSqlGenerator>().Generate(migration.DownOperations))
-            await db.Database.ExecuteSqlRawAsync(command.CommandText);
-        // Later portfolio migrations add metadata/indexes to the same table. Its removal
-        // restores the original account-only schema; remove their history together.
-        foreach (var applied in migrations.Migrations.Keys.Where(key => string.CompareOrdinal(key, portfolioMigration.Key) >= 0))
+        foreach (var applied in migrations.Migrations.Keys.Where(key => string.CompareOrdinal(key, portfolioMigration.Key) >= 0).OrderDescending())
+        {
+            var migration = migrations.CreateMigration(migrations.Migrations[applied], db.Database.ProviderName!);
+            // Drop feature tables as a whole. Reversing intermediate column changes needs
+            // historical target models on SQLite, and is unnecessary for this baseline test.
+            var drops = migration.DownOperations.OfType<Microsoft.EntityFrameworkCore.Migrations.Operations.DropTableOperation>()
+                .Cast<Microsoft.EntityFrameworkCore.Migrations.Operations.MigrationOperation>().ToArray();
+            foreach (var command in db.GetService<IMigrationsSqlGenerator>().Generate(drops))
+                await db.Database.ExecuteSqlRawAsync(command.CommandText);
             await db.Database.ExecuteSqlRawAsync(db.GetService<IHistoryRepository>().GetDeleteScript(applied));
+        }
         var userId = Guid.NewGuid();
         var generation = Guid.NewGuid();
         db.Users.Add(new LearnerUser { Id = userId, GoogleSubject = "existing-subject", Email = "existing@example.test", Name = "Existing", CreatedAtUtc = 1 });

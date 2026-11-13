@@ -120,7 +120,9 @@ Security Policy" messages.
 
 - A contributor with merge rights could still publish misleading content; review pull requests.
 - Links in notes may point to any https site (external links get `noopener noreferrer`).
-- The contact form is a `mailto:` link, so spam is handled by the owner's mailbox, not the site.
+- Contact submissions require server-verified Turnstile, a trusted proxy, bounded JSON, a honeypot,
+  token replay protection and a per-process IP limit. See [contact operations](contact-form.md)
+  for provisioning and the multi-instance rate-limit boundary. There is no public message-read API.
 - Request bounds are not a distributed rate limiter. Configure provider limits and
   infrastructure abuse controls before a public cloud-account rollout. Backend user-secrets
   are for development; use the hosting platform's secret store for Google and database credentials.

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProCoderJi.Api.Features.Portfolio;
+using ProCoderJi.Api.Features.Contact;
 
 namespace ProCoderJi.Api.Data;
 
@@ -10,10 +11,22 @@ public sealed class PlatformDbContext(DbContextOptions<PlatformDbContext> option
     public DbSet<ProgressState> ProgressStates => Set<ProgressState>();
     public DbSet<PracticeAttemptEntity> Attempts => Set<PracticeAttemptEntity>();
     public DbSet<PortfolioEntity> Portfolios => Set<PortfolioEntity>();
+    public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder model)
     {
+        model.Entity<ContactMessage>(entity =>
+        {
+            entity.HasKey(message => message.Id);
+            entity.Property(message => message.Name).HasMaxLength(100);
+            entity.Property(message => message.Email).HasMaxLength(254);
+            entity.Property(message => message.Subject).HasMaxLength(160);
+            entity.Property(message => message.Message).HasMaxLength(4000);
+            entity.Property(message => message.CaptchaTokenHash).HasMaxLength(64);
+            entity.HasIndex(message => message.CaptchaTokenHash).IsUnique();
+            entity.HasIndex(message => message.CreatedAtUtc);
+        });
         model.Entity<LearnerUser>(entity =>
         {
             entity.HasKey(user => user.Id);
