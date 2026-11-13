@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const CONTACT = "procoderji@gmail.com";
 const EDITOR = "/learn/portfolio";
@@ -320,13 +321,13 @@ export async function runPortfolioChecks({ browser, base, backendOrigin }) {
       const page = await context.newPage(); await editor(page);
       await page.getByLabel("Name", { exact: true }).fill("Keep these unsaved edits");
       page.once("dialog", dialog => dialog.dismiss());
-      await page.getByRole("link", { name: "Placement practice", exact: true }).click();
+      await page.locator("[data-site-header]").getByRole("link", { name: "Placement practice", exact: true }).click();
       assert.equal(new URL(page.url()).pathname, EDITOR);
       assert.equal(await page.getByLabel("Name", { exact: true }).inputValue(), "Keep these unsaved edits");
       page.once("dialog", dialog => dialog.accept());
       await Promise.all([
         page.waitForURL(url => url.pathname === "/practice"),
-        page.getByRole("link", { name: "Placement practice", exact: true }).click(),
+        page.locator("[data-site-header]").getByRole("link", { name: "Placement practice", exact: true }).click(),
       ]);
       assert.equal(new URL(page.url()).pathname, "/practice");
     });
@@ -418,4 +419,15 @@ export async function runPortfolioChecks({ browser, base, backendOrigin }) {
     await fixture(`/publishing/${originalPublishing ? "true" : "false"}`);
   }
   return findings;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const { chromium } = await import("playwright-core");
+  const browser = await chromium.launch({ channel: process.env.E2E_CHANNEL || "chrome", headless: true });
+  try {
+    const findings = await runPortfolioChecks({ browser, base: process.env.BASE || "http://localhost:3150",
+      backendOrigin: process.env.E2E_BACKEND_ORIGIN || "http://127.0.0.1:5151" });
+    console.log(JSON.stringify({ portfolioFindings: findings }, null, 2));
+    if (findings.length) process.exitCode = 1;
+  } finally { await browser.close(); }
 }

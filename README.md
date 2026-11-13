@@ -4,10 +4,9 @@
 
 # ProCoderJii Learning Hub
 
-### For the semester. For what’s next.
+### Practise for campus placements. Understand your answers. Build a study habit.
 
-A student learning brand bringing together course resources, placement practice, games,
-portfolios, concept videos and community. This repository builds the open-source web platform.
+A student learning workspace with original practice questions, explanations, and saved progress.
 
 [Website](https://procoderji.com) · [Documentation](docs/README.md) · [Roadmap](https://github.com/procoderji-com/procoderji/issues/22) · [Good first issues](https://github.com/procoderji-com/procoderji/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22) · [Report a bug](https://github.com/procoderji-com/procoderji/issues/new?template=bug_report.yml) · [Propose a question](https://github.com/procoderji-com/procoderji/issues/new?template=practice_question.yml)
 
@@ -22,17 +21,17 @@ portfolios, concept videos and community. This repository builds the open-source
 > [!NOTE]
 > This is an early student-product foundation. Four practice topics contain 24 original multiple-choice questions. Practice and browser-saved progress work without login. An optional ASP.NET Core backend provides Google sign-in, account progress, and private portfolio drafts. The portfolio editor, two themes, Markdown import, and public-page support are implemented; public publishing is off by default pending deployment configuration. Billing and checkout are not enabled. Course notes, guides, and job listings are awaiting published content.
 
-![ProCoderJii homepage with a placement practice sample](docs/images/homepage.png)
+![ProCoderJii homepage with the current yellow brand and shared navigation](docs/images/homepage-desktop.png)
 
 <details>
-<summary>Student learning workspace</summary>
+<summary>Learning workspace and mobile previews</summary>
 
-![Guest learning workspace before the first session](docs/images/learning-workspace.png)
+![Guest learning workspace with the shared navigation and dashboard sidebar](docs/images/learning-workspace.png)
+
+<img src="docs/images/responsive-home-mobile.png" alt="ProCoderJii homepage at 360px" width="360" />
+<img src="docs/images/responsive-menu-mobile.png" alt="Shared mobile navigation at 360px" width="360" />
 
 </details>
-
-Interface contributions follow the [design system](design-system/MASTER.md), with shared
-navigation, self-hosted typography, keyboard access and responsive layouts.
 
 See the [product roadmap](docs/product-roadmap.md) for student validation, content growth, and future monetization work.
 

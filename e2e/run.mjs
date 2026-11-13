@@ -20,7 +20,8 @@ const BACKEND_PROJECT = path.join(ROOT, "backend", "tests", "ProCoderJi.BrowserH
 const BACKEND_DLL = path.join(ROOT, "backend", "tests", "ProCoderJi.BrowserHost", "bin", "Release", "net10.0", "ProCoderJi.BrowserHost.dll");
 const NEXT = path.join(ROOT, "node_modules", "next", "dist", "bin", "next");
 const TEMP_ROOT = fs.realpathSync(os.tmpdir());
-const runEnv = { ...process.env, DOTNET_API_URL: FULLSTACK ? BACKEND_ORIGIN : "" };
+const runEnv = { ...process.env, DOTNET_API_URL: FULLSTACK ? BACKEND_ORIGIN : "",
+  CONTACT_PROXY_KEY: FULLSTACK ? "browser-fixture-contact-proxy-key-123456789" : "", VERCEL: "" };
 
 let server = null;
 let backend = null;
@@ -111,9 +112,11 @@ for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => {
 let code = 1;
 try {
   // If the cleanliness check fails, cleanup must never check out real content.
-  fixtures.assertClean();
-  fixturesApplied = true;
-  fixtures.apply();
+  if (process.env.E2E_HEADER_ONLY !== "1") {
+    fixtures.assertClean();
+    fixturesApplied = true;
+    fixtures.apply();
+  }
 
   if (FULLSTACK) {
     if (PORT === BACKEND_PORT) throw new Error("E2E_PORT and E2E_BACKEND_PORT must differ");
@@ -140,7 +143,10 @@ try {
   await run(process.execPath, [NEXT, "build"]);
   server = start(process.execPath, [NEXT, "start", "-p", PORT], runEnv);
   await waitUntilReady(server, BASE, "Next.js", 40);
-  await run(process.execPath, [path.join(ROOT, "e2e", "checks.mjs")], { ...runEnv, BASE, E2E_BACKEND_ORIGIN: BACKEND_ORIGIN });
+  const checks = process.env.E2E_HEADER_ONLY === "1" ? "site-header-checks.mjs"
+    : process.env.E2E_PORTFOLIO_ONLY === "1" ? "portfolio-checks.mjs"
+    : process.env.E2E_CONTACT_ONLY === "1" ? "contact-checks.mjs" : "checks.mjs";
+  await run(process.execPath, [path.join(ROOT, "e2e", checks)], { ...runEnv, BASE, E2E_BACKEND_ORIGIN: BACKEND_ORIGIN });
   code = 0;
 } catch (error) {
   console.error(String(error.message ?? error));

@@ -14,6 +14,20 @@ public sealed class SqlServerPlatformDbContextModelSnapshot : ModelSnapshot
     {
         model.HasAnnotation("ProductVersion", "10.0.14");
         model.HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+        model.Entity("ProCoderJi.Api.Features.Contact.ContactMessage", entity =>
+        {
+            entity.Property<Guid>("Id").ValueGeneratedOnAdd();
+            entity.Property<string>("Name").IsRequired().HasMaxLength(100);
+            entity.Property<string>("Email").IsRequired().HasMaxLength(254);
+            entity.Property<string>("Subject").IsRequired().HasMaxLength(160);
+            entity.Property<string>("Message").IsRequired().HasMaxLength(4000);
+            entity.Property<string>("CaptchaTokenHash").IsRequired().HasMaxLength(64);
+            entity.Property<long>("CreatedAtUtc");
+            entity.HasKey("Id");
+            entity.HasIndex("CaptchaTokenHash").IsUnique();
+            entity.HasIndex("CreatedAtUtc");
+            entity.ToTable("ContactMessages");
+        });
         model.Entity("ProCoderJi.Api.Data.LearnerUser", entity =>
         {
             entity.Property<Guid>("Id").ValueGeneratedOnAdd();

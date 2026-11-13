@@ -25,7 +25,9 @@ public static class PortfolioApiConfiguration
                 await context.HttpContext.Response.WriteAsJsonAsync(new
                 {
                     code = "rate-limited",
-                    error = "Too many portfolio requests. Wait before trying again."
+                    error = context.HttpContext.Request.Path.StartsWithSegments("/api/platform/contact")
+                        ? "Too many messages. Wait a minute before trying again."
+                        : "Too many portfolio requests. Wait before trying again."
                 }, cancellationToken);
             };
         });

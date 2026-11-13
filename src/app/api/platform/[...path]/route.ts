@@ -3,6 +3,7 @@ import { canonicalGoogleChallenge, isBackendPath, parseBackendOrigin } from "@/f
 import { revalidateTag } from "next/cache";
 import { portfolioCacheTag } from "@/features/portfolio/public-model";
 import { validateUsername } from "@/features/portfolio/validation";
+import { contactClientIp } from "@/lib/contact-proxy";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,6 +21,10 @@ async function proxy(
   context: { params: Promise<{ path: string[] }> },
 ) {
   const path = (await context.params).path.join("/");
+  const contact = path === "contact" || path === "contact/config";
+  const contactUnavailable = "Message submission is temporarily unavailable. Please try again later.";
+  if (contact && request.method !== (path === "contact" ? "POST" : "GET"))
+    return error("This method is not available.", 405);
   if (!isBackendPath(path)) return error("Unknown learner endpoint.", 404);
   const backend = parseBackendOrigin(process.env.DOTNET_API_URL);
   if (!backend) {
@@ -29,11 +34,19 @@ async function proxy(
         { headers: privateHeaders },
       );
     return error(
-      "Account sync is not enabled. You can continue practising on this device.",
+      contact ? contactUnavailable : "Account sync is not enabled. You can continue practising on this device.",
       503,
     );
   }
   const headers = new Headers();
+  if (contact) {
+    const key = process.env.CONTACT_PROXY_KEY;
+    if (!key || key.length < 32) return error(contactUnavailable, 503);
+    headers.set("X-Contact-Proxy-Key", key);
+    const ip = contactClientIp(request.headers, process.env.VERCEL === "1");
+    if (!ip) return error("Your connection could not be verified. Please try again.", 400);
+    headers.set("X-Contact-Client-IP", ip);
+  }
   for (const name of [
     "cookie",
     "origin",
@@ -45,10 +58,11 @@ async function proxy(
     if (value) headers.set(name, value);
   }
   let body: Uint8Array | undefined;
+  const bodyLimit = contact ? 32 * 1024 : LIMIT;
   if (request.method !== "GET") {
     if (request.headers.get("origin") !== request.nextUrl.origin)
-      return error("Use the current site to update your account.", 403);
-    if (Number(request.headers.get("content-length")) > LIMIT)
+      return error(contact ? "Submit your message from this website." : "Use the current site to update your account.", 403);
+    if (Number(request.headers.get("content-length")) > bodyLimit)
       return error("The request is too large.", 413);
     const reader = request.body?.getReader();
     if (reader) {
@@ -59,7 +73,7 @@ async function proxy(
           const chunk = await reader.read();
           if (chunk.done) break;
           size += chunk.value.byteLength;
-          if (size > LIMIT) {
+          if (size > bodyLimit) {
             await reader.cancel();
             return error("The request is too large.", 413);
           }
@@ -117,7 +131,7 @@ async function proxy(
     });
   } catch {
     return error(
-      "The account service is temporarily unavailable. Your browser progress is still available.",
+      contact ? contactUnavailable : "The account service is temporarily unavailable. Your browser progress is still available.",
       503,
     );
   }

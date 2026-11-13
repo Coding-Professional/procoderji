@@ -39,6 +39,8 @@ export function canonicalGoogleChallenge(requestUrl: string, authorizationLocati
 }
 
 export const BACKEND_PATHS = new Set([
+  "contact",
+  "contact/config",
   "auth/session",
   "auth/google",
   "auth/logout",

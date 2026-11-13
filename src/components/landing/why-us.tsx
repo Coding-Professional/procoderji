@@ -1,63 +1,84 @@
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+"use client";
 
-const paths = [
-  {
-    title: "Prepare for placements",
-    description:
-      "Short aptitude, reasoning, verbal and programming sessions. An explanation with every answer.",
-    href: "/practice",
-    action: "Find a practice topic",
-  },
-  {
-    title: "Make your work visible",
-    description:
-      "Turn your projects and skills into a portfolio. Start with a draft, publish when you’re ready.",
-    href: "/learn/portfolio",
-    action: "Build your portfolio",
-  },
-  {
-    title: "Keep your place",
-    description:
-      "See what you’ve practised, revisit mistakes and choose the next topic to work on.",
-    href: "/learn",
-    action: "Open your workspace",
-  },
-  {
-    title: "Take a useful break",
-    description:
-      "A pattern to spot. A number to remember. Quick games for the gap between study sessions.",
-    href: "/games",
-    action: "Try a warm-up",
-  },
-];
+import React from "react";
+import { motion } from "framer-motion";
+import { Youtube, User, BookOpenCheck, type LucideIcon } from "lucide-react";
+
+const FeatureCard = ({
+    icon: Icon,
+    title,
+    description,
+}: {
+    icon: LucideIcon;
+    title: string;
+    description: string;
+}) => (
+    <motion.div className="relative p-[2px] rounded-3xl border border-gray-800 shadow-xl transition-all duration-300">
+        <div className="rounded-3xl bg-white/90 backdrop-blur-xl p-6 sm:p-8 h-full">
+            <motion.div
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1 }}
+                className="w-14 h-14 rounded-xl border border-gray-200 flex items-center justify-center text-primary mb-5 shadow-inner"
+            >
+                <Icon aria-hidden="true" className="w-7 h-7 text-amber-700" />
+            </motion.div>
+
+            <h3 className="text-xl font-extrabold mb-3 text-gray-900 tracking-tight">{title}</h3>
+
+            <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+        </div>
+    </motion.div>
+);
 
 export function WhyUs() {
-  return (
-    <section className="section-block pt-2" aria-labelledby="paths-heading">
-      <div className="page-container">
-        <div className="section-intro">
-          <h2 id="paths-heading" className="section-title">
-            What are you working on?
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            A few good places to start.
-          </p>
-        </div>
-        <div className="path-grid">
-          {paths.map((path, index) => (
-            <article className="path-item" key={path.href}>
-              <span className="path-number">0{index + 1} /</span>
-              <h3>{path.title}</h3>
-              <p>{path.description}</p>
-              <Link href={path.href} className="text-link mt-3">
-                {path.action}
-                <ArrowUpRight aria-hidden="true" size={15} />
-              </Link>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+    return (
+        <section className="relative px-4 py-16 sm:px-6 sm:py-24 lg:py-28 bg-white/80 overflow-hidden">
+            <motion.div
+                animate={{ y: [0, -30, 0] }}
+                transition={{ repeat: Infinity, duration: 10 }}
+                className="absolute top-10 left-16 w-40 h-40 rounded-full blur-3xl"
+            />
+            <motion.div
+                animate={{ y: [0, 40, 0] }}
+                transition={{ repeat: Infinity, duration: 12 }}
+                className="absolute bottom-10 right-20 w-52 h-52 rounded-full blur-3xl"
+            />
+
+            <div className="max-w-7xl mx-auto relative">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-10 sm:mb-16 lg:mb-20"
+                >
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
+                        Why Learn with ProCoderJii?
+                    </h2>
+                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        Unit-wise notes that go with the ProCoderJii videos, organised so you can find what you need.
+                    </p>
+                </motion.div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
+                    <FeatureCard
+                        icon={Youtube}
+                        title="YouTube + Notes"
+                        description="Watch concept videos on ProCoderJii and revise the same topic here with clean, unit-wise notes."
+                    />
+
+                    <FeatureCard
+                        icon={User}
+                        title="Student Focused"
+                        description="Resources are arranged by branch, semester, and subject so students can find the right file in seconds."
+                    />
+
+                    <FeatureCard
+                        icon={BookOpenCheck}
+                        title="Exam Ready Content"
+                        description="Notes are written unit by unit to support exam preparation and last-week revision."
+                    />
+                </div>
+            </div>
+        </section>
+    );
 }

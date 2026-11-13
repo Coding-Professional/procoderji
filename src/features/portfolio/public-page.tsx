@@ -8,14 +8,11 @@ export function PublicPortfolioPage({ username, data }: PublicPortfolioPresentat
   return (
     <div className={`min-h-screen px-4 py-5 sm:px-6 sm:py-8 ${developer ? "bg-slate-950" : "bg-slate-50"}`}>
       <div className="mx-auto max-w-5xl">
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-          <Link href="/" prefetch={false} className={`inline-flex min-h-11 items-center rounded-lg text-sm font-extrabold focus-visible:outline-2 focus-visible:outline-offset-4 ${developer ? "text-amber-300" : "text-slate-900"}`}>
-            ProCoderJii
-          </Link>
+        <div className="mb-6 flex flex-wrap items-center justify-end gap-x-6 gap-y-2">
           <Link href="/learn/portfolio" prefetch={false} className={`inline-flex min-h-11 items-center rounded-lg text-sm font-semibold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 ${chrome}`}>
             Create your portfolio
           </Link>
-        </header>
+        </div>
         <main id="main-content" className="min-w-0">
           <PortfolioPreview data={data} />
         </main>

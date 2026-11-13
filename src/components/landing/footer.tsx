@@ -1,64 +1,150 @@
+"use client";
+
+import React from "react";
 import Link from "next/link";
-import { Brand } from "@/components/brand";
+import { ArrowRight, BookOpen, Mail } from "lucide-react";
 import { LEGAL_PAGES } from "@/lib/legal";
-import { CONTACT_EMAIL } from "@/lib/contact";
+import { getGuides, getJobs } from "@/lib/content-data";
+import { motion } from "framer-motion";
 
 export function Footer() {
-  return (
-    <footer className="site-footer">
-      <div className="page-container">
-        <div className="footer-grid">
-          <div>
-            <Brand />
-            <p className="footer-caption">
-              A student learning brand. Notes for the semester, practice for
-              placements, and room to build something of your own.
-            </p>
-            <a
-              href="https://github.com/procoderji-com/procoderji"
-              className="text-link mt-3"
-            >
-              Open source. Open to your ideas.
-            </a>
-          </div>
-          <div>
-            <h2 className="footer-heading">Your next step</h2>
-            <nav aria-label="Explore" className="footer-links">
-              <Link href="/practice">Placement practice</Link>
-              <Link href="/dashboard">Course notes</Link>
-              <Link href="/games">Practice games</Link>
-              <Link href="/learn/portfolio">Portfolio builder</Link>
-              <Link href="/learn">My learning</Link>
-            </nav>
-          </div>
-          <div>
-            <h2 className="footer-heading">The project</h2>
-            <nav aria-label="Project" className="footer-links">
-              <Link href="/about">About ProCoderJii</Link>
-              <a href="https://github.com/procoderji-com/procoderji/blob/dev/CONTRIBUTING.md">
-                Contribute
-              </a>
-              <a href={`mailto:${CONTACT_EMAIL}`}>Contact the team</a>
-            </nav>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <span>
-            © {new Date().getUTCFullYear()} ProCoderJii. Keep learning.
-          </span>
-          <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-3">
-            {LEGAL_PAGES.map((page) => (
-              <Link
-                className="hover:underline"
-                key={page.path}
-                href={page.path}
-              >
-                {page.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </div>
-    </footer>
-  );
+    // Only link sections that have content.
+    const hasGuides = getGuides().length > 0;
+    const hasJobs = getJobs().length > 0;
+
+    return (
+        <footer className="py-8 px-4 sm:px-6 bg-white overflow-hidden">
+            <div className="max-w-8xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="relative rounded-[2.5rem] border border-gray-800 overflow-hidden p-5 sm:p-8 md:p-12 lg:p-16"
+                >
+                    <div className="absolute inset-0 opacity-20">
+                        <div className="absolute top-0 -left-1/4 w-1/2 h-1/2 bg-yellow-300/40 rounded-full blur-[120px] animate-pulse" />
+                        <div className="absolute bottom-0 -right-1/4 w-1/2 h-1/2 bg-amber-400/30 rounded-full blur-[120px] animate-pulse delay-1000" />
+                    </div>
+
+                    <div
+                        className="absolute inset-0 opacity-[0.1]"
+                        style={{
+                            backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)",
+                            backgroundSize: "32px 32px",
+                        }}
+                    />
+
+                    <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
+                        <div className="space-y-8">
+                            <motion.h2
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight"
+                            >
+                                STUDY BETTER WITH <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-gray-900">
+                                    PROCODERJII NOTES
+                                </span>
+                            </motion.h2>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                className="flex flex-col sm:flex-row gap-4"
+                            >
+                                <Link
+                                    href="/dashboard"
+                                    className="inline-flex min-h-12 items-center justify-center gap-2 px-6 py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-colors shadow-lg"
+                                >
+                                    <BookOpen aria-hidden="true" className="h-4 w-4 shrink-0" />
+                                    Browse Notes
+                                </Link>
+                                <a
+                                    href="mailto:procoderji@gmail.com"
+                                    className="px-8 py-4 bg-white/80 border border-gray-200 text-gray-900 font-semibold rounded-xl hover:bg-white transition-all flex items-center gap-2 group"
+                                >
+                                    <Mail aria-hidden="true" className="w-5 h-5" />
+                                    <span>Contact</span>
+                                    <ArrowRight aria-hidden="true" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </a>
+                            </motion.div>
+                        </div>
+
+                        <div className="flex flex-col justify-between gap-12">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                                className="grid grid-cols-2 gap-6 sm:gap-12 lg:pl-20"
+                            >
+                                <div>
+                                    <h3 className="font-bold mb-6 uppercase tracking-wider text-sm">Platform</h3>
+                                    <ul className="space-y-4 text-sm font-medium">
+                                        <li>
+                                            <Link href="/dashboard" className="hover:text-gray-500 transition-colors">
+                                                Browse Notes
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/games" className="hover:text-gray-500 transition-colors">
+                                                Practice Games
+                                            </Link>
+                                        </li>
+                                        {hasGuides && (
+                                            <li>
+                                                <Link href="/guides" className="hover:text-gray-500 transition-colors">
+                                                    Guides
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {hasJobs && (
+                                            <li>
+                                                <Link href="/jobs" className="hover:text-gray-500 transition-colors">
+                                                    Jobs
+                                                </Link>
+                                            </li>
+                                        )}
+                                        <li>
+                                            <a href="#faq" className="hover:text-gray-500 transition-colors">
+                                                FAQs
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 className="font-bold mb-6 uppercase tracking-wider text-sm">Connect</h3>
+                                    <ul className="space-y-4 text-sm font-medium ">
+                                        <li>
+                                            <a href="mailto:procoderji@gmail.com" className="hover:text-gray-500 transition-colors">
+                                                Email
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#contact" className="hover:text-gray-500 transition-colors">
+                                                Contact Section
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+
+                    <div className="relative z-10 md:mt-2 mt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+                        <p>Copyright {new Date().getFullYear()} ProCoderJii. All rights reserved.</p>
+                        <nav aria-label="Legal" className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+                            {LEGAL_PAGES.filter((p) => p.path !== "/about").map((p) => (
+                                <Link key={p.path} href={p.path} className="inline-flex min-h-11 items-center hover:text-gray-700 underline-offset-2 hover:underline sm:min-h-0">
+                                    {p.label}
+                                </Link>
+                            ))}
+                        </nav>
+                    </div>
+                </motion.div>
+            </div>
+        </footer>
+    );
 }

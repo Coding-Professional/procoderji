@@ -4,6 +4,10 @@ ASP.NET Core 10 provides Google sign-in, server-managed cookie sessions, durable
 and portfolio drafts/publication. Next.js forwards `/api/platform/*` through its server-only
 BFF. Guest practice and the in-memory portfolio preview work without backend credentials.
 
+The anonymous [contact form](../docs/contact-form.md) saves private messages after server-side
+Cloudflare Turnstile verification. It requires separate CAPTCHA and proxy credentials; Google
+sign-in is not required. Apply its migration before enabling submission.
+
 ## Run locally
 
 Install a supported .NET 10 SDK and keep its runtime on the latest servicing patch. From the repository root:

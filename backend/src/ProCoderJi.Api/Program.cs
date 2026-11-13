@@ -12,6 +12,7 @@ using ProCoderJi.Api.Features.Accounts;
 using ProCoderJi.Api.Features.Practice;
 using ProCoderJi.Api.Features.Progress;
 using ProCoderJi.Api.Features.Portfolio;
+using ProCoderJi.Api.Features.Contact;
 
 var operatorCommand = PortfolioModerationCommand.IsRequested(args);
 var builder = WebApplication.CreateBuilder(operatorCommand ? [] : args);
@@ -33,6 +34,10 @@ builder.Services.AddScoped<IProgressStore>(services => IsMongo(services.GetRequi
 builder.Services.AddScoped<IPortfolioStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
     ? services.GetRequiredService<MongoPortfolioStore>() : services.GetRequiredService<RelationalPortfolioStore>());
 builder.Services.AddPortfolioApi();
+builder.Services.AddContactApi();
+builder.Services.AddScoped<IContactStore>(services => IsMongo(services.GetRequiredService<IConfiguration>())
+    ? new MongoContactStore(services.GetRequiredService<MongoPlatformDatabase>())
+    : new RelationalContactStore(services.GetRequiredService<PlatformDbContext>()));
 builder.Services.AddDataProtection().SetApplicationName("ProCoderJi.Platform");
 builder.Services.AddOptions<KeyManagementOptions>().Configure<IServiceProvider>((options, services) =>
     options.XmlRepository = IsMongo(services.GetRequiredService<IConfiguration>())
@@ -121,7 +126,9 @@ if (args.Contains("--migrate")) return;
 app.UseExceptionHandler(handler => handler.Run(async context =>
 {
     context.Response.StatusCode = 503;
-    await context.Response.WriteAsJsonAsync(new { error = "The learning account service is temporarily unavailable. Your browser practice remains available." });
+    await context.Response.WriteAsJsonAsync(new { error = context.Request.Path.StartsWithSegments("/api/platform/contact")
+        ? "Your message could not be saved right now. Please try again later."
+        : "The learning account service is temporarily unavailable. Your browser practice remains available." });
 }));
 app.Use(async (context, next) =>
 {
@@ -140,6 +147,7 @@ app.UseAntiforgery();
 app.MapAccountEndpoints();
 app.MapProgressEndpoints();
 app.MapPortfolioEndpoints();
+app.MapContactEndpoints();
 app.MapGet("/api/platform/health", () => Results.Json(new { status = "ok" }));
 app.Run();
 
