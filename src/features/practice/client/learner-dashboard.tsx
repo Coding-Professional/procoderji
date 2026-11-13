@@ -53,13 +53,13 @@ export function LearnerDashboard() {
     <>
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+          <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
             Your learning workspace
           </p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Build skills. Keep moving.
+          <h1 className="workspace-heading mt-2">
+            Your learning, at a glance.
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
+          <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
             A little focused practice today. A clearer idea of what to work on
             tomorrow.
           </p>
@@ -71,13 +71,13 @@ export function LearnerDashboard() {
       {!ready ? (
         <p
           role="status"
-          className="rounded-2xl border border-slate-200 bg-white p-6"
+          className="rounded-lg border border-border bg-white p-6"
         >
           Loading your learning progress…
         </p>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="learning-stats">
             {[
               {
                 label: "Completed sessions",
@@ -102,27 +102,24 @@ export function LearnerDashboard() {
                 icon: Target,
               },
             ].map(({ label, value, detail, icon: Icon }) => (
-              <section
-                key={label}
-                className="rounded-2xl border border-slate-200 bg-white p-5"
-              >
-                <div className="flex items-center justify-between text-sm font-medium text-slate-600">
+              <section key={label} className="learning-stat">
+                <div className="flex items-center justify-between text-sm font-medium text-muted-foreground">
                   <h2>{label}</h2>
                   <Icon aria-hidden="true" className="h-4 w-4" />
                 </div>
-                <p className="mt-3 text-3xl font-extrabold tabular-nums">
+                <p className="mt-3 text-3xl font-semibold tabular-nums">
                   {value}
                 </p>
-                <p className="mt-2 text-xs text-slate-500">{detail}</p>
+                <p className="mt-2 text-xs text-muted-foreground">{detail}</p>
               </section>
             ))}
           </div>
-          <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
-            <p className="text-xs font-bold tracking-widest text-amber-800 uppercase">
+          <section className="next-session mt-7">
+            <p className="text-xs font-bold tracking-widest text-primary uppercase">
               Your next step
             </p>
-            <h2 className="mt-2 text-2xl font-extrabold">{nextTopic.title}</h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-700">
+            <h2 className="mt-2 text-2xl font-semibold">{nextTopic.title}</h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-foreground">
               {recommendation.message}
             </p>
             <Link
@@ -134,9 +131,9 @@ export function LearnerDashboard() {
             </Link>
           </section>
           <div className="mt-8 grid gap-6 xl:grid-cols-[1.35fr_1fr]">
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <section className="rounded-lg border border-border bg-white p-6">
               <h2 className="text-lg font-bold">Your skill picture</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-500">
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
                 Practice accuracy helps you choose a next topic. It isn’t a
                 placement readiness score.
               </p>
@@ -154,7 +151,7 @@ export function LearnerDashboard() {
                         >
                           {topic.title}
                         </Link>
-                        <span className="text-slate-600">
+                        <span className="text-muted-foreground">
                           {result?.answered
                             ? `${result.accuracyPercent}% · ${result.answered} answered`
                             : "Not started"}
@@ -162,10 +159,10 @@ export function LearnerDashboard() {
                       </div>
                       <div
                         aria-hidden="true"
-                        className="h-2 rounded-full bg-slate-100"
+                        className="h-2 rounded-full bg-accent"
                       >
                         <div
-                          className="h-2 rounded-full bg-amber-400"
+                          className="h-2 rounded-full bg-primary"
                           style={{ width: `${result?.accuracyPercent ?? 0}%` }}
                         />
                       </div>
@@ -174,29 +171,29 @@ export function LearnerDashboard() {
                 })}
               </div>
             </section>
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <section className="rounded-lg border border-border bg-white p-6">
               <div className="flex items-center gap-2">
                 <CalendarDays
                   aria-hidden="true"
-                  className="h-5 w-5 text-amber-700"
+                  className="h-5 w-5 text-primary"
                 />
                 <h2 className="text-lg font-bold">A manageable weekly plan</h2>
               </div>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Suggested goal: three short sessions over seven days.
               </p>
-              <p className="mt-4 text-3xl font-extrabold tabular-nums">
+              <p className="mt-4 text-3xl font-semibold tabular-nums">
                 {Math.min(weekly, 3)}{" "}
-                <span className="text-base font-medium text-slate-500">
+                <span className="text-base font-medium text-muted-foreground">
                   of 3 sessions
                 </span>
               </p>
-              <ol className="mt-5 space-y-3 text-sm leading-6 text-slate-700">
+              <ol className="mt-5 space-y-3 text-sm leading-6 text-foreground">
                 <li>1. Practise your recommended topic.</li>
                 <li>2. Review explanations for missed answers.</li>
                 <li>3. Try a different topic to broaden your practice.</li>
               </ol>
-              <p className="mt-5 border-t border-slate-100 pt-4 text-xs leading-5 text-slate-500">
+              <p className="mt-5 border-t border-border pt-4 text-xs leading-5 text-muted-foreground">
                 You choose the pace. Repeated questions count as practice, so
                 accuracy is a learning aid rather than a benchmark.
               </p>
@@ -213,7 +210,7 @@ export function LearnerDashboard() {
               </Link>
             </div>
             {sessions.length ? (
-              <ul className="mt-3 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <ul className="mt-3 divide-y divide-slate-100 overflow-hidden rounded-lg border border-border bg-white">
                 {sessions.slice(0, 5).map(({ attempt, summary }) => (
                   <li
                     key={attempt.id}
@@ -227,7 +224,7 @@ export function LearnerDashboard() {
                           )?.title
                         }
                       </p>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {new Date(attempt.completedAt).toLocaleDateString(
                           "en-IN",
                           { day: "numeric", month: "short", year: "numeric" },
@@ -235,16 +232,16 @@ export function LearnerDashboard() {
                         · {summary.answered} answered
                       </p>
                     </div>
-                    <p className="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-bold">
+                    <p className="rounded-full bg-accent px-3 py-1.5 text-sm font-bold">
                       {summary.correct}/{summary.totalQuestions} correct
                     </p>
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="mt-3 rounded-2xl border border-dashed border-slate-300 bg-white p-7">
+              <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-white p-7">
                 <h3 className="font-bold">Your first session starts here</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Choose a topic, try five questions, and review each
                   explanation. Your results will appear here.
                 </p>
@@ -255,7 +252,10 @@ export function LearnerDashboard() {
               </div>
             )}
           </section>
-          <p role="status" className="mt-6 text-xs leading-6 text-slate-500">
+          <p
+            role="status"
+            className="mt-6 text-xs leading-6 text-muted-foreground"
+          >
             {user
               ? syncStatus === "synced"
                 ? "Your progress is synced to your account."

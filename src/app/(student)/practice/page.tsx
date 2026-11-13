@@ -14,44 +14,39 @@ export const metadata = pageMetadata({
 export default function PracticePage() {
   return (
     <>
-      <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+      <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
         Prepare with purpose
       </p>
-      <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Campus placement practice
-      </h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+      <h1 className="workspace-heading mt-2">Campus placement practice</h1>
+      <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
         Work through short topic sessions. Understand why an answer works,
         review mistakes, and use your own progress to decide what comes next.
       </p>
-      <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-700">
+      <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-foreground">
         <span className="flex items-center gap-2">
-          <Target aria-hidden="true" className="h-4 w-4 text-amber-700" />
+          <Target aria-hidden="true" className="h-4 w-4 text-primary" />
           {QUESTION_BANK.length} original questions
         </span>
         <span className="flex items-center gap-2">
-          <Clock aria-hidden="true" className="h-4 w-4 text-amber-700" />
+          <Clock aria-hidden="true" className="h-4 w-4 text-primary" />
           Self-paced sessions
         </span>
         <span className="flex items-center gap-2">
-          <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-amber-700" />
+          <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-primary" />
           No login required
         </span>
       </div>
-      <div className="mt-8 grid gap-5 sm:grid-cols-2">
+      <div className="practice-topics mt-9">
         {PRACTICE_TOPICS.map((topic, index) => (
-          <article
-            key={topic.id}
-            className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6"
-          >
-            <span className="text-xs font-bold tracking-widest text-slate-400">
+          <article key={topic.id} className="practice-topic">
+            <span className="text-xs font-bold tracking-widest text-muted-foreground">
               0{index + 1}
             </span>
             <h2 className="mt-3 text-xl font-bold">{topic.title}</h2>
-            <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">
+            <p className="mt-3 flex-1 text-sm leading-7 text-muted-foreground">
               {topic.description}
             </p>
-            <p className="mt-5 text-xs font-medium text-slate-500">
+            <p className="mt-5 text-xs font-medium text-muted-foreground">
               {QUESTION_BANK.filter((q) => q.topicId === topic.id).length}{" "}
               questions · Easy & medium · Explanations included
             </p>
@@ -65,9 +60,9 @@ export default function PracticePage() {
           </article>
         ))}
       </div>
-      <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="mt-8 rounded-lg border border-border bg-white p-6">
         <h2 className="text-lg font-bold">Learn from every attempt</h2>
-        <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+        <p className="mt-2 max-w-3xl text-sm leading-7 text-muted-foreground">
           These starter sets build familiarity with common reasoning and
           aptitude skills. They are independent learning exercises, and the
           small question bank is not a calibrated employer assessment. Use

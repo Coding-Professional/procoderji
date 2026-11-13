@@ -1,118 +1,60 @@
-"use client";
-
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
+import Link from "next/link";
 
 const faqs = [
-    {
-        question: "Are the notes and study files free?",
-        answer:
-            "Yes. Everything published here is free to read online.",
-    },
-    {
-        question: "Is this connected to the ProCoderJii YouTube channel?",
-        answer:
-            "Yes. This platform is built to go along with the ProCoderJii YouTube videos, with notes added unit by unit as they are reviewed.",
-    },
-    {
-        question: "Can I download the notes as PDFs?",
-        answer:
-            "Not yet. Notes are read online for now. If you would like downloadable PDFs, email us and let us know.",
-    },
-    {
-        question: "How is content organized?",
-        answer:
-            "Content is arranged by branch, semester, subject, and unit so students can find the right material quickly.",
-    },
-    {
-        question: "Do you upload previous year questions?",
-        answer:
-            "Not yet. Previous year questions are not published here at the moment. You can request them by email.",
-    },
-    {
-        question: "How can I request missing notes?",
-        answer:
-            "You can contact us through email and share your subject details. We prioritize requests based on student demand.",
-    },
-    {
-        question: "Can I contribute my own notes?",
-        answer:
-            "Not at the moment. Notes here are written and reviewed by the ProCoderJii team. If you spot a mistake or want a topic covered, email us.",
-    },
-    {
-        question: "Where can I contact the team?",
-        answer:
-            "Use the contact section or email us directly at procoderji@gmail.com.",
-    },
+  [
+    "Are the notes and study files free?",
+    "Yes. Published notes, placement practice and warm-up games are free to use. You can read and practise without an account.",
+  ],
+  [
+    "Do I need to sign in?",
+    "You can practise as a guest. Sign in with Google when you want to save progress across devices or save a private portfolio draft.",
+  ],
+  [
+    "Can I publish my own portfolio?",
+    "Yes, on a deployment with publishing enabled. Choose your address, review the public fields and confirm the publishing policy. You must be at least 18 to publish. Saving a draft does not publish it.",
+  ],
+  [
+    "Can I download the notes as PDFs?",
+    "Notes are currently available to read online. If a downloadable format would help, let us know which subject you need.",
+  ],
+  [
+    "Are these official company placement tests?",
+    "No. The questions and games are independent learning exercises. Use them to practise and understand concepts alongside your other preparation.",
+  ],
+  [
+    "Can I help improve the project?",
+    "Yes. Code, original practice questions, documentation and accessibility improvements are welcome on GitHub. If you spot an error in a note, you can also email the team.",
+  ],
 ];
 
-const FaqItem = ({ question, answer }: { question: string; answer: string }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative group rounded-2xl p-[2px] border border-gray-800 mb-4"
-        >
-            <div className="rounded-2xl bg-white px-6 py-5 shadow-sm transition-all duration-300 ">
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="w-full flex items-center justify-between text-left"
-                >
-                    <span className="text-lg font-semibold text-gray-900 flex-1">{question}</span>
-                    <ChevronDown
-                        className={cn(
-                            "w-5 h-5 text-gray-400 transition-transform duration-300",
-                            isOpen && "rotate-180"
-                        )}
-                    />
-                </button>
-
-                <AnimatePresence>
-                    {isOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden"
-                        >
-                            <p className="text-gray-600 mt-4 pb-2 leading-relaxed">{answer}</p>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-        </motion.div>
-    );
-};
-
 export function FAQ() {
-    return (
-        <section id="faq" className="py-24 px-6 bg-white/80">
-            <div className="max-w-4xl mx-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-16"
-                >
-                    <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
-                        Frequently Asked Questions
-                    </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
-                        Common questions about ProCoderJii notes and study material.
-                    </p>
-                </motion.div>
-
-                <div>
-                    {faqs.map((faq, index) => (
-                        <FaqItem key={index} {...faq} />
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
+  return (
+    <section id="faq" className="section-block section-white">
+      <div className="page-container faq-layout">
+        <div>
+          <p className="eyebrow">A few things you might be wondering</p>
+          <h2 className="section-title mt-4">Good questions.</h2>
+          <p className="section-description">Here’s how the platform works.</p>
+          <Link href="/#contact" className="text-link mt-3">
+            Ask us something else
+          </Link>
+        </div>
+        <div>
+          {faqs.map(([question, answer]) => (
+            <details className="faq-item" key={question}>
+              <summary>
+                {question}
+                <Plus
+                  aria-hidden="true"
+                  className="h-4 w-4 shrink-0 transition-transform"
+                />
+              </summary>
+              <p>{answer}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }

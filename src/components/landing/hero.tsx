@@ -1,179 +1,249 @@
 "use client";
 
-import React, { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { FloatingLogo } from "@/components/floating-logo";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, BookOpen, ChevronRight } from "lucide-react";
 import { getCourses } from "@/lib/courses";
 import { dashboardHref } from "@/lib/catalog";
+import { QUESTION_BANK, type OptionId } from "@/features/practice/domain";
 
-// Only branches that exist in the catalogue are offered, so every link resolves.
 const branches = getCourses().flatMap((course) =>
-    course.branches.map((branch) => ({
-        courseSlug: course.slug,
-        slug: branch.slug,
-        label: branch.short ?? branch.title,
-        semesters: branch.semesters,
-    }))
+  course.branches.map((branch) => ({
+    courseSlug: course.slug,
+    slug: branch.slug,
+    label: branch.short ?? branch.title,
+    semesters: branch.semesters,
+  })),
 );
+const sample = QUESTION_BANK.find(
+  (question) => question.topicId === "quantitative",
+)!;
 
-function BranchSelector() {
-    const searchParams = useSearchParams();
-    const router = useRouter();
-
-    // The URL is the single source of truth; unknown ?branch= values are ignored.
-    const branchParam = searchParams.get("branch");
-    const selected = branches.find((b) => b.slug === branchParam) ?? null;
-    const step: "branch" | "semester" = selected ? "semester" : "branch";
-
-    const setBranch = (slug: string | null) => {
-        router.push(slug ? `/?branch=${encodeURIComponent(slug)}` : "/", { scroll: false });
-    };
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            className="mt-10 sm:mt-16 w-full max-w-3xl relative z-10"
-        >
-            <div className="border border-gray-800 shadow-[0_20px_50px_rgba(0,0,0,0.05)] bg-white/80 backdrop-blur-xl rounded-3xl p-1 overflow-hidden ring-1 ring-gray-900/5">
-                {/* Progress Header */}
-                <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 bg-white/50">
-                    <div className="flex items-center gap-2 text-sm" aria-live="polite">
-                        <span className={cn("font-semibold transition-colors", step === "branch" ? "text-primary" : "text-gray-500")}>Branch</span>
-                        <ChevronRight className="w-4 h-4 text-gray-300" aria-hidden="true" />
-                        <span className={cn("font-semibold transition-colors", step === "semester" ? "text-primary" : "text-gray-500")}>Semester</span>
-                    </div>
-                    {step === "semester" && (
-                        <button
-                            type="button"
-                            onClick={() => setBranch(null)}
-                            className="text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors px-2 py-2"
-                        >
-                            Change branch
-                        </button>
-                    )}
-                </div>
-
-                {/* Content Area */}
-                <div className="p-4 sm:p-6 min-h-[240px] rounded-3xl border border-gray-800 flex flex-col justify-center bg-white/10">
-                    <AnimatePresence mode="wait">
-                        {step === "branch" && (
-                            <motion.div
-                                key="branch"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="space-y-4"
-                            >
-                                <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 gap-4">
-                                    {branches.map((branch) => (
-                                        <button
-                                            type="button"
-                                            key={`${branch.courseSlug}/${branch.slug}`}
-                                            onClick={() => setBranch(branch.slug)}
-                                            className="group border border-gray-800 flex flex-col items-center justify-center p-6 rounded-2xl bg-white hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-                                        >
-                                            <span className="font-semibold text-gray-900 group-hover:text-primary transition-colors">{branch.label}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                                <p className="text-sm text-gray-500">
-                                    More branches will be added. Need one? <a href="#contact" className="underline hover:text-gray-900">Let us know</a>.
-                                </p>
-                            </motion.div>
-                        )}
-                        {step === "semester" && selected && (
-                            <motion.div
-                                key="semester"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="grid grid-cols-2 sm:grid-cols-4 gap-4"
-                            >
-                                {selected.semesters.map((sem, i) => (
-                                    <Link
-                                        key={sem.slug}
-                                        href={dashboardHref([selected.courseSlug, selected.slug, sem.slug])}
-                                        className="group border border-gray-800 flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl bg-white hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-                                    >
-                                        <span className="text-3xl font-black text-gray-300 group-hover:text-gray-500 mb-2 transition-colors">{i + 1}</span>
-                                        <span className="font-bold text-gray-900 group-hover:text-gray-800 transition-colors">Semester</span>
-                                        <span className="text-xs text-gray-500 mt-1">
-                                            {sem.subjects.length ? `${sem.subjects.length} subject${sem.subjects.length === 1 ? "" : "s"}` : "Coming soon"}
-                                        </span>
-                                    </Link>
-                                ))}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-        </motion.div>
-    );
-}
-
-/** Crawlable, no-JS version of the branch picker shown while the interactive one loads. */
-function SelectorFallback() {
-    return (
-        <div className="mt-10 sm:mt-16 w-full max-w-3xl relative z-10 rounded-3xl border border-gray-800 bg-white/80 p-6 min-h-[240px]">
-            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 gap-4">
-                {branches.map((branch) => (
-                    <Link
-                        key={`${branch.courseSlug}/${branch.slug}`}
-                        href={`/?branch=${encodeURIComponent(branch.slug)}`}
-                        className="border border-gray-800 flex items-center justify-center p-6 rounded-2xl bg-white font-semibold text-gray-900"
-                    >
-                        {branch.label}
-                    </Link>
-                ))}
-            </div>
+function SampleQuestion() {
+  const [answer, setAnswer] = useState<OptionId | null>(null);
+  const [checked, setChecked] = useState(false);
+  return (
+    <div className="sample-question">
+      <div className="sample-header">
+        <span>THE PRACTICE DESK</span>
+        <span>One question to get going</span>
+      </div>
+      <div className="sample-body">
+        <p className="sample-label">Quantitative aptitude · A quick sample</p>
+        <fieldset>
+          <legend>{sample.prompt}</legend>
+          <div className="sample-options">
+            {sample.options.map((option) => (
+              <label key={option.id} className="sample-option">
+                <input
+                  type="radio"
+                  name="sample-question"
+                  value={option.id}
+                  aria-label={option.text}
+                  checked={answer === option.id}
+                  onChange={() => {
+                    setAnswer(option.id);
+                    setChecked(false);
+                  }}
+                />
+                <span>{option.text}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <div className="sample-bottom">
+          <button
+            type="button"
+            disabled={answer === null}
+            className="pcj-button pcj-button-primary"
+            onClick={() => setChecked(true)}
+          >
+            Check answer <ArrowRight aria-hidden="true" size={15} />
+          </button>
+          <span className="text-xs text-muted-foreground">
+            Try it. No sign-in needed.
+          </span>
         </div>
-    );
+        <div aria-live="polite" aria-atomic="true">
+          {checked && (
+            <p className="sample-answer">
+              <strong>
+                {answer === sample.answerId
+                  ? "You got it. "
+                  : "Here’s how it works. "}
+              </strong>
+              {sample.explanation}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function Hero() {
-    return (
-        <section className="flex-1 flex flex-col items-center justify-center px-4 py-16 sm:py-24 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50 pointer-events-none" />
+  return (
+    <section
+      className="page-container hero-layout"
+      aria-labelledby="home-heading"
+    >
+      <div className="hero-copy">
+        <div className="eyebrow">
+          <span className="eyebrow-dot" /> A home for student life
+        </div>
+        <h1 id="home-heading" className="display-heading">
+          For the semester.
+          <br />
+          <em>For what’s next.</em>
+        </h1>
+        <p>
+          Course notes for the exam ahead. Practice for your first interview. A
+          portfolio for the things you build. Find your next step here.
+        </p>
+        <div className="hero-actions">
+          <Link href="/practice" className="pcj-button pcj-button-primary">
+            Start placement practice <ArrowRight aria-hidden="true" size={16} />
+          </Link>
+          <Link href="/dashboard" className="pcj-button pcj-button-secondary">
+            <BookOpen aria-hidden="true" size={16} /> Find your notes
+          </Link>
+        </div>
+        <div className="hero-footnote">
+          Free to start. Learn at your own pace.
+        </div>
+      </div>
+      <SampleQuestion />
+    </section>
+  );
+}
 
-            <FloatingLogo />
-
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="max-w-4xl mx-auto space-y-6 sm:space-y-8 relative z-10"
+function BranchSelector() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const selected = branches.find(
+    (branch) => branch.slug === searchParams.get("branch"),
+  );
+  return (
+    <div className="notes-picker">
+      <div className="notes-picker-head">
+        <span className="inline-flex items-center gap-2" aria-live="polite">
+          Branch <ChevronRight size={13} aria-hidden="true" />{" "}
+          <strong>
+            {selected
+              ? `${selected.label} · Choose your semester`
+              : "Choose your branch"}
+          </strong>
+        </span>
+        {selected && (
+          <button
+            type="button"
+            className="min-h-11 text-xs font-semibold underline underline-offset-4"
+            onClick={() => router.push("/", { scroll: false })}
+          >
+            Change branch
+          </button>
+        )}
+      </div>
+      {!selected ? (
+        <div className="branch-grid">
+          {branches.map((branch) => (
+            <button
+              type="button"
+              key={`${branch.courseSlug}/${branch.slug}`}
+              className="branch-option"
+              onClick={() =>
+                router.push(`/?branch=${encodeURIComponent(branch.slug)}`, {
+                  scroll: false,
+                })
+              }
             >
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-primary shadow-sm mb-4">
-                    <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                    <span>Free learning. Focused placement practice.</span>
-                </div>
+              {branch.label}
+              <ArrowRight aria-hidden="true" size={17} />
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="semester-grid">
+          {selected.semesters.map((semester, index) => (
+            <Link
+              key={semester.slug}
+              href={dashboardHref([
+                selected.courseSlug,
+                selected.slug,
+                semester.slug,
+              ])}
+              className="semester-option"
+            >
+              <span>Semester</span>
+              <strong>{String(index + 1).padStart(2, "0")}</strong>
+              <span>
+                {semester.subjects.length
+                  ? `${semester.subjects.length} subjects`
+                  : "Coming soon"}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
+      <p className="mt-4 text-xs leading-6 text-muted-foreground">
+        Don’t see your branch?{" "}
+        <Link
+          href="/#contact"
+          className="font-medium underline underline-offset-4"
+        >
+          Request a subject.
+        </Link>
+      </p>
+    </div>
+  );
+}
 
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.1] break-words">
-                    Build skills for <br className="hidden sm:block" />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-gray-900">
-                        your next opportunity
-                    </span>
-                </h1>
-
-                <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                    Practise aptitude, reasoning, verbal ability, and programming with clear explanations.
-                    Save your progress, find your next topic, and build a study routine at your own pace.
-                </p>
-                <div className="flex flex-wrap justify-center gap-3">
-                    <Link href="/practice" className="inline-flex min-h-12 items-center rounded-xl bg-gray-900 px-6 py-3 font-bold text-white hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gray-900">Start placement practice</Link>
-                    <Link href="/learn" className="inline-flex min-h-12 items-center rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gray-900">My learning workspace</Link>
-                </div>
-            </motion.div>
-
-            <Suspense fallback={<SelectorFallback />}>
-                <BranchSelector />
-            </Suspense>
-        </section>
-    );
+export function NotesFinder() {
+  return (
+    <section
+      id="notes"
+      className="section-block section-white"
+      aria-labelledby="notes-heading"
+    >
+      <div className="page-container notes-layout">
+        <div>
+          <p className="eyebrow">Less hunting for the right material</p>
+          <h2 id="notes-heading" className="section-title mt-4">
+            Your semester,
+            <br />
+            sorted.
+          </h2>
+          <p className="section-description">
+            Start with your branch and semester. Find the subject, open a unit,
+            and get back to studying.
+          </p>
+          <Link href="/dashboard" className="text-link mt-4">
+            Browse all course notes <ArrowRight aria-hidden="true" size={16} />
+          </Link>
+        </div>
+        <Suspense
+          fallback={
+            <div className="notes-picker">
+              <p className="text-sm font-medium">Choose your branch</p>
+              <div className="branch-grid mt-4">
+                {branches.map((branch) => (
+                  <Link
+                    key={branch.slug}
+                    href={`/?branch=${branch.slug}`}
+                    className="branch-option"
+                  >
+                    {branch.label}
+                    <ArrowRight aria-hidden="true" size={16} />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          }
+        >
+          <BranchSelector />
+        </Suspense>
+      </div>
+    </section>
+  );
 }

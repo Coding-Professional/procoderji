@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { waitForDeployment } from "./deployment-status.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const localStaging = process.argv.includes("--local-staging");
@@ -56,6 +57,28 @@ function authentication(tokenKey) {
   return requireValue(tokenKey);
 }
 
+async function confirmReady(result, cwd, project, token, label) {
+  return waitForDeployment(result.deployment?.id, {
+    label,
+    read: async id => {
+      if (!token) {
+        const inspected = vercel(["inspect", id, "--json"], cwd, project);
+        return inspected.deployment ?? inspected;
+      }
+      const endpoint = new URL(`https://api.vercel.com/v13/deployments/${id}`);
+      endpoint.searchParams.set("teamId", requireValue("VERCEL_ORG_ID"));
+      const response = await fetch(endpoint, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!response.ok) throw new Error(`${label} status lookup failed (${response.status}).`);
+      const deployment = await response.json();
+      if (deployment.projectId !== project) throw new Error(`${label} deployment belongs to a different project.`);
+      return { id: deployment.id, readyState: deployment.readyState };
+    },
+  });
+}
+
 function deploySource() {
   const result = spawnSync("git", ["ls-files", "-z"], { cwd: root, encoding: "utf8", windowsHide: true });
   if (result.status !== 0) throw new Error("Cannot enumerate tracked deployment source.");
@@ -103,8 +126,9 @@ async function main() {
   const frontendSource = deploySource();
   fs.copyFileSync(path.join(backendSource, "vercel.backend.json"), path.join(backendSource, "vercel.json"));
   const deployArgs = ["deploy", "--prod", "--yes", "--json", "--meta", `sourceCommit=${sha}`, "--meta", `sourceBranch=${branch}`];
-  const backend = vercel([...deployArgs, "--project", backendProject], backendSource, backendProject, authentication("VERCEL_BACKEND_TOKEN"));
-  if (backend.status === "error" || backend.deployment?.readyState !== "READY") throw new Error("Backend deployment did not become ready.");
+  const backendToken = authentication("VERCEL_BACKEND_TOKEN");
+  const backend = vercel([...deployArgs, "--project", backendProject], backendSource, backendProject, backendToken);
+  await confirmReady(backend, backendSource, backendProject, backendToken, "Backend");
   await check(`${backendOrigin}/api/platform/health`, async r => r.ok && (await r.json()).status === "ok");
   await check(`${backendOrigin}/api/platform/auth/session`, async r => {
     if (!r.ok) return false;
@@ -113,8 +137,9 @@ async function main() {
   });
   console.log("Backend is ready; database-backed session check passed.");
 
-  const frontend = vercel([...deployArgs, "--project", frontendProject], frontendSource, frontendProject, authentication("VERCEL_FRONTEND_TOKEN"));
-  if (frontend.status === "error" || frontend.deployment?.readyState !== "READY") throw new Error("Frontend deployment did not become ready.");
+  const frontendToken = authentication("VERCEL_FRONTEND_TOKEN");
+  const frontend = vercel([...deployArgs, "--project", frontendProject], frontendSource, frontendProject, frontendToken);
+  await confirmReady(frontend, frontendSource, frontendProject, frontendToken, "Frontend");
   await check(publicOrigin, async r => r.ok && (branch === "main" || r.headers.get("x-robots-tag")?.includes("noindex")));
   console.log(`Frontend is ready: ${publicOrigin}`);
   const summary = `### ${branch === "main" ? "Production" : "Staging"} deployment\n\nCommit: \`${sha}\`\n\n- Frontend: ${publicOrigin}\n- Backend: ${backendOrigin}\n- Health and database-backed session checks passed.\n`;
