@@ -22,6 +22,7 @@ synchronization is a separate capability; paid billing is future work.
 | Import a portfolio from a text template | [Markdown import](portfolio-markdown.md), [template](../public/templates/portfolio.md) |
 | Work on portfolio fields, policy, publication, or storage | [Shared rules](../shared/portfolio/README.md), [Portfolio API](portfolio-api.md) |
 | Configure production hosting and the site domain | [Deployment](deployment.md) |
+| Contribute to dev, test staging and promote a production release | [Branches and releases](branching-and-releases.md) |
 | Run the API and choose a database with Docker | [Containers](containers.md) |
 | Configure the selected hosted PostgreSQL database | [Neon setup](neon.md) |
 | Report a vulnerability privately | [Security policy](../SECURITY.md) |

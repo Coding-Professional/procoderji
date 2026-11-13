@@ -9,7 +9,7 @@ import {
 } from "./markdown.ts";
 import type { PortfolioData } from "./types.ts";
 
-const template = fs.readFileSync("public/templates/portfolio.md", "utf8");
+const template = fs.readFileSync("public/templates/portfolio.md", "utf8").replace(/\r\n/g, "\n");
 const example: PortfolioData = {
   name: "Riya Student",
   headline: "Computer science student building useful web applications",

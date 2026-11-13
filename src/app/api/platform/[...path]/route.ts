@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isBackendPath, parseBackendOrigin } from "@/features/account/config";
+import { canonicalGoogleChallenge, isBackendPath, parseBackendOrigin } from "@/features/account/config";
 import { revalidateTag } from "next/cache";
 import { portfolioCacheTag } from "@/features/portfolio/public-model";
 import { validateUsername } from "@/features/portfolio/validation";
@@ -90,6 +90,13 @@ async function proxy(
         signal: AbortSignal.timeout(20_000),
       },
     );
+    if (path === "auth/google" && request.method === "GET" && upstream.status === 302) {
+      const canonical = canonicalGoogleChallenge(request.url, upstream.headers.get("location"));
+      if (canonical) {
+        // Restart on the callback host before forwarding a host-only correlation cookie.
+        return new Response(null, { status: 307, headers: { ...privateHeaders, Location: canonical } });
+      }
+    }
     const responseHeaders = new Headers(privateHeaders);
     for (const name of ["content-type", "location", "retry-after"]) {
       const value = upstream.headers.get(name);

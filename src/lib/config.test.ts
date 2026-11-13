@@ -17,6 +17,18 @@ test("the expected baseline headers are present", () => {
 	assert.match(map["Permissions-Policy"], /camera=\(\)/);
 });
 
+test("staging sends noindex headers while retaining security headers", async () => {
+	const previous = process.env.DEPLOYMENT_ENVIRONMENT;
+	try {
+		process.env.DEPLOYMENT_ENVIRONMENT = "staging";
+		const rules = (await nextConfig.headers?.()) ?? [];
+		assert.deepEqual(rules[0].headers, [...securityHeaders, { key: "X-Robots-Tag", value: "noindex, nofollow" }]);
+	} finally {
+		if (previous === undefined) delete process.env.DEPLOYMENT_ENVIRONMENT;
+		else process.env.DEPLOYMENT_ENVIRONMENT = previous;
+	}
+});
+
 test("the framework is not advertised in an X-Powered-By header", () => {
 	assert.equal(nextConfig.poweredByHeader, false);
 });

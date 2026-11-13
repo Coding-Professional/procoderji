@@ -18,6 +18,26 @@ export function parseBackendOrigin(value: string | undefined): string | null {
   }
 }
 
+/** The authorization location must come from the trusted .NET upstream, never browser input. */
+export function canonicalGoogleChallenge(requestUrl: string, authorizationLocation: string | null): string | null {
+  if (!authorizationLocation) return null;
+  try {
+    const request = new URL(requestUrl);
+    const authorization = new URL(authorizationLocation);
+    if (authorization.origin !== "https://accounts.google.com" || authorization.username || authorization.password) return null;
+    const callback = new URL(authorization.searchParams.get("redirect_uri") ?? "");
+    const localHttp = callback.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(callback.hostname);
+    if ((callback.protocol !== "https:" && !localHttp) || callback.username || callback.password ||
+      callback.pathname !== "/api/platform/signin-google" || callback.search || callback.hash || callback.origin === request.origin) return null;
+    const destination = new URL("/api/platform/auth/google", callback.origin);
+    const returnTo = request.searchParams.get("returnTo");
+    if (returnTo !== null) destination.searchParams.set("returnTo", returnTo);
+    return destination.href;
+  } catch {
+    return null;
+  }
+}
+
 export const BACKEND_PATHS = new Set([
   "auth/session",
   "auth/google",

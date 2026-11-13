@@ -19,7 +19,8 @@ These steps do not need repeated owner permission. Existing decisions, including
 backend and selected Neon PostgreSQL deployment, remain valid. A person implementing that
 approved scope should continue through a reviewable change and its relevant checks.
 
-Use the pull-request workflow for changes to `main`, and satisfy the repository's active review
+Use feature PRs into `dev`, then a reviewed promotion PR from canonical `dev` into `main`.
+Follow [branching and releases](branching-and-releases.md), and satisfy the active review
 and status-check rules before merging. Maintainers can merge routine changes within their
 authorised scope once the relevant checks and review are complete. Production rollout and
 private-credential access follow the separately agreed operating scope.

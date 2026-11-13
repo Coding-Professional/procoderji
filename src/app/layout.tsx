@@ -3,6 +3,7 @@ import "./globals.css";
 import { getSiteUrl } from "@/lib/site";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
 import { MotionProvider } from "@/components/motion-provider";
+import { isNonProductionDeployment } from "@/lib/deployment";
 
 const siteUrl = getSiteUrl();
 
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
     images: [OG_IMAGE],
   },
   twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
+  ...(isNonProductionDeployment(process.env.DEPLOYMENT_ENVIRONMENT, process.env.VERCEL_ENV)
+    ? { robots: { index: false, follow: false } }
+    : {}),
 };
 
 export default function RootLayout({
@@ -36,6 +40,11 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        {isNonProductionDeployment(process.env.DEPLOYMENT_ENVIRONMENT, process.env.VERCEL_ENV) && (
+          <div role="status" className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-sm text-amber-950">
+            Staging preview. Use sample data; accounts and saved work here are separate from production.
+          </div>
+        )}
         <MotionProvider>
         {/* Background Layer */}
         <div className="min-h-screen w-full  relative overflow-hidden">
