@@ -13,9 +13,9 @@ import type { PortfolioData, PortfolioProblem } from "../types";
 import { validatePortfolio, validateUsername } from "../validation";
 import { PortfolioPreview } from "../themes/portfolio-preview";
 
-const card = "rounded-2xl border border-slate-200 bg-white p-5 sm:p-6";
-const input = "mt-2 block min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 outline-offset-4 placeholder:text-slate-400 focus-visible:outline-2 focus-visible:outline-slate-900 disabled:bg-slate-50 disabled:text-slate-500";
-const smallAction = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-slate-300 bg-white p-2 text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-40";
+const card = "workspace-card";
+const input = "mt-2 block min-h-11 w-full min-w-0 rounded-md border border-input bg-white px-3 py-2 text-base text-foreground outline-offset-4 placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-slate-900 disabled:bg-background disabled:text-muted-foreground";
+const smallAction = "inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-slate-300 bg-white p-2 text-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-40";
 const initialData: PortfolioData = {};
 const fieldId = (path: string) => `portfolio-${path.replace(/[^a-zA-Z0-9-]/g, "-")}`;
 const fingerprint = (data: PortfolioData, searchVisible: boolean) => JSON.stringify({ data, searchVisible });
@@ -50,8 +50,8 @@ function Field({ path, label, value, onChange, problems, maxLength, hint, multil
     onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(event.target.value),
   };
   return <div>
-    <label htmlFor={id} className="block text-sm font-semibold text-slate-800">{label}</label>
-    {hint && <p id={`${id}-hint`} className="mt-1 text-sm leading-6 text-slate-500">{hint}</p>}
+    <label htmlFor={id} className="block text-sm font-semibold text-foreground">{label}</label>
+    {hint && <p id={`${id}-hint`} className="mt-1 text-sm leading-6 text-muted-foreground">{hint}</p>}
     {multiline ? <textarea {...attributes} rows={4} /> : <input {...attributes} type={type} />}
     {error && <p id={`${id}-error`} className="mt-2 text-sm font-medium text-rose-700">{problemMessage(error)}</p>}
   </div>;
@@ -59,8 +59,8 @@ function Field({ path, label, value, onChange, problems, maxLength, hint, multil
 
 function Section({ title, children, count }: { title: string; children: ReactNode; count?: number }) {
   return <details className={card}>
-    <summary className="min-h-11 cursor-pointer text-lg font-bold text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">
-      {title}{count !== undefined && <span className="ml-2 text-sm font-normal text-slate-500">({count})</span>}
+    <summary className="min-h-11 cursor-pointer text-lg font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">
+      {title}{count !== undefined && <span className="ml-2 text-sm font-normal text-muted-foreground">({count})</span>}
     </summary>
     <div className="mt-5 space-y-5">{children}</div>
   </details>;
@@ -87,7 +87,7 @@ function StringList({ path, label, items, limit, maxLength, problems, onChange }
   problems: PortfolioProblem[]; onChange: (items: string[]) => void;
 }) {
   return <div className="space-y-3" id={fieldId(path)} tabIndex={-1}>
-    <p className="text-sm text-slate-500">Up to {limit} entries, {maxLength} characters each.</p>
+    <p className="text-sm text-muted-foreground">Up to {limit} entries, {maxLength} characters each.</p>
     {items.map((item, index) => <div key={index} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
       <Field path={`${path}[${index}]`} label={`${label} ${index + 1}`} value={item} maxLength={maxLength} problems={problems} onChange={value => onChange(items.map((old, position) => position === index ? value : old))} />
       <EntryControls label={label.toLowerCase()} index={index} length={items.length} onMove={next => { onChange(move(items, index, next)); requestAnimationFrame(() => document.getElementById(fieldId(`${path}[${next}]`))?.focus()); }} onRemove={() => onChange(items.filter((_, position) => position !== index))} />
@@ -279,17 +279,17 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
     const entries = data[kind] ?? [];
     const limit = RULES.maxItems[kind];
     return <Section title={label} count={entries.length}>
-      <p className="text-sm text-slate-500">Up to {limit} entries. Add the required title or institution before saving.</p>
+      <p className="text-sm text-muted-foreground">Up to {limit} entries. Add the required title or institution before saving.</p>
       <div id={fieldId(kind)} tabIndex={-1} className="space-y-5">
         {entries.map((entry, index) => {
           const values = entry as unknown as Record<string, string | string[] | undefined>;
           const replace = (patch: Record<string, string | string[]>) => update({ [kind]: entries.map((old, position) => position === index ? { ...old, ...patch } : old) });
-          return <fieldset key={index} id={fieldId(`${kind}[${index}]`)} tabIndex={-1} className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <legend className="px-2 text-sm font-bold text-slate-800">{label.replace(/s$/, "")} {index + 1}</legend>
+          return <fieldset key={index} id={fieldId(`${kind}[${index}]`)} tabIndex={-1} className="min-w-0 space-y-4 rounded-xl border border-border bg-background p-4">
+            <legend className="px-2 text-sm font-bold text-foreground">{label.replace(/s$/, "")} {index + 1}</legend>
             <EntryControls label={kind === "projects" ? "project" : kind === "education" ? "education entry" : "experience"} index={index} length={entries.length} onMove={next => { update({ [kind]: move<ObjectEntry>(entries, index, next) }); requestAnimationFrame(() => document.getElementById(fieldId(`${kind}[${next}].${ENTRY_FIELDS[kind][0].key}`))?.focus()); }} onRemove={() => update({ [kind]: entries.filter((_, position) => position !== index) })} />
             {ENTRY_FIELDS[kind].map(field => <Field key={field.key} path={`${kind}[${index}].${field.key}`} label={field.label} value={typeof values[field.key] === "string" ? values[field.key] as string : ""} maxLength={RULES.maxLength[field.max]} multiline={field.multiline} type={field.type} problems={problems} onChange={value => replace({ [field.key]: value })} hint={field.type === "url" ? "Optional https:// project address." : undefined} />)}
             {kind === "projects" && <div>
-              <h3 className="mb-3 text-sm font-bold text-slate-800">Technologies</h3>
+              <h3 className="mb-3 text-sm font-bold text-foreground">Technologies</h3>
               <StringList path={`projects[${index}].technologies`} label="Technology" items={Array.isArray(values.technologies) ? values.technologies : []} limit={RULES.maxItems["projects.technologies"]} maxLength={RULES.maxLength["projects.technologies.item"]} problems={problems} onChange={technologies => replace({ technologies })} />
             </div>}
           </fieldset>;
@@ -311,35 +311,35 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
   return <>
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="max-w-2xl">
-        <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">Your work, in one place</p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Portfolio builder</h1>
-        <p className="mt-3 leading-7 text-slate-600">Introduce yourself, show your projects and choose a simple public page. Keep changes private until you are ready to publish.</p>
+        <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Your work, in one place</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Portfolio builder</h1>
+        <p className="mt-3 leading-7 text-muted-foreground">Introduce yourself, show your projects and choose a simple public page. Keep changes private until you are ready to publish.</p>
       </div>
       <a href="#portfolio-preview" className={secondaryAction}><Eye className="h-4 w-4" aria-hidden="true" />Jump to live preview</a>
     </div>
 
     {!userId && <section className={`${card} mt-6 border-amber-200 bg-amber-50`}>
-      <h2 className="font-bold text-slate-900">Try the editor, then sign in to save</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-700">Your guest draft stays only in this open page. It is cleared when you leave or change accounts. A Google account is needed to save a private draft, claim an address or publish.</p>
-      {accountConfigured ? <form action="/api/platform/auth/google" method="get" className="mt-4"><input type="hidden" name="returnTo" value="/learn/portfolio" /><button type="submit" className={primaryAction}>Continue with Google</button></form> : <p className="mt-3 text-sm text-slate-600">Account services are not available on this deployment. You can still try the preview. <Link className="font-semibold underline" href="/account">View account options</Link>.</p>}
+      <h2 className="font-bold text-foreground">Try the editor, then sign in to save</h2>
+      <p className="mt-2 text-sm leading-6 text-foreground">Your guest draft stays only in this open page. It is cleared when you leave or change accounts. A Google account is needed to save a private draft, claim an address or publish.</p>
+      {accountConfigured ? <form action="/api/platform/auth/google" method="get" className="mt-4"><input type="hidden" name="returnTo" value="/learn/portfolio" /><button type="submit" className={primaryAction}>Continue with Google</button></form> : <p className="mt-3 text-sm text-muted-foreground">Account services are not available on this deployment. You can still try the preview. <Link className="font-semibold underline" href="/account">View account options</Link>.</p>}
     </section>}
 
-    {loading && <p role="status" className="mt-6 text-sm text-slate-600">Loading your private draft…</p>}
+    {loading && <p role="status" className="mt-6 text-sm text-muted-foreground">Loading your private draft…</p>}
     <div ref={errorSummary} tabIndex={-1} role={error || problems.length ? "alert" : undefined} className={error || problems.length ? "mt-6 rounded-xl border border-rose-300 bg-rose-50 p-5 text-rose-900 outline-offset-4" : "hidden"}>
       <h2 className="font-bold">Check your portfolio before continuing</h2>
       {error && <p className="mt-2 text-sm leading-6">{error}</p>}
       {problems.length > 0 && <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{problems.map((problem, index) => <li key={`${problem.path}:${problem.code}:${index}`}><a href={`#${fieldId(problem.path)}`} onClick={() => focusProblem(problem.path)} className="underline">{problem.path}: {problemMessage(problem)}</a></li>)}</ul>}
     </div>
     {message && <p role="status" className="mt-5 flex gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900"><Check className="h-5 w-5 shrink-0" aria-hidden="true" />{message}</p>}
-    {(conflict || loadFailed) && <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-slate-800"><p>{conflict ? "Another update was saved. Your unsaved edits are still here. Load the latest draft before trying to save again." : "Your saved draft could not be loaded. Retry before saving to your account."}</p><button type="button" className={`${secondaryAction} mt-3`} disabled={busy} onClick={requestReload}>Load latest draft</button></div>}
-    {suspended && <div role="status" className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-slate-800">Your public portfolio is suspended. You can edit your private draft or unpublish it. Contact <a className="font-semibold underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> to request a review.</div>}
+    {(conflict || loadFailed) && <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-foreground"><p>{conflict ? "Another update was saved. Your unsaved edits are still here. Load the latest draft before trying to save again." : "Your saved draft could not be loaded. Retry before saving to your account."}</p><button type="button" className={`${secondaryAction} mt-3`} disabled={busy} onClick={requestReload}>Load latest draft</button></div>}
+    {suspended && <div role="status" className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-foreground">Your public portfolio is suspended. You can edit your private draft or unpublish it. Contact <a className="font-semibold underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> to request a review.</div>}
 
     <div className="mt-7 grid items-start gap-7 xl:grid-cols-2">
       <form noValidate onSubmit={event => { event.preventDefault(); save(); }}>
         <fieldset disabled={busy || loading} className="min-w-0 space-y-5">
           <legend className="sr-only">Portfolio details</legend>
           <section className={`${card} space-y-5`}>
-            <h2 className="text-xl font-bold text-slate-900">Introduction</h2>
+            <h2 className="text-xl font-bold text-foreground">Introduction</h2>
             <Field path="name" label="Name" value={data.name ?? ""} maxLength={RULES.maxLength.name} problems={problems} onChange={name => update({ name })} hint="Required to publish. Use the name you want to show publicly." />
             <Field path="headline" label="Headline" value={data.headline ?? ""} maxLength={RULES.maxLength.headline} problems={problems} onChange={headline => update({ headline })} hint="Required to publish. A short introduction, such as your course and interests." />
             <Field path="about" label="About you" value={data.about ?? ""} maxLength={RULES.maxLength.about} problems={problems} multiline onChange={about => update({ about })} hint="Share your interests and goals. Do not add a phone number or home address." />
@@ -353,39 +353,39 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
             {([['github','GitHub profile'],['linkedin','LinkedIn profile'],['website','Personal website'],['email','Public email']] as const).map(([key,label]) => <Field key={key} path={`links.${key}`} label={label} value={data.links?.[key] ?? ""} maxLength={key === "email" ? RULES.maxLength.email : RULES.maxLength.link} type={key === "email" ? "email" : "url"} problems={problems} onChange={value => update({ links: { ...data.links, [key]: value } })} hint={key === "email" ? "Optional. This address becomes visible to everyone when published." : "Optional complete https:// address."} />)}
           </Section>
           <section className={`${card} space-y-4`}>
-            <h2 className="text-xl font-bold text-slate-900">Appearance and search visibility</h2>
-            <label className="block text-sm font-semibold text-slate-800" htmlFor="portfolio-theme">Theme</label>
+            <h2 className="text-xl font-bold text-foreground">Appearance and search visibility</h2>
+            <label className="block text-sm font-semibold text-foreground" htmlFor="portfolio-theme">Theme</label>
             <select id="portfolio-theme" className={input} value={data.theme ?? "simple"} onChange={event => update({ theme: event.target.value as "simple" | "developer" })}><option value="simple">Simple</option><option value="developer">Developer</option></select>
-            <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-slate-700"><input className="mt-1 h-5 w-5 shrink-0 accent-slate-900" type="checkbox" checked={searchVisible} onChange={event => { dirtyRef.current = true; setSearchVisible(event.target.checked); setMessage(""); }} />Allow search engines to discover my published portfolio</label>
-            <p className="text-sm leading-6 text-slate-500">Off by default. A published page can still be opened by anyone with its address. This setting changes only after publishing; search engines may take time to update.</p>
+            <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-foreground"><input className="mt-1 h-5 w-5 shrink-0 accent-primary" type="checkbox" checked={searchVisible} onChange={event => { dirtyRef.current = true; setSearchVisible(event.target.checked); setMessage(""); }} />Allow search engines to discover my published portfolio</label>
+            <p className="text-sm leading-6 text-muted-foreground">Off by default. A published page can still be opened by anyone with its address. This setting changes only after publishing; search engines may take time to update.</p>
           </section>
           <section className={`${card} space-y-4`}>
-            <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-bold text-slate-900">Save and publish</h2><span className="text-sm font-medium text-slate-500">{busy ? "Working…" : dirty ? "Unsaved changes" : record ? "Draft saved" : "New draft"}</span></div>
+            <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-bold text-foreground">Save and publish</h2><span className="text-sm font-medium text-muted-foreground">{busy ? "Working…" : dirty ? "Unsaved changes" : record ? "Draft saved" : "New draft"}</span></div>
             <button type="submit" className={primaryAction} disabled={accountActionsDisabled}><Save className="h-4 w-4" aria-hidden="true" />Save draft</button>
-            <p className="text-sm leading-6 text-slate-500">Saving a draft keeps it private. Publishing makes a copy of your current details available at your chosen address.</p>
-            <div className="border-t border-slate-200 pt-4">
+            <p className="text-sm leading-6 text-muted-foreground">Saving a draft keeps it private. Publishing makes a copy of your current details available at your chosen address.</p>
+            <div className="border-t border-border pt-4">
               <Field path="username" label="Public username" value={username} maxLength={RULES.username.maxLength} problems={problems} disabled={!!record?.username} onChange={value => { setUsername(value); setAvailability(""); setProblems([]); }} hint={record?.username ? "This username is fixed for this portfolio. Deleting an ordinary portfolio releases the address." : "3–30 lowercase letters, digits and single hyphens. A claimed username cannot be changed."} />
-              {record?.username ? <p className="mt-2 text-sm font-semibold text-slate-700">Claimed address: /u/{record.username}</p> : <div className="mt-3 flex flex-wrap gap-3">
+              {record?.username ? <p className="mt-2 text-sm font-semibold text-foreground">Claimed address: /u/{record.username}</p> : <div className="mt-3 flex flex-wrap gap-3">
                 <button type="button" className={secondaryAction} disabled={accountActionsDisabled} onClick={() => { if (!showProblems(validateUsername(username))) return; void run(async () => { const available = await api().checkUsername(username); if (mounted.current) setAvailability(available ? "This username is available. It is reserved only after you claim it." : "This username is already claimed."); }); }}>Check availability</button>
                 <button type="button" className={secondaryAction} disabled={accountActionsDisabled} onClick={() => { if (!showProblems(validateUsername(username))) return; void run(async () => { applyRecord(await api().claimUsername(username, record?.revision ?? null)); }, "Username claimed. Review your details before publishing."); }}>Claim username</button>
               </div>}
-              {availability && <p role="status" className="mt-2 text-sm text-slate-700">{availability}</p>}
+              {availability && <p role="status" className="mt-2 text-sm text-foreground">{availability}</p>}
             </div>
             {userId && workspace && !workspace.publishingEnabled && <p className="rounded-lg bg-amber-50 p-3 text-sm leading-6 text-amber-950">Public publishing is not available on this deployment. You can prepare and save a private draft.</p>}
-            <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-slate-700"><input className="mt-1 h-5 w-5 shrink-0 accent-slate-900" type="checkbox" checked={eligible} onChange={event => setEligible(event.target.checked)} disabled={accountActionsDisabled || !workspace?.publishingEnabled || suspended} />I am 18 or older and have read the portfolio Terms and Privacy Policy</label>
-            <p className="text-sm text-slate-500">Read the <Link className="font-semibold underline" href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> and <Link className="font-semibold underline" href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>. No date of birth is collected.</p>
-            {!record?.username && <p className="text-sm text-slate-500">Claim a username before publishing.</p>}
+            <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-6 text-foreground"><input className="mt-1 h-5 w-5 shrink-0 accent-primary" type="checkbox" checked={eligible} onChange={event => setEligible(event.target.checked)} disabled={accountActionsDisabled || !workspace?.publishingEnabled || suspended} />I am 18 or older and have read the portfolio Terms and Privacy Policy</label>
+            <p className="text-sm text-muted-foreground">Read the <Link className="font-semibold underline" href="/terms" target="_blank" rel="noopener noreferrer">Terms</Link> and <Link className="font-semibold underline" href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>. No date of birth is collected.</p>
+            {!record?.username && <p className="text-sm text-muted-foreground">Claim a username before publishing.</p>}
             <div className="flex flex-wrap gap-3">
               <button type="button" className={primaryAction} disabled={accountActionsDisabled || !workspace?.publishingEnabled || !workspace.policyVersion || !eligible || !record?.username || suspended} onClick={publish}>Publish portfolio</button>
               {record && (record.status === "published" || record.status === "suspended") && <button type="button" className={secondaryAction} disabled={accountActionsDisabled} onClick={() => void run(async () => applyRecord(await api().unpublish(record.revision)), "Your portfolio is no longer public. Your draft is still saved.")}>Unpublish</button>}
               {record?.status === "published" && record.username && <Link className={secondaryAction} href={`/u/${record.username}`} target="_blank" rel="noopener noreferrer">View public portfolio</Link>}
             </div>
-            {record && <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4"><button type="button" className={secondaryAction} disabled={accountActionsDisabled} onClick={requestReload}>Load latest draft</button><button type="button" className={`${secondaryAction} text-rose-700`} disabled={accountActionsDisabled || suspended} onClick={() => { setDialogKind("delete"); dialog.current?.showModal(); }}><Trash2 className="h-4 w-4" aria-hidden="true" />Delete portfolio</button></div>}
+            {record && <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4"><button type="button" className={secondaryAction} disabled={accountActionsDisabled} onClick={requestReload}>Load latest draft</button><button type="button" className={`${secondaryAction} text-rose-700`} disabled={accountActionsDisabled || suspended} onClick={() => { setDialogKind("delete"); dialog.current?.showModal(); }}><Trash2 className="h-4 w-4" aria-hidden="true" />Delete portfolio</button></div>}
           </section>
           <Section title="Import a Markdown draft">
-            <p className="text-sm leading-6 text-slate-600">Fill the template yourself or with your own AI tool, then import it for review. Only share details you want in your portfolio. Importing does not save or publish.</p>
+            <p className="text-sm leading-6 text-muted-foreground">Fill the template yourself or with your own AI tool, then import it for review. Only share details you want in your portfolio. Importing does not save or publish.</p>
             <a href="/templates/portfolio.md" download className={secondaryAction}>Download Markdown template</a>
-            <label htmlFor="portfolio-markdown-file" className="block text-sm font-semibold text-slate-800">Choose a Markdown text file (up to 50 KiB)</label>
+            <label htmlFor="portfolio-markdown-file" className="block text-sm font-semibold text-foreground">Choose a Markdown text file (up to 50 KiB)</label>
             <input id="portfolio-markdown-file" className="block max-w-full text-sm file:mr-3 file:min-h-11 file:rounded-lg file:border file:border-slate-300 file:bg-white file:px-3 file:font-semibold" type="file" accept=".md,.markdown,.txt,text/plain,text/markdown" onChange={event => {
               const generation = ++fileReadGeneration.current;
               const file = event.target.files?.[0]; event.target.value = "";
@@ -397,11 +397,11 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
                 setMarkdown(source); importMarkdown(source);
               }).catch(() => { if (mounted.current && generation === fileReadGeneration.current) setImportErrors(["The file could not be read. Save it as UTF-8 Markdown and try again."]); });
             }} />
-            <label htmlFor="portfolio-markdown" className="block text-sm font-semibold text-slate-800">Or paste Markdown</label>
+            <label htmlFor="portfolio-markdown" className="block text-sm font-semibold text-foreground">Or paste Markdown</label>
             <textarea id="portfolio-markdown" className={input} rows={7} value={markdown} onChange={event => { fileReadGeneration.current++; setMarkdown(event.target.value); setImportErrors([]); }} />
             <button type="button" className={secondaryAction} onClick={() => { fileReadGeneration.current++; importMarkdown(markdown); }}>Import into form</button>
             {importErrors.length > 0 && <div role="alert" className="rounded-lg border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900"><p className="font-bold">The Markdown needs a correction</p><ul className="mt-2 list-disc space-y-1 pl-5">{importErrors.map((problem,index) => <li key={index}>{problem}</li>)}</ul></div>}
-            <label htmlFor="portfolio-ai-prompt" className="block text-sm font-semibold text-slate-800">Optional AI prompt</label>
+            <label htmlFor="portfolio-ai-prompt" className="block text-sm font-semibold text-foreground">Optional AI prompt</label>
             <textarea id="portfolio-ai-prompt" className={input} rows={5} value={PORTFOLIO_MARKDOWN_AI_PROMPT} readOnly />
             <button type="button" className={secondaryAction} onClick={() => {
               if (!navigator.clipboard?.writeText) { setImportErrors(["Copy is unavailable here. Select and copy the prompt text above."]); return; }
@@ -411,14 +411,14 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
         </fieldset>
       </form>
       <aside id="portfolio-preview" tabIndex={-1} className="min-w-0 xl:sticky xl:top-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-bold text-slate-900">Live preview</h2><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Only you can see this preview</span></div>
-        <p className="mb-4 text-sm leading-6 text-slate-500">This shows your current form, including unsaved edits. Your public page changes only when you publish.</p>
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white xl:max-h-[calc(100vh-9rem)] xl:overflow-y-auto"><PortfolioPreview data={data} theme={data.theme ?? "simple"} headingLevel={2} preview /></div>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-bold text-foreground">Live preview</h2><span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-muted-foreground">Only you can see this preview</span></div>
+        <p className="mb-4 text-sm leading-6 text-muted-foreground">This shows your current form, including unsaved edits. Your public page changes only when you publish.</p>
+        <div className="overflow-hidden rounded-lg border border-border bg-white xl:max-h-[calc(100vh-9rem)] xl:overflow-y-auto"><PortfolioPreview data={data} theme={data.theme ?? "simple"} headingLevel={2} preview /></div>
       </aside>
     </div>
-    <dialog ref={dialog} aria-labelledby="portfolio-confirm-title" className="m-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-xl backdrop:bg-slate-950/50">
+    <dialog ref={dialog} aria-labelledby="portfolio-confirm-title" className="m-auto max-w-md rounded-lg border border-border bg-white p-6 text-foreground shadow-xl backdrop:bg-slate-950/50">
       <h2 id="portfolio-confirm-title" className="text-xl font-bold">{dialogKind === "delete" ? "Delete your portfolio?" : "Replace unsaved edits?"}</h2>
-      <p className="mt-3 text-sm leading-6 text-slate-600">{dialogKind === "delete" ? "This removes your saved draft and public page, and releases your username. Your question-practice history and Google account are unchanged." : "Loading the latest saved draft replaces the details currently in this form. Your unsaved edits will be lost."}</p>
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">{dialogKind === "delete" ? "This removes your saved draft and public page, and releases your username. Your question-practice history and Google account are unchanged." : "Loading the latest saved draft replaces the details currently in this form. Your unsaved edits will be lost."}</p>
       <div className="mt-5 flex flex-wrap gap-3"><button type="button" className={secondaryAction} onClick={() => dialog.current?.close()}>Cancel</button><button type="button" className={dialogKind === "delete" ? `${secondaryAction} text-rose-700` : primaryAction} onClick={() => {
         dialog.current?.close();
         if (dialogKind === "reload") { loadLatest(); return; }

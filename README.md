@@ -4,9 +4,10 @@
 
 # ProCoderJii Learning Hub
 
-### Practise for campus placements. Understand your answers. Build a study habit.
+### For the semester. For what’s next.
 
-A student learning workspace with original practice questions, explanations, and saved progress.
+A student learning brand bringing together course resources, placement practice, games,
+portfolios, concept videos and community. This repository builds the open-source web platform.
 
 [Website](https://procoderji.com) · [Documentation](docs/README.md) · [Roadmap](https://github.com/procoderji-com/procoderji/issues/22) · [Good first issues](https://github.com/procoderji-com/procoderji/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22) · [Report a bug](https://github.com/procoderji-com/procoderji/issues/new?template=bug_report.yml) · [Propose a question](https://github.com/procoderji-com/procoderji/issues/new?template=practice_question.yml)
 
@@ -21,7 +22,17 @@ A student learning workspace with original practice questions, explanations, and
 > [!NOTE]
 > This is an early student-product foundation. Four practice topics contain 24 original multiple-choice questions. Practice and browser-saved progress work without login. An optional ASP.NET Core backend provides Google sign-in, account progress, and private portfolio drafts. The portfolio editor, two themes, Markdown import, and public-page support are implemented; public publishing is off by default pending deployment configuration. Billing and checkout are not enabled. Course notes, guides, and job listings are awaiting published content.
 
+![ProCoderJii homepage with a placement practice sample](docs/images/homepage.png)
+
+<details>
+<summary>Student learning workspace</summary>
+
 ![Guest learning workspace before the first session](docs/images/learning-workspace.png)
+
+</details>
+
+Interface contributions follow the [design system](design-system/MASTER.md), with shared
+navigation, self-hosted typography, keyboard access and responsive layouts.
 
 See the [product roadmap](docs/product-roadmap.md) for student validation, content growth, and future monetization work.
 

@@ -82,7 +82,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
 
   if (ownerScope && ownerScope !== activeScope)
     return (
-      <section className="rounded-2xl border border-amber-300 bg-amber-50 p-6">
+      <section className="rounded-lg border border-amber-300 bg-amber-50 p-6">
         <h1 className="text-2xl font-bold">Your learning account changed</h1>
         <p className="mt-3 text-sm leading-7">
           Start a new session to save answers to the current workspace.
@@ -106,23 +106,23 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
         <h1
           ref={resultHeading}
           tabIndex={-1}
-          className="mt-2 text-3xl font-extrabold focus:outline-none"
+          className="mt-2 text-3xl font-semibold focus:outline-none"
         >
           Session complete
         </h1>
-        <p className="mt-3 text-slate-600">
+        <p className="mt-3 text-muted-foreground">
           Take a moment to review the reasoning. That is where this session pays
           off.
         </p>
-        <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+        <section className="mt-7 rounded-lg border border-border bg-white p-6 sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div>
-              <p className="text-sm font-medium text-slate-500">
+              <p className="text-sm font-medium text-muted-foreground">
                 {topic.title}
               </p>
-              <p className="mt-2 text-4xl font-extrabold">
+              <p className="mt-2 text-4xl font-semibold">
                 {summary.correct}
-                <span className="text-lg font-medium text-slate-500">
+                <span className="text-lg font-medium text-muted-foreground">
                   {" "}
                   / {summary.totalQuestions} correct
                 </span>
@@ -142,7 +142,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
                 Incorrect
               </p>
               <p>
-                <strong className="block text-xl text-slate-600">
+                <strong className="block text-xl text-muted-foreground">
                   {summary.unanswered}
                 </strong>
                 Skipped
@@ -151,7 +151,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
           </div>
           <p
             role="status"
-            className="mt-6 border-t border-slate-100 pt-4 text-sm text-slate-600"
+            className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground"
           >
             {!storageAvailable
               ? "This session is available for review here, but browser storage is unavailable."
@@ -189,7 +189,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
               return (
                 <article
                   key={question.id}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
+                  className="rounded-lg border border-border bg-white p-5 sm:p-6"
                 >
                   <p
                     className={`text-xs font-bold ${answer.isCorrect ? "text-emerald-700" : "text-rose-700"}`}
@@ -214,7 +214,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
                       <dd className="inline">{correct.text}</dd>
                     </div>
                   </dl>
-                  <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm leading-7 text-slate-700">
+                  <p className="mt-4 rounded-xl bg-background p-4 text-sm leading-7 text-foreground">
                     {question.explanation}
                   </p>
                 </article>
@@ -231,23 +231,23 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
       <>
         <Link
           href="/practice"
-          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-600 hover:underline"
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-muted-foreground hover:underline"
         >
           <ArrowLeft aria-hidden="true" className="h-4 w-4" />
           All topics
         </Link>
-        <p className="mt-6 text-xs font-bold tracking-widest text-slate-500 uppercase">
+        <p className="mt-6 text-xs font-bold tracking-widest text-muted-foreground uppercase">
           Focused practice
         </p>
-        <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
+        <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
           {topic.title}
         </h1>
-        <p className="mt-4 max-w-2xl leading-7 text-slate-600">
+        <p className="mt-4 max-w-2xl leading-7 text-muted-foreground">
           {topic.description}
         </p>
-        <section className="mt-8 max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+        <section className="mt-8 max-w-2xl rounded-lg border border-border bg-white p-6 sm:p-8">
           <h2 className="text-xl font-bold">Make time for a small step</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
+          <p className="mt-3 text-sm leading-7 text-muted-foreground">
             Answer at your own pace, skip a question when needed, and review
             every explanation at the end. Answers save when you finish the
             session.
@@ -280,7 +280,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
               </select>
             </label>
           </div>
-          <p className="mt-4 text-xs leading-6 text-slate-500">
+          <p className="mt-4 text-xs leading-6 text-muted-foreground">
             This topic has {questionCount} questions. A difficulty filter may
             shorten your session.
           </p>
@@ -301,14 +301,14 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-slate-600">
+        <p className="text-sm font-semibold text-muted-foreground">
           {topic.title} · Self-paced practice
         </p>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           {answered}/{questions.length} answered
         </p>
       </div>
-      <h1 className="mt-4 text-2xl font-extrabold">{topic.title} practice</h1>
+      <h1 className="mt-4 text-2xl font-semibold">{topic.title} practice</h1>
       <nav aria-label="Session questions" className="mt-6 flex flex-wrap gap-2">
         {questions.map((item, index) => (
           <button
@@ -316,14 +316,14 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
             onClick={() => move(index)}
             aria-label={`Go to question ${index + 1}${responses[item.id] ? ", answered" : ""}`}
             aria-current={index === current ? "step" : undefined}
-            className={`flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-bold ${index === current ? "border-slate-900 bg-slate-900 text-white" : responses[item.id] ? "border-emerald-300 bg-emerald-50 text-emerald-800" : "border-slate-300 bg-white text-slate-600"}`}
+            className={`flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-bold ${index === current ? "border-slate-900 bg-slate-900 text-white" : responses[item.id] ? "border-emerald-300 bg-emerald-50 text-emerald-800" : "border-slate-300 bg-white text-muted-foreground"}`}
           >
             {index + 1}
           </button>
         ))}
       </nav>
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-        <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+      <section className="mt-6 rounded-lg border border-border bg-white p-6 sm:p-8">
+        <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
           Question {current + 1} of {questions.length} · {question.difficulty}
         </p>
         <h2
@@ -338,7 +338,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
           {question.options.map((option) => (
             <label
               key={option.id}
-              className={`flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm leading-7 transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-slate-900 ${responses[question.id] === option.id ? "border-amber-400 bg-amber-50" : "border-slate-200 hover:bg-slate-50"}`}
+              className={`flex min-h-14 cursor-pointer items-start gap-3 rounded-xl border p-4 text-sm leading-7 transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-slate-900 ${responses[question.id] === option.id ? "border-amber-400 bg-amber-50" : "border-border hover:bg-background"}`}
             >
               <input
                 type="radio"
@@ -348,7 +348,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
                 onChange={() =>
                   setResponses((old) => ({ ...old, [question.id]: option.id }))
                 }
-                className="mt-1.5 h-4 w-4 shrink-0 accent-slate-900"
+                className="mt-1.5 h-4 w-4 shrink-0 accent-primary"
               />
               <span>
                 <span className="mr-2 font-bold uppercase">{option.id}.</span>
@@ -378,7 +378,7 @@ export function PracticeSession({ topicId }: { topicId: TopicId }) {
             </button>
           )}
         </div>
-        <p className="mt-5 text-xs leading-6 text-slate-500">
+        <p className="mt-5 text-xs leading-6 text-muted-foreground">
           You can leave questions unanswered. Your review will show skipped
           answers separately.
         </p>

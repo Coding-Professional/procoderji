@@ -124,6 +124,8 @@ Open a pull request from your fork branch to `procoderji-com/procoderji:dev`. Fi
 template, link a related issue when one exists, explain the resulting behavior, and list the
 checks you ran.
 Include screenshots for visible UI changes and sources or permissions for learning content.
+For interface changes, follow the [design system](design-system/MASTER.md): use the shared
+brand, typography, buttons and colour tokens, and check both keyboard and mobile navigation.
 
 `dev` is the integration/staging branch; `main` is production. Feature and dependency changes
 go through `dev`. Maintainers promote the canonical `dev` branch to `main` after staging checks;
