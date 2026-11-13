@@ -74,6 +74,11 @@ in an isolated directory, deploys/verifies the API first, then deploys the front
 summary records the checked source commit and both origins. A failure stops the rollout; inspect
 the relevant Vercel project and restore its previous deployment if a rollback is needed.
 
+Each build is created without assigning domains. The pipeline discovers it by its source commit
+and unique run metadata, waits for provider readiness, promotes that exact build, and verifies
+the project's current production target. A previously rolled-back domain cannot silently keep
+serving an older build while the workflow reports success.
+
 Disable a previous independent Git deployment connection after this pipeline has been verified;
 otherwise a second deployment path can publish before CI finishes. The canonical GitHub Actions
 pipeline does not require granting Vercel's GitHub integration access to an organization.
