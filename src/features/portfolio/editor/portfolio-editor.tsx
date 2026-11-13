@@ -12,6 +12,7 @@ import { PORTFOLIO_RULES as RULES } from "../rules";
 import type { PortfolioData, PortfolioProblem } from "../types";
 import { validatePortfolio, validateUsername } from "../validation";
 import { PortfolioPreview } from "../themes/portfolio-preview";
+import styles from "../portfolio-workspace.module.css";
 
 const card = "rounded-2xl border border-slate-200 bg-white p-5 sm:p-6";
 const input = "mt-2 block min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 outline-offset-4 placeholder:text-slate-400 focus-visible:outline-2 focus-visible:outline-slate-900 disabled:bg-slate-50 disabled:text-slate-500";
@@ -308,14 +309,14 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
     setMessage("Markdown imported into the form. Review every section and the preview before saving.");
   };
 
-  return <>
+  return <div className={styles.workspace}>
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="max-w-2xl">
         <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">Your work, in one place</p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Portfolio builder</h1>
         <p className="mt-3 leading-7 text-slate-600">Introduce yourself, show your projects and choose a simple public page. Keep changes private until you are ready to publish.</p>
       </div>
-      <a href="#portfolio-preview" className={secondaryAction}><Eye className="h-4 w-4" aria-hidden="true" />Jump to live preview</a>
+      <a href="#portfolio-preview" className={`${secondaryAction} w-full sm:w-auto`}><Eye className="h-4 w-4" aria-hidden="true" />Jump to live preview</a>
     </div>
 
     {!userId && <section className={`${card} mt-6 border-amber-200 bg-amber-50`}>
@@ -334,8 +335,8 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
     {(conflict || loadFailed) && <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-slate-800"><p>{conflict ? "Another update was saved. Your unsaved edits are still here. Load the latest draft before trying to save again." : "Your saved draft could not be loaded. Retry before saving to your account."}</p><button type="button" className={`${secondaryAction} mt-3`} disabled={busy} onClick={requestReload}>Load latest draft</button></div>}
     {suspended && <div role="status" className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-slate-800">Your public portfolio is suspended. You can edit your private draft or unpublish it. Contact <a className="font-semibold underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> to request a review.</div>}
 
-    <div className="mt-7 grid items-start gap-7 xl:grid-cols-2">
-      <form noValidate onSubmit={event => { event.preventDefault(); save(); }}>
+    <div className={styles.columns}>
+      <form className="min-w-0" noValidate onSubmit={event => { event.preventDefault(); save(); }}>
         <fieldset disabled={busy || loading} className="min-w-0 space-y-5">
           <legend className="sr-only">Portfolio details</legend>
           <section className={`${card} space-y-5`}>
@@ -410,10 +411,10 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
           </Section>
         </fieldset>
       </form>
-      <aside id="portfolio-preview" tabIndex={-1} className="min-w-0 xl:sticky xl:top-4">
+      <aside id="portfolio-preview" tabIndex={-1} className={styles.preview}>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-bold text-slate-900">Live preview</h2><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Only you can see this preview</span></div>
         <p className="mb-4 text-sm leading-6 text-slate-500">This shows your current form, including unsaved edits. Your public page changes only when you publish.</p>
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white xl:max-h-[calc(100vh-9rem)] xl:overflow-y-auto"><PortfolioPreview data={data} theme={data.theme ?? "simple"} headingLevel={2} preview /></div>
+        <div className={styles.previewSurface}><PortfolioPreview data={data} theme={data.theme ?? "simple"} headingLevel={2} preview /></div>
       </aside>
     </div>
     <dialog ref={dialog} aria-labelledby="portfolio-confirm-title" className="m-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-xl backdrop:bg-slate-950/50">
@@ -426,5 +427,5 @@ function EditorWorkspace({ userId, csrfToken, accountConfigured, refreshAccount 
         void run(async () => { await api().delete(record.revision); if (!mounted.current) return; dirtyRef.current = false; setRecord(null); setData({}); setSearchVisible(false); setUsername(""); setEligible(false); setSavedFingerprint(fingerprint({}, false)); }, "Portfolio deleted. Its public address is no longer active.");
       }}>{dialogKind === "delete" ? "Confirm deletion" : "Load saved draft"}</button></div>
     </dialog>
-  </>;
+  </div>;
 }

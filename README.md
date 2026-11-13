@@ -21,7 +21,17 @@ A student learning workspace with original practice questions, explanations, and
 > [!NOTE]
 > This is an early student-product foundation. Four practice topics contain 24 original multiple-choice questions. Practice and browser-saved progress work without login. An optional ASP.NET Core backend provides Google sign-in, account progress, and private portfolio drafts. The portfolio editor, two themes, Markdown import, and public-page support are implemented; public publishing is off by default pending deployment configuration. Billing and checkout are not enabled. Course notes, guides, and job listings are awaiting published content.
 
-![Guest learning workspace before the first session](docs/images/learning-workspace.png)
+![ProCoderJii homepage with the current yellow brand and shared navigation](docs/images/homepage-desktop.png)
+
+<details>
+<summary>Learning workspace and mobile previews</summary>
+
+![Guest learning workspace with the shared navigation and dashboard sidebar](docs/images/learning-workspace.png)
+
+<img src="docs/images/responsive-home-mobile.png" alt="ProCoderJii homepage at 360px" width="360" />
+<img src="docs/images/responsive-menu-mobile.png" alt="Shared mobile navigation at 360px" width="360" />
+
+</details>
 
 See the [product roadmap](docs/product-roadmap.md) for student validation, content growth, and future monetization work.
 

@@ -74,6 +74,6 @@ test("the old RGPV logo is gone and nothing references it", () => {
 });
 
 test("every component that shows the logo uses the ProCoderJii logo file", () => {
-	const users = ["src/components/landing/navbar.tsx", "src/components/app-sidebar.tsx", "src/components/floating-logo.tsx", "src/components/site-shell.tsx", "src/components/legal/legal-layout.tsx"];
+	const users = ["src/components/site-header.tsx", "src/components/floating-logo.tsx"];
 	for (const f of users) assert.match(read(f).toString("utf8"), /\/logo\.png/, `${f} should use /logo.png`);
 });

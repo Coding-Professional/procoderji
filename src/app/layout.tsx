@@ -4,6 +4,8 @@ import { getSiteUrl } from "@/lib/site";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
 import { MotionProvider } from "@/components/motion-provider";
 import { isNonProductionDeployment } from "@/lib/deployment";
+import { SiteHeader } from "@/components/site-header";
+import { ProgressProvider } from "@/features/progress/progress-provider";
 
 const siteUrl = getSiteUrl();
 
@@ -46,8 +48,9 @@ export default function RootLayout({
           </div>
         )}
         <MotionProvider>
+        <ProgressProvider>
         {/* Background Layer */}
-        <div className="min-h-screen w-full  relative overflow-hidden">
+        <div className="min-h-screen w-full  relative overflow-clip">
           <div
             className="absolute inset-0 z-0"
             style={{
@@ -63,9 +66,11 @@ export default function RootLayout({
 
           {/* Main Content */}
           <div className="relative z-10">
+            <SiteHeader />
             {children}
           </div>
         </div>
+        </ProgressProvider>
         </MotionProvider>
       </body>
     </html>

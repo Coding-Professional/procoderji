@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { Metadata } from "next";
 import {
     LEGAL,
@@ -68,16 +67,6 @@ export function LegalLayout({ title, children, effectiveDate }: {
     return (
         <div className="min-h-screen px-4 py-8 sm:px-6">
             <div className="mx-auto max-w-3xl">
-                <header className="mb-8 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 text-lg font-bold text-gray-900">
-                        <Image src="/logo.png" alt="" width={28} height={28} className="rounded-lg" />
-                        ProCoderJii
-                    </Link>
-                    <Link href="/practice" className="inline-flex min-h-11 items-center text-sm font-semibold text-gray-700 underline">
-                        Start practice
-                    </Link>
-                </header>
-
                 <main id="main-content" className="rounded-3xl border border-gray-200 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-10">
                     {missing.length > 0 && (
                         <div role="note" className="mb-8 rounded-xl border border-yellow-400 bg-yellow-50 p-4 text-sm text-gray-900">

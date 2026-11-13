@@ -66,21 +66,6 @@ export function DashboardClientLayout({
 
     return (
         <div className="flex min-h-screen text-foreground relative">
-            {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-b border-border px-4 py-3 flex items-center justify-between">
-                <div className="font-bold text-lg">ProCoderJii</div>
-                <button
-                    ref={toggle}
-                    type="button"
-                    onClick={() => setOpenOnPath(pathname)}
-                    aria-label="Open navigation menu"
-                    aria-expanded={isSidebarOpen}
-                    className="inline-flex min-h-11 min-w-11 items-center justify-center hover:bg-accent rounded-md"
-                >
-                    <Menu className="w-6 h-6" aria-hidden="true" />
-                </button>
-            </div>
-
             {/* Mobile Sidebar Overlay */}
             <AnimatePresence>
                 {isSidebarOpen && (
@@ -91,7 +76,7 @@ export function DashboardClientLayout({
                             exit={{ opacity: 0 }}
                             onClick={closeSidebar}
                             aria-hidden="true"
-                            className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+                            className="md:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
                         />
                         <motion.div
                             ref={drawer}
@@ -106,7 +91,7 @@ export function DashboardClientLayout({
                                 damping: 25,
                                 stiffness: 200,
                             }}
-                            className="md:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[calc(100vw-2rem)] bg-background border-r border-border shadow-2xl"
+                            className="md:hidden fixed inset-y-0 left-0 z-[70] w-72 max-w-[calc(100vw-2rem)] bg-background border-r border-border shadow-2xl"
                         >
                             <div className="absolute top-2 right-2 z-50">
                                 <button
@@ -133,8 +118,14 @@ export function DashboardClientLayout({
             {/* Main Content */}
             <main
                 id="main-content"
-                className="flex-1 flex flex-col min-w-0 overflow-hidden relative pt-16 md:pt-0"
+                className="flex-1 flex flex-col min-w-0 overflow-hidden relative"
             >
+                <div className="border-b border-border bg-background/80 px-4 py-3 md:hidden">
+                    <button ref={toggle} type="button" onClick={() => setOpenOnPath(pathname)} aria-label="Open navigation menu" aria-expanded={isSidebarOpen}
+                        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-md px-2 text-sm font-semibold hover:bg-accent">
+                        <Menu className="h-5 w-5" aria-hidden="true" />Browse Notes
+                    </button>
+                </div>
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10">
                     <div className="max-w-6xl mx-auto">{children}</div>
                 </div>

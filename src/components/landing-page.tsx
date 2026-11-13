@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Navbar } from "@/components/landing/navbar";
 import { Hero } from "@/components/landing/hero";
 import { About } from "@/components/landing/about";
 import { WhyUs } from "@/components/landing/why-us";
@@ -17,7 +16,6 @@ export function LandingPage({ latestVideos }: { latestVideos?: React.ReactNode }
 
 
             <main id="main-content" className="relative z-10 flex flex-col min-h-screen">
-                <Navbar />
                 <Hero />
                 <About />
                 <WhyUs />

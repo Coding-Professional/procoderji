@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
 import type { PortfolioData } from "../types";
 import { portfolioInitials, portfolioProfileLinks, portfolioProjectHref, type PortfolioThemeId } from "./presentation";
+import styles from "../portfolio-workspace.module.css";
 
 export interface PortfolioThemeProps {
   data: PortfolioData;
@@ -63,29 +64,30 @@ export function ThemeFrame({ data, headingLevel = 1, preview = false, variant }:
   const education = data.education?.filter((entry) => hasText(entry.institution)) ?? [];
   const experience = data.experience?.filter((entry) => hasText(entry.organization) || hasText(entry.role)) ?? [];
   const achievements = data.achievements?.filter(hasText) ?? [];
+  const previewHasDetails = hasText(data.about) || skills.length > 0 || education.length > 0;
   const text = `whitespace-pre-line leading-7 [overflow-wrap:anywhere] ${colors.copy}`;
 
   return (
-    <article aria-label={preview ? "Portfolio preview" : undefined} className={`min-w-0 overflow-hidden [overflow-wrap:anywhere] ${colors.frame}`} data-portfolio-theme={variant}>
+    <article aria-label={preview ? "Portfolio preview" : undefined} className={`min-w-0 overflow-hidden [overflow-wrap:anywhere] ${colors.frame} ${preview ? styles.frame : ""}`} data-portfolio-theme={variant}>
       {variant === "developer" && (
         <div aria-hidden="true" className="flex items-center gap-2 border-b border-slate-700 px-6 py-3 font-mono text-xs text-slate-300 sm:px-9">
           <span className="h-2 w-2 rounded-full bg-amber-300" />
           portfolio.md
         </div>
       )}
-      <header className={`p-6 sm:p-9 ${colors.header}`}>
-        <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
-          <div aria-hidden="true" className={`flex h-16 w-16 shrink-0 items-center justify-center text-2xl font-extrabold sm:h-20 sm:w-20 sm:text-3xl ${colors.avatar}`}>
+      <header className={`${preview ? styles.previewHeader : "p-6 sm:p-9"} ${colors.header}`}>
+        <div className={preview ? styles.previewIdentity : "flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start sm:gap-6"}>
+          <div aria-hidden="true" className={`flex shrink-0 items-center justify-center font-extrabold ${preview ? styles.previewAvatar : "h-16 w-16 text-2xl sm:h-20 sm:w-20 sm:text-3xl"} ${colors.avatar}`}>
             {portfolioInitials(data.name)}
           </div>
           <div className="min-w-0 flex-1">
             <p className={`mb-2 text-xs font-bold uppercase tracking-widest ${colors.eyebrow}`}>
               {preview ? "Your portfolio preview" : "Student portfolio"}
             </p>
-            <Name className={`text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl ${colors.title}`}>
+            <Name className={`font-extrabold leading-tight tracking-tight ${preview ? styles.previewName : "text-3xl sm:text-4xl"} ${colors.title}`}>
               {hasText(data.name) ? data.name : "Your name"}
             </Name>
-            <p className={`mt-3 max-w-2xl text-base leading-7 sm:text-lg ${colors.copy}`}>
+            <p className={`mt-3 max-w-2xl leading-7 ${preview ? styles.previewHeadline : "text-base sm:text-lg"} ${colors.copy}`}>
               {hasText(data.headline) ? data.headline : "Add a headline that describes what you do."}
             </p>
             {links.length > 0 && (
@@ -103,8 +105,8 @@ export function ThemeFrame({ data, headingLevel = 1, preview = false, variant }:
         </div>
       </header>
 
-      <div className={`p-6 sm:p-9 ${variant === "developer" ? "grid gap-9 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.65fr)]" : "space-y-8"}`}>
-        <div className="min-w-0 space-y-7">
+      <div className={`${preview ? styles.previewBody : "p-6 sm:p-9"} ${variant === "developer" ? `grid gap-9 ${preview ? previewHasDetails ? styles.developerBody : "" : "lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.65fr)]"}` : "space-y-8"}`}>
+        {(!preview || previewHasDetails) && <div className="min-w-0 space-y-7">
           {hasText(data.about) && <ThemeSection variant={variant} headingLevel={headingLevel} title="About"><p className={text}>{data.about}</p></ThemeSection>}
           {skills.length > 0 && (
             <ThemeSection variant={variant} headingLevel={headingLevel} title="Skills">
@@ -127,7 +129,7 @@ export function ThemeFrame({ data, headingLevel = 1, preview = false, variant }:
               </ul>
             </ThemeSection>
           )}
-        </div>
+        </div>}
 
         <div className="min-w-0 space-y-7">
           {projects.length > 0 && (

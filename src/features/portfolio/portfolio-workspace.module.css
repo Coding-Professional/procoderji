@@ -1,0 +1,104 @@
+.workspace {
+  container: portfolio-workspace / inline-size;
+  min-width: 0;
+}
+
+.columns {
+  display: grid;
+  align-items: start;
+  gap: 1.5rem;
+  margin-top: 1.75rem;
+}
+
+.preview {
+  min-width: 0;
+  scroll-margin-top: calc(var(--site-header-height, 76px) + 1rem);
+}
+
+.previewSurface {
+  overflow: hidden;
+  border-radius: 1rem;
+}
+
+@container portfolio-workspace (min-width: 60rem) {
+  .columns {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 2rem;
+  }
+
+  .preview {
+    position: sticky;
+    top: calc(var(--site-header-height, 76px) + 1.5rem);
+  }
+
+  .previewSurface {
+    max-height: calc(100dvh - var(--site-header-height, 76px) - 9.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Embedded themes adapt to the preview pane, rather than the browser width.
+   Published portfolios retain their existing theme layout. */
+.frame {
+  container: portfolio-preview / inline-size;
+}
+
+.previewHeader,
+.previewBody {
+  padding: 1.5rem;
+}
+
+.previewIdentity {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.previewAvatar {
+  width: 4rem;
+  height: 4rem;
+  font-size: 1.5rem;
+}
+
+.previewName {
+  font-size: 1.875rem;
+}
+
+.previewHeadline {
+  font-size: 1rem;
+}
+
+@container portfolio-preview (min-width: 32rem) {
+  .previewHeader,
+  .previewBody {
+    padding: 2.25rem;
+  }
+
+  .previewIdentity {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .previewAvatar {
+    width: 5rem;
+    height: 5rem;
+    font-size: 1.875rem;
+  }
+
+  .previewName {
+    font-size: 2.25rem;
+  }
+
+  .previewHeadline {
+    font-size: 1.125rem;
+  }
+}
+
+@container portfolio-preview (min-width: 42rem) {
+  .developerBody {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.65fr);
+  }
+}

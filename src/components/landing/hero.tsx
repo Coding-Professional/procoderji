@@ -140,7 +140,7 @@ function SelectorFallback() {
 
 export function Hero() {
     return (
-        <section className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-20 lg:py-24 text-center relative overflow-hidden">
+        <section data-home-hero className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-20 lg:py-24 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50 pointer-events-none" />
 
             <FloatingLogo />

@@ -170,7 +170,7 @@ await interaction("home: mobile menu opens, lists links, closes", "mobile", asyn
   await btn.click();
   await page.locator("#mobile-menu").waitFor({ state: "visible" });
   expectTrue((await page.getByRole("button", { name: /close menu/i }).getAttribute("aria-expanded")) === "true", "aria-expanded should be true when open");
-  for (const t of ["About", "Games", "Contact", "Guides", "Jobs", "Browse Notes"]) {
+  for (const t of ["Browse Notes", "Placement practice", "Games", "About", "Contact"]) {
     expectTrue(await page.locator("#mobile-menu").getByText(t, { exact: true }).isVisible(), `menu should list ${t}`);
   }
   await page.getByRole("button", { name: /close menu/i }).click();
@@ -191,7 +191,7 @@ await interaction("home: original mobile menu links remain reachable on short sc
 
 await interaction("home: desktop nav has working links", "desktop", async (page) => {
   await page.goto(BASE + "/", { waitUntil: "networkidle" });
-  for (const [t, href] of [["Games", "/games"], ["Guides", "/guides"], ["Jobs", "/jobs"], ["Browse Notes", "/dashboard"]]) {
+  for (const [t, href] of [["Browse Notes", "/dashboard"], ["Placement practice", "/practice"], ["Games", "/games"], ["About", "/about"], ["Contact", "/#contact"]]) {
     const a = page.locator("nav").getByRole("link", { name: t, exact: true }).first();
     expectTrue((await a.getAttribute("href")) === href, `${t} should link to ${href}`);
   }
