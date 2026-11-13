@@ -5,7 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { activateDeployment, findDeployment, waitForDeployment } from "./deployment-status.mjs";
+import { activateDeployment, findDeployment, readProviderResult, waitForDeployment } from "./deployment-status.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const localStaging = process.argv.includes("--local-staging");
@@ -70,9 +70,7 @@ async function providerApi(endpoint, cwd, project, token, label, method = "GET")
     ...(method === "POST" ? { body: "{}" } : {}),
     signal: AbortSignal.timeout(30_000),
   });
-  if (!response.ok) throw new Error(`${label} provider lookup failed (${response.status}).`);
-  if (response.status === 204) return {};
-  return response.json();
+  return readProviderResult(response, label, { empty: method === "POST" });
 }
 
 async function confirmReady(cwd, project, token, label, commit, run) {

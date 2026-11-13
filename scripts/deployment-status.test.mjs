@@ -1,9 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { activateDeployment, findDeployment, waitForDeployment } from "./deployment-status.mjs";
+import { activateDeployment, findDeployment, readProviderResult, waitForDeployment } from "./deployment-status.mjs";
 
 const id = "dpl_test123";
 const options = { label: "Backend", intervalMs: 0, maxAttempts: 3 };
+
+test("successful empty promotion responses are accepted while lookups require JSON", async () => {
+  assert.deepEqual(await readProviderResult(new Response(null, { status: 200 }), "Promotion", { empty: true }), {});
+  assert.deepEqual(await readProviderResult(new Response(null, { status: 204 }), "Promotion"), {});
+  assert.deepEqual(await readProviderResult(Response.json({ id }), "Lookup"), { id });
+  await assert.rejects(readProviderResult(new Response(null, { status: 200 }), "Lookup"), /invalid JSON/);
+  await assert.rejects(readProviderResult(new Response(null, { status: 403 }), "Promotion", { empty: true }), /request failed \(403\)/);
+});
 
 test("already-current production builds do not request a conflicting promotion", async () => {
   await activateDeployment(id, { ...options, project: "project", read: async () => ({ id: "project", targets: { production: { id } } }),

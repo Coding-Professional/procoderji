@@ -1,4 +1,12 @@
 /** Confirm provider state instead of trusting the CLI's deployment snapshot. */
+export async function readProviderResult(response, label, { empty = false } = {}) {
+  if (!response.ok) throw new Error(`${label} provider request failed (${response.status}).`);
+  // Promotion returns a successful empty 200 response, not a JSON document.
+  if (empty || response.status === 204) return {};
+  try { return await response.json(); }
+  catch { throw new Error(`${label} provider returned invalid JSON.`); }
+}
+
 export async function activateDeployment(id, {
   project, label, read, promote, maxAttempts = 30, intervalMs = 2000,
   sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
