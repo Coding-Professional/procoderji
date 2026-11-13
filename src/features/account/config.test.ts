@@ -1,6 +1,31 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { BACKEND_PATHS, isBackendPath, parseBackendOrigin } from "./config.ts";
+import { BACKEND_PATHS, canonicalGoogleChallenge, isBackendPath, parseBackendOrigin } from "./config.ts";
+
+const googleChallenge = (callback: string) => `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams({ redirect_uri: callback, state: "private-state" })}`;
+
+test("OAuth starts on its callback host before setting a host-only correlation cookie", () => {
+  const location = googleChallenge("https://procoderji.com/api/platform/signin-google");
+  const request = "https://www.procoderji.com/api/platform/auth/google?returnTo=%2Flearn%2Fportfolio&code=discard-me";
+  assert.equal(canonicalGoogleChallenge(request, location), "https://procoderji.com/api/platform/auth/google?returnTo=%2Flearn%2Fportfolio");
+  assert.equal(canonicalGoogleChallenge("https://procoderji.com/api/platform/auth/google", location), null);
+});
+
+test("staging aliases restart on the staging callback host without leaking OAuth state", () => {
+  const location = googleChallenge("https://procoderji-dev.vercel.app/api/platform/signin-google");
+  const redirect = canonicalGoogleChallenge("https://unique-preview.vercel.app/api/platform/auth/google", location);
+  assert.equal(redirect, "https://procoderji-dev.vercel.app/api/platform/auth/google");
+  assert.ok(!redirect.includes("private-state"));
+});
+
+test("malformed or unrelated upstream redirects cannot become canonical login redirects", () => {
+  const request = "https://preview.example.test/api/platform/auth/google";
+  for (const location of [null, "not a URL", "https://unrelated.example.test/", googleChallenge("javascript:alert(1)"),
+    googleChallenge("https://user:secret@example.test/api/platform/signin-google"), googleChallenge("https://example.test/wrong-path"),
+    googleChallenge("https://example.test/api/platform/signin-google?secret=hidden"), googleChallenge("http://example.test/api/platform/signin-google")]) {
+    assert.equal(canonicalGoogleChallenge(request, location), null);
+  }
+});
 
 test("backend proxy accepts explicit root origins for local and hosted .NET services", () => {
   assert.equal(

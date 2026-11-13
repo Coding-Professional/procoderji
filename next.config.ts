@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { isNonProductionDeployment } from "./src/lib/deployment.ts";
 
 /**
  * Conservative response headers. No Content-Security-Policy yet: the site loads
@@ -16,7 +17,10 @@ const nextConfig: NextConfig = {
   // Do not announce the framework in an "X-Powered-By: Next.js" response header.
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    const headers = isNonProductionDeployment(process.env.DEPLOYMENT_ENVIRONMENT, process.env.VERCEL_ENV)
+      ? [...securityHeaders, { key: "X-Robots-Tag", value: "noindex, nofollow" }]
+      : securityHeaders;
+    return [{ source: "/:path*", headers }];
   },
   // The old plain /courses/... reader duplicated the dashboard (same URL structure, no styling).
   // Send visitors and any old links to the real pages instead of serving duplicate content.

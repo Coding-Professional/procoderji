@@ -3,6 +3,7 @@ version: 2
 # updates, when enabled in the repository settings, do not follow this schedule.
 updates:
   - package-ecosystem: npm
+    target-branch: dev
     directory: /
     schedule:
       interval: monthly
@@ -38,6 +39,7 @@ updates:
         update-types:
           - version-update:semver-major
   - package-ecosystem: nuget
+    target-branch: dev
     # Dependabot expands ProCoderJi.slnx here, covering the API and test projects
     # together so shared .NET packages can move in one reviewed pull request.
     directory: /backend
@@ -56,6 +58,7 @@ updates:
           - minor
           - patch
   - package-ecosystem: github-actions
+    target-branch: dev
     directory: /
     schedule:
       interval: monthly

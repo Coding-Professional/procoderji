@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [dev, main]
   workflow_dispatch:
 
 permissions:
@@ -11,7 +11,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Cancel stale PR checks, but never interrupt a push run during a deployment.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -148,3 +149,43 @@ jobs:
           ConnectionStrings__Platform: 'Host=localhost;Port=5432;Database=procoderji_test;Username=postgres;Password=postgres'
           PublicOrigin: http://localhost:3000
         run: dotnet run --project backend/src/ProCoderJi.Api --configuration Release --no-build --no-launch-profile -- --migrate
+
+  deploy:
+    name: Deploy checked branch
+    permissions:
+      contents: read
+      deployments: write
+    needs: [verify, site-quality, backend]
+    if: github.event_name == 'push' && github.repository == 'procoderji-com/procoderji' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      url: ${{ vars.PUBLIC_ORIGIN }}
+    concurrency:
+      group: deploy-${{ github.ref_name }}
+      cancel-in-progress: false
+    steps:
+      - name: Check out checked commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24
+
+      - name: Install deployment CLI
+        run: npm install --global vercel@65.14.0
+
+      - name: Deploy backend, verify storage, then deploy frontend
+        env:
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_FRONTEND_PROJECT_ID: ${{ vars.VERCEL_FRONTEND_PROJECT_ID }}
+          VERCEL_BACKEND_PROJECT_ID: ${{ vars.VERCEL_BACKEND_PROJECT_ID }}
+          PUBLIC_ORIGIN: ${{ vars.PUBLIC_ORIGIN }}
+          BACKEND_ORIGIN: ${{ vars.BACKEND_ORIGIN }}
+          VERCEL_FRONTEND_TOKEN: ${{ secrets.VERCEL_FRONTEND_TOKEN }}
+          VERCEL_BACKEND_TOKEN: ${{ secrets.VERCEL_BACKEND_TOKEN }}
+        run: node scripts/deploy-vercel.mjs

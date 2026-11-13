@@ -53,13 +53,13 @@ fork as `origin`, and continue from the same checkout.
 
 ## Start a branch
 
-Update your local `main` before starting a new change:
+Update your local `dev` before starting a new change:
 
 ```bash
-git switch main
 git fetch upstream
-git merge --ff-only upstream/main
-git push origin main
+git switch dev
+git merge --ff-only upstream/dev
+git push origin dev
 git switch -c feat/describe-the-change
 ```
 
@@ -120,10 +120,15 @@ git commit -m "Describe the change"
 git push -u origin <your-branch-name>
 ```
 
-Open a pull request from your fork branch to `procoderji-com/procoderji:main`. Fill in the
+Open a pull request from your fork branch to `procoderji-com/procoderji:dev`. Fill in the
 template, link a related issue when one exists, explain the resulting behavior, and list the
 checks you ran.
 Include screenshots for visible UI changes and sources or permissions for learning content.
+
+`dev` is the integration/staging branch; `main` is production. Feature and dependency changes
+go through `dev`. Maintainers promote the canonical `dev` branch to `main` after staging checks;
+contributors do not send feature branches directly to `main`. See the
+[branch and deployment workflow](docs/branching-and-releases.md).
 
 Respond to review feedback and keep the branch up to date when needed. Maintainers review
 student value, correctness, accessibility, and maintenance cost before merging. A proposed

@@ -12,7 +12,7 @@ on:
       - 'vercel.backend.json'
       - '.github/workflows/backend-containers.yml'
   push:
-    branches: [main]
+    branches: [dev, main]
     paths:
       - 'backend/**'
       - 'shared/**'
