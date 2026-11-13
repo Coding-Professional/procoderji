@@ -1,6 +1,6 @@
 "use client";
 
-import { Brand } from "@/components/brand";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -27,17 +27,26 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
   const { user, accountConfigured, syncStatus, storageAvailable } =
     useProgress();
   return (
-    <div className="learning-workspace min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-5">
-            <Brand />
-            <span className="hidden border-l border-border pl-5 text-sm text-muted-foreground sm:inline">
-              Student workspace
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+          <Link
+            href="/"
+            className="flex min-h-11 items-center gap-3 font-extrabold tracking-tight"
+          >
+            <Image
+              src="/logo.png"
+              alt=""
+              width={36}
+              height={36}
+              className="rounded-lg"
+            />
+            <span>
+              ProCoderJii <span className="ml-1 hidden text-slate-500 sm:inline">Learn</span>
             </span>
-          </div>
+          </Link>
           <div className="flex items-center gap-4 text-sm">
-            <span className="hidden text-xs text-muted-foreground sm:inline">
+            <span className="hidden rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 sm:inline-flex">
               Free practice beta
             </span>
             <Link
@@ -50,11 +59,8 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className="border-b border-border bg-background px-4 py-4 lg:min-h-[calc(100vh-85px)] lg:border-r lg:border-b-0 lg:px-5 lg:py-8">
-          <p className="mb-4 hidden px-3 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase lg:block">
-            Your study desk
-          </p>
+      <div className="mx-auto grid max-w-7xl lg:grid-cols-[230px_minmax(0,1fr)]">
+        <aside className="border-b border-slate-200 bg-white px-4 py-4 lg:min-h-[calc(100vh-85px)] lg:border-r lg:border-b-0 lg:px-5 lg:py-8">
           <nav
             aria-label="Learning"
             className="flex flex-wrap gap-1 lg:flex-col lg:gap-2"
@@ -68,7 +74,7 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
                   key={href}
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className={`inline-flex min-h-11 items-center gap-3 rounded-md px-3 py-3 text-sm font-medium transition-colors ${active ? "bg-primary text-white" : "text-muted-foreground hover:bg-accent hover:text-foreground"}`}
+                  className={`inline-flex min-h-11 items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 ${active ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
                 >
                   <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
                   {label}
@@ -76,8 +82,8 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
-          <div className="mt-8 hidden border-t border-border pt-6 text-xs leading-6 text-muted-foreground lg:block">
-            <p className="font-semibold text-foreground">
+          <div className="mt-8 hidden border-t border-slate-200 pt-6 text-xs leading-6 text-slate-500 lg:block">
+            <p className="font-semibold text-slate-700">
               Your progress, your control
             </p>
             <p>
@@ -90,7 +96,7 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
             {accountConfigured && !user && (
               <Link
                 href="/account"
-                className="mt-2 inline-flex min-h-11 items-center gap-1 font-semibold text-foreground"
+                className="mt-2 inline-flex min-h-11 items-center gap-1 font-semibold text-slate-900"
               >
                 Save across devices{" "}
                 <ArrowUpRight aria-hidden="true" className="h-3 w-3" />
@@ -100,7 +106,7 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
         </aside>
         <main
           id="main-content"
-          className="min-w-0 px-4 py-8 sm:px-7 sm:py-10 lg:px-10 lg:py-12"
+          className="min-w-0 px-4 py-8 sm:px-7 sm:py-10 lg:px-10"
         >
           {!storageAvailable && (
             <p
@@ -112,7 +118,7 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
             </p>
           )}
           {children}
-          <footer className="mt-14 flex flex-wrap gap-5 border-t border-border pt-6 text-xs text-muted-foreground">
+          <footer className="mt-14 flex flex-wrap gap-5 border-t border-slate-200 pt-6 text-xs text-slate-500">
             <span>Independent practice. No hiring guarantees.</span>
             <Link href="/privacy" className="underline">
               Privacy

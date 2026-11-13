@@ -99,11 +99,13 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
   };
   return (
     <>
-      <p className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
+      <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
         You are in control
       </p>
-      <h1 className="workspace-heading mt-2">Account & learning data</h1>
-      <p className="mt-4 max-w-2xl leading-7 text-muted-foreground">
+      <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Account & learning data
+      </h1>
+      <p className="mt-4 max-w-2xl leading-7 text-slate-600">
         Practise as a guest, or sign in with Google to keep your learning
         history across devices. No subscription is required.
       </p>
@@ -113,7 +115,7 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
         </p>
       ) : (
         <>
-          <section className="mt-8 max-w-3xl rounded-lg border border-border bg-white p-6 sm:p-8">
+          <section className="mt-8 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
             {user ? (
               <>
                 <div className="flex items-center gap-3">
@@ -123,10 +125,10 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
                   />
                   <h2 className="text-xl font-bold">Your learning account</h2>
                 </div>
-                <p className="mt-3 break-all text-sm text-muted-foreground">
+                <p className="mt-3 break-all text-sm text-slate-600">
                   Signed in as {user.email ?? user.name ?? "a Google learner"}
                 </p>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                <p className="mt-3 text-sm leading-7 text-slate-600">
                   Completed sessions save on this device and sync to your
                   account. Guest history stays separate until you choose to
                   import it.
@@ -173,7 +175,7 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
                 </div>
                 <p
                   role="status"
-                  className={`mt-4 text-sm ${syncError ? "text-rose-700" : "text-muted-foreground"}`}
+                  className={`mt-4 text-sm ${syncError ? "text-rose-700" : "text-slate-500"}`}
                 >
                   {syncError ||
                     (syncStatus === "synced"
@@ -188,7 +190,7 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
                 <h2 className="text-xl font-bold">
                   Continue with your Google account
                 </h2>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                <p className="mt-3 text-sm leading-7 text-slate-600">
                   Google confirms your identity. Your learning account uses your
                   basic profile and email; ProCoderJii does not receive your
                   Google password.
@@ -200,7 +202,7 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
                     Continue with Google
                   </button>
                 </form>
-                <p className="mt-4 text-xs leading-6 text-muted-foreground">
+                <p className="mt-4 text-xs leading-6 text-slate-500">
                   By continuing, you agree to the{" "}
                   <Link href="/terms" className="underline">
                     Terms
@@ -217,7 +219,7 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
                 <h2 className="text-xl font-bold">
                   Your browser is your workspace
                 </h2>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                <p className="mt-3 text-sm leading-7 text-slate-600">
                   Google sign-in and account sync are unavailable right now.
                   Your completed sessions save in this browser, and all practice
                   remains available.
@@ -228,9 +230,9 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
               </>
             )}
           </section>
-          <section className="mt-6 max-w-3xl rounded-lg border border-border bg-white p-6 sm:p-8">
+          <section className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
             <h2 className="text-xl font-bold">Your progress data</h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+            <p className="mt-3 text-sm leading-7 text-slate-600">
               {attempts.length} saved sessions in this workspace. Export your
               visible history, or delete progress for{" "}
               {user
@@ -260,7 +262,7 @@ export function AccountPanel({ authFailed = false }: { authFailed?: boolean }) {
               </button>
             </div>
             {user && (
-              <p className="mt-5 text-xs leading-6 text-muted-foreground">
+              <p className="mt-5 text-xs leading-6 text-slate-500">
                 To request deletion of your sign-in account, email{" "}
                 <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
                   {CONTACT_EMAIL}
