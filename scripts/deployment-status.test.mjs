@@ -1,9 +1,27 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { waitForDeployment } from "./deployment-status.mjs";
+import { findDeployment, waitForDeployment } from "./deployment-status.mjs";
 
 const id = "dpl_test123";
 const options = { label: "Backend", intervalMs: 0, maxAttempts: 3 };
+
+test("deployment discovery ignores old runs and waits for the exact invocation to be indexed", async () => {
+  let reads = 0;
+  const older = { uid: "dpl_old", meta: { sourceCommit: "commit", sourceRun: "older" } };
+  const current = { uid: id, meta: { sourceCommit: "commit", sourceRun: "current" } };
+  const found = await findDeployment({ ...options, commit: "commit", run: "current", read: async () => ++reads === 1 ? [older] : [older, current] });
+  assert.equal(found, id);
+  assert.equal(reads, 2);
+});
+
+test("discovery rejects wrong commits, ambiguous records and malformed provider lists", async () => {
+  const record = { id, meta: { sourceCommit: "commit", sourceRun: "current" } };
+  const input = { ...options, commit: "commit", run: "current" };
+  await assert.rejects(findDeployment({ ...input, read: async () => [{ ...record, meta: { sourceCommit: "different", sourceRun: "current" } }] }), /not found/);
+  await assert.rejects(findDeployment({ ...input, read: async () => [record, record] }), /ambiguous/);
+  await assert.rejects(findDeployment({ ...input, read: async () => undefined }), /list is invalid/);
+  await assert.rejects(findDeployment({ ...input, run: "", read: async () => assert.fail("unexpected lookup") }), /metadata is missing/);
+});
 
 test("queued and building deployments are checked until the provider reports ready", async () => {
   const states = ["QUEUED", "BUILDING", "READY"];
