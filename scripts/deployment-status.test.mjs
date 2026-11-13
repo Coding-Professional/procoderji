@@ -1,9 +1,32 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { findDeployment, waitForDeployment } from "./deployment-status.mjs";
+import { activateDeployment, findDeployment, waitForDeployment } from "./deployment-status.mjs";
 
 const id = "dpl_test123";
 const options = { label: "Backend", intervalMs: 0, maxAttempts: 3 };
+
+test("already-current production builds do not request a conflicting promotion", async () => {
+  await activateDeployment(id, { ...options, project: "project", read: async () => ({ id: "project", targets: { production: { id } } }),
+    promote: async () => assert.fail("already-current deployments must not be promoted again") });
+});
+
+test("promotion waits until the checked deployment becomes the project's current target", async () => {
+  let promoted = false;
+  let reads = 0;
+  await activateDeployment(id, { ...options, project: "project",
+    read: async () => ({ id: "project", targets: { production: { id: ++reads < 3 ? "dpl_old" : id } } }),
+    promote: async () => { promoted = true; } });
+  assert.equal(promoted, true);
+  assert.equal(reads, 3);
+});
+
+test("wrong projects, failed promotions and stale canonical targets cannot pass", async () => {
+  await assert.rejects(activateDeployment(id, { ...options, project: "project", read: async () => ({ id: "other" }),
+    promote: async () => assert.fail("wrong project must not be promoted") }), /different project/);
+  const input = { ...options, project: "project", read: async () => ({ id: "project" }) };
+  await assert.rejects(activateDeployment(id, { ...input, promote: async () => { throw Error("Promotion denied"); } }), /Promotion denied/);
+  await assert.rejects(activateDeployment(id, { ...input, promote: async () => {} }), /canonical target/);
+});
 
 test("deployment discovery ignores old runs and waits for the exact invocation to be indexed", async () => {
   let reads = 0;

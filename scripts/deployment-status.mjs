@@ -1,4 +1,24 @@
 /** Confirm provider state instead of trusting the CLI's deployment snapshot. */
+export async function activateDeployment(id, {
+  project, label, read, promote, maxAttempts = 30, intervalMs = 2000,
+  sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
+}) {
+  const current = async () => {
+    const record = await read();
+    if (record.id !== project) throw new Error(`${label} target belongs to a different project.`);
+    return record.targets?.production?.id === id;
+  };
+  // Some deployment runtimes assign production domains despite --skip-domain.
+  // Promoting an already-current deployment returns 409; verify and finish instead.
+  if (await current()) return;
+  await promote();
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (await current()) return;
+    if (attempt + 1 < maxAttempts) await sleep(intervalMs);
+  }
+  throw new Error(`${label} canonical target does not serve the checked deployment.`);
+}
+
 export async function findDeployment({
   read, commit, run, label, maxAttempts = 10, intervalMs = 1000,
   sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),

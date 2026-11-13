@@ -5,7 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { findDeployment, waitForDeployment } from "./deployment-status.mjs";
+import { activateDeployment, findDeployment, waitForDeployment } from "./deployment-status.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const localStaging = process.argv.includes("--local-staging");
@@ -46,7 +46,7 @@ function vercel(args, cwd, project, token, json = true) {
     encoding: "utf8", windowsHide: true, timeout: 12 * 60 * 1000,
     maxBuffer: 8 * 1024 * 1024,
   });
-  if (result.status !== 0) throw new Error("Vercel command failed. Inspect the deployment in the project dashboard.");
+  if (result.status !== 0) throw new Error(`Vercel ${args[0]} command failed. Inspect the deployment in the project dashboard.`);
   if (!json) return;
   let data;
   try { data = JSON.parse(result.stdout); } catch { /* Never dump raw provider logs. */ }
@@ -60,15 +60,18 @@ function authentication(tokenKey) {
   return requireValue(tokenKey);
 }
 
-async function providerApi(endpoint, cwd, project, token, label) {
+async function providerApi(endpoint, cwd, project, token, label, method = "GET") {
   const url = new URL(endpoint, "https://api.vercel.com");
   url.searchParams.set("teamId", requireValue("VERCEL_ORG_ID"));
   if (!token) return vercel(["api", `${url.pathname}${url.search}`, "--method", "GET"], cwd, project);
   const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
+    method,
+    headers: { Authorization: `Bearer ${token}`, ...(method === "POST" ? { "Content-Type": "application/json" } : {}) },
+    ...(method === "POST" ? { body: "{}" } : {}),
     signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) throw new Error(`${label} provider lookup failed (${response.status}).`);
+  if (response.status === 204) return {};
   return response.json();
 }
 
@@ -92,14 +95,13 @@ async function confirmReady(cwd, project, token, label, commit, run) {
 async function promote(deployment, cwd, project, token, label) {
   // A previous rollback can leave domains pinned to an older build. Activate only
   // this invocation's verified production build, then confirm the canonical target.
-  vercel(["promote", deployment.id, "--yes"], cwd, project, token, false);
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const current = await providerApi(`/v9/projects/${project}`, cwd, project, token, label);
-    if (current.id !== project) throw new Error(`${label} target belongs to a different project.`);
-    if (current.targets?.production?.id === deployment.id) return;
-    if (attempt < 4) await new Promise(resolve => setTimeout(resolve, 2000));
-  }
-  throw new Error(`${label} canonical target does not serve the checked deployment.`);
+  await activateDeployment(deployment.id, {
+    project, label,
+    read: () => providerApi(`/v9/projects/${project}`, cwd, project, token, label),
+    promote: () => token
+      ? providerApi(`/v10/projects/${project}/promote/${deployment.id}`, cwd, project, token, `${label} promotion`, "POST")
+      : vercel(["promote", deployment.id, "--yes"], cwd, project, token, false),
+  });
 }
 
 function deploySource() {
