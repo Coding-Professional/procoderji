@@ -1,0 +1,28 @@
+# Keep local credentials and operator files out of every Vercel upload.
+.git/
+.vercel/
+.env*
+**/.env*
+**/*.env
+.neon
+.agents/
+.codex/
+skills-lock.json
+**/appsettings.Local.json
+**/*.user
+**/*.suo
+
+# Backend build output and local data are not deployment inputs.
+backend/**/bin/
+backend/**/obj/
+backend/**/.data/
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Dependencies and generated frontend/test output are rebuilt by Vercel.
+node_modules/
+.next/
+coverage/
+playwright-report/
+test-results/

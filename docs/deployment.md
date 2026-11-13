@@ -100,6 +100,14 @@ The intended production setup serves the canonical HTTPS origin directly and red
 hosts to that origin while preserving paths. Compare the final served host with canonical tags,
 Open Graph URLs, robots and sitemap entries.
 
+Configure this redirect before enabling Google sign-in. A login started on `www.procoderji.com`
+sets a host-only correlation cookie there; a callback to `procoderji.com` cannot receive that
+cookie. In the frontend Vercel project's Domains settings, redirect `www.procoderji.com` to
+`procoderji.com` with status `308`, preserving the path and query. Verify that even
+`https://www.procoderji.com/api/platform/auth/google` redirects to the canonical host before a
+correlation cookie is issued. Keep the Google callback and backend `PublicOrigin` on that same
+canonical origin. This changes hosting redirects, not DNS records.
+
 Read-only checks:
 
 ```bash

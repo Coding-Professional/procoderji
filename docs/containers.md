@@ -147,9 +147,12 @@ build needs `global.json` and `shared/`. Its catch-all rewrite serves the API; t
 is for a **separate backend Vercel project**, not the existing Next.js project. Container Runtime
 and Services are currently beta features.
 
-1. In a separate checkout or worktree, link Vercel CLI to a dedicated backend project with
-   `vercel link`. Set that project's Root Directory to the repository root. A separate checkout
-   keeps its local `.vercel` project link apart from the frontend's link.
+1. Use a separate checkout or worktree for a dedicated backend project. Create the project
+   with `vercel project create procoderji-api --scope YOUR_TEAM` if it does not exist, then link
+   it explicitly with `vercel link --yes --project procoderji-api --scope YOUR_TEAM`. A plain
+   `vercel link` can select the frontend project from the Git remote. Set the backend project's
+   Root Directory to the repository root. A separate checkout keeps its local `.vercel` project
+   link apart from the frontend's link.
 2. Set these values in the backend project's environment settings:
 
    | Variable | Value |
@@ -171,11 +174,19 @@ and Services are currently beta features.
    docker run --rm --env Database__Provider --env ConnectionStrings__Platform --env Database__Name --env PublicOrigin procoderji-api:local --migrate
    ```
 
-4. Deploy using the optional configuration from the repository root:
+4. In the **backend-only checkout**, copy the optional configuration to `vercel.json` so the
+   remote build reads the service configuration, then deploy from the repository root. Preserve
+   any existing `vercel.json` before copying:
 
    ```bash
-   vercel deploy --local-config vercel.backend.json --prod
+   cp vercel.backend.json vercel.json
+   vercel deploy --project procoderji-api --scope YOUR_TEAM --prod
    ```
+
+   In PowerShell, use `Copy-Item vercel.backend.json vercel.json`. Keep this generated
+   `vercel.json` local to the backend checkout; committing its catch-all API rewrite to the
+   shared branch would change frontend deployments. Keep the repository's `.vercelignore` in
+   place: Git ignore rules alone do not exclude all local operator files from Vercel CLI uploads.
 
 5. Set the frontend project's server-only `DOTNET_API_URL` to the backend's reachable HTTPS
    origin, redeploy the frontend, and verify the callback and account flows. Deployment
@@ -183,8 +194,9 @@ and Services are currently beta features.
    callback remains on the frontend origin; do not register the backend URL as the callback.
 
 The optional configuration is an operator template; no Vercel project is created or changed by
-committing it. It has not been verified against a live Vercel account. Review beta availability,
-project settings and database connectivity before using it for production accounts.
+committing it. Verify the deployed API's health, session endpoint, Google redirect and database
+connectivity before enabling frontend account traffic. A successful build alone does not
+establish that the container serves requests.
 
 The repository does not provision a cloud account, a database, DNS or Google credentials. A
 successful image build or CI check does not verify live Google consent in the deployed system.
