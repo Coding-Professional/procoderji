@@ -3,7 +3,7 @@
 import React, { Suspense } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, BookOpen, ChevronRight, GraduationCap, LayoutDashboard, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronRight, GraduationCap, LayoutDashboard, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FloatingLogo } from "@/components/floating-logo";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -102,7 +102,6 @@ function BranchSelector() {
                                         href={dashboardHref([selected.courseSlug, selected.slug, sem.slug])}
                                         className="group border border-gray-800 flex min-w-0 flex-col items-center justify-center p-3 sm:p-6 rounded-2xl bg-white hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
                                     >
-                                        <BookOpen aria-hidden="true" className="mb-2 h-4 w-4 text-amber-700" />
                                         <span className="text-3xl font-black text-gray-300 group-hover:text-gray-500 mb-2 transition-colors">{i + 1}</span>
                                         <span className="font-bold text-gray-900 group-hover:text-gray-800 transition-colors">Semester</span>
                                         <span className="text-xs text-gray-500 mt-1">
