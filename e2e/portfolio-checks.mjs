@@ -92,7 +92,10 @@ export async function runPortfolioChecks({ browser, base, backendOrigin }) {
       const url = new URL(request.url());
       if (/^https?:$/.test(url.protocol) && url.origin !== new URL(base).origin) foreignRequests.add(url.origin);
     });
-    const response = await page.goto(base + "/u/" + username, { waitUntil: "networkidle" });
+    // Next.js prefetch requests can outlive rendering; assert the loaded page's
+    // status, content and privacy boundaries instead of waiting for network idle.
+    const response = await page.goto(base + "/u/" + username, { waitUntil: "load" });
+    await page.evaluate(() => document.fonts.ready);
     assert.equal(response?.status(), expectedStatus, `Public ${username} should return ${expectedStatus}`);
     if (expectedStatus === 200) {
       assert.equal(await page.locator("h1").count(), 1);
@@ -109,7 +112,7 @@ export async function runPortfolioChecks({ browser, base, backendOrigin }) {
   }
 
   async function editor(page) {
-    const response = await page.goto(base + EDITOR, { waitUntil: "networkidle" });
+    const response = await page.goto(base + EDITOR, { waitUntil: "load" });
     assert.equal(response?.status(), 200);
     await page.getByRole("heading", { name: "Portfolio builder", exact: true }).waitFor();
     await until(() => page.getByRole("button", { name: "Save draft", exact: true }).isEnabled(), "Authenticated editor did not become ready");
@@ -403,7 +406,7 @@ export async function runPortfolioChecks({ browser, base, backendOrigin }) {
 
     await run("guest", "guests can preview while private APIs and unpublished pages stay protected", async contexts => {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 } }); contexts.push(context);
-      const page = await context.newPage(); await page.goto(base + EDITOR, { waitUntil: "networkidle" });
+      const page = await context.newPage(); await page.goto(base + EDITOR, { waitUntil: "load" });
       await page.getByRole("heading", { name: "Try the editor, then sign in to save", exact: true }).waitFor();
       await page.getByLabel("Name", { exact: true }).fill("Guest preview");
       assert.equal(await page.getByRole("button", { name: "Save draft", exact: true }).isDisabled(), true);
