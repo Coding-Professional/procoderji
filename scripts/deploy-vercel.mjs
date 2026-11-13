@@ -4,7 +4,8 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { waitForDeployment } from "./deployment-status.mjs";
+import { randomUUID } from "node:crypto";
+import { findDeployment, waitForDeployment } from "./deployment-status.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const localStaging = process.argv.includes("--local-staging");
@@ -36,7 +37,7 @@ function workspace() {
   return directory;
 }
 
-function vercel(args, cwd, project, token) {
+function vercel(args, cwd, project, token, json = true) {
   const result = spawnSync(command, [
     ...prefix, ...args,
     ...(token ? ["--token", token] : []),
@@ -45,6 +46,8 @@ function vercel(args, cwd, project, token) {
     encoding: "utf8", windowsHide: true, timeout: 12 * 60 * 1000,
     maxBuffer: 8 * 1024 * 1024,
   });
+  if (result.status !== 0) throw new Error("Vercel command failed. Inspect the deployment in the project dashboard.");
+  if (!json) return;
   let data;
   try { data = JSON.parse(result.stdout); } catch { /* Never dump raw provider logs. */ }
   if (result.status !== 0 || !data) throw new Error("Vercel deployment failed. Inspect its build in the project dashboard.");
@@ -57,26 +60,46 @@ function authentication(tokenKey) {
   return requireValue(tokenKey);
 }
 
-async function confirmReady(result, cwd, project, token, label) {
-  return waitForDeployment(result.deployment?.id, {
+async function providerApi(endpoint, cwd, project, token, label) {
+  const url = new URL(endpoint, "https://api.vercel.com");
+  url.searchParams.set("teamId", requireValue("VERCEL_ORG_ID"));
+  if (!token) return vercel(["api", `${url.pathname}${url.search}`, "--method", "GET"], cwd, project);
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) throw new Error(`${label} provider lookup failed (${response.status}).`);
+  return response.json();
+}
+
+async function confirmReady(cwd, project, token, label, commit, run) {
+  // CLI JSON envelopes differ across platforms. Resolve this exact invocation
+  // from provider metadata, then verify its project and live readiness state.
+  const id = await findDeployment({
+    label, commit, run,
+    read: async () => (await providerApi(`/v6/deployments?projectId=${project}&limit=20`, cwd, project, token, label)).deployments,
+  });
+  return waitForDeployment(id, {
     label,
     read: async id => {
-      if (!token) {
-        const inspected = vercel(["inspect", id, "--json"], cwd, project);
-        return inspected.deployment ?? inspected;
-      }
-      const endpoint = new URL(`https://api.vercel.com/v13/deployments/${id}`);
-      endpoint.searchParams.set("teamId", requireValue("VERCEL_ORG_ID"));
-      const response = await fetch(endpoint, {
-        headers: { Authorization: `Bearer ${token}` },
-        signal: AbortSignal.timeout(30_000),
-      });
-      if (!response.ok) throw new Error(`${label} status lookup failed (${response.status}).`);
-      const deployment = await response.json();
+      const deployment = await providerApi(`/v13/deployments/${id}`, cwd, project, token, label);
       if (deployment.projectId !== project) throw new Error(`${label} deployment belongs to a different project.`);
       return { id: deployment.id, readyState: deployment.readyState };
     },
   });
+}
+
+async function promote(deployment, cwd, project, token, label) {
+  // A previous rollback can leave domains pinned to an older build. Activate only
+  // this invocation's verified production build, then confirm the canonical target.
+  vercel(["promote", deployment.id, "--yes"], cwd, project, token, false);
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const current = await providerApi(`/v9/projects/${project}`, cwd, project, token, label);
+    if (current.id !== project) throw new Error(`${label} target belongs to a different project.`);
+    if (current.targets?.production?.id === deployment.id) return;
+    if (attempt < 4) await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+  throw new Error(`${label} canonical target does not serve the checked deployment.`);
 }
 
 function deploySource() {
@@ -125,10 +148,12 @@ async function main() {
   const backendSource = deploySource();
   const frontendSource = deploySource();
   fs.copyFileSync(path.join(backendSource, "vercel.backend.json"), path.join(backendSource, "vercel.json"));
-  const deployArgs = ["deploy", "--prod", "--yes", "--json", "--meta", `sourceCommit=${sha}`, "--meta", `sourceBranch=${branch}`];
+  const run = randomUUID();
+  const deployArgs = ["deploy", "--prod", "--skip-domain", "--yes", "--json", "--meta", `sourceCommit=${sha}`, "--meta", `sourceBranch=${branch}`, "--meta", `sourceRun=${run}`];
   const backendToken = authentication("VERCEL_BACKEND_TOKEN");
-  const backend = vercel([...deployArgs, "--project", backendProject], backendSource, backendProject, backendToken);
-  await confirmReady(backend, backendSource, backendProject, backendToken, "Backend");
+  vercel([...deployArgs, "--project", backendProject], backendSource, backendProject, backendToken);
+  const backend = await confirmReady(backendSource, backendProject, backendToken, "Backend", sha, run);
+  await promote(backend, backendSource, backendProject, backendToken, "Backend");
   await check(`${backendOrigin}/api/platform/health`, async r => r.ok && (await r.json()).status === "ok");
   await check(`${backendOrigin}/api/platform/auth/session`, async r => {
     if (!r.ok) return false;
@@ -138,8 +163,9 @@ async function main() {
   console.log("Backend is ready; database-backed session check passed.");
 
   const frontendToken = authentication("VERCEL_FRONTEND_TOKEN");
-  const frontend = vercel([...deployArgs, "--project", frontendProject], frontendSource, frontendProject, frontendToken);
-  await confirmReady(frontend, frontendSource, frontendProject, frontendToken, "Frontend");
+  vercel([...deployArgs, "--project", frontendProject], frontendSource, frontendProject, frontendToken);
+  const frontend = await confirmReady(frontendSource, frontendProject, frontendToken, "Frontend", sha, run);
+  await promote(frontend, frontendSource, frontendProject, frontendToken, "Frontend");
   await check(publicOrigin, async r => r.ok && (branch === "main" || r.headers.get("x-robots-tag")?.includes("noindex")));
   console.log(`Frontend is ready: ${publicOrigin}`);
   const summary = `### ${branch === "main" ? "Production" : "Staging"} deployment\n\nCommit: \`${sha}\`\n\n- Frontend: ${publicOrigin}\n- Backend: ${backendOrigin}\n- Health and database-backed session checks passed.\n`;
