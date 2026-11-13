@@ -1,4 +1,4 @@
-// Deployment credentials stay in environment secrets and temporary auth files.
+// Deployment credentials stay in environment secrets, never in source or logs.
 // PR jobs never execute this script with deployment credentials.
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
@@ -35,10 +35,10 @@ function workspace() {
   return directory;
 }
 
-function vercel(args, cwd, project, authDirectory) {
+function vercel(args, cwd, project, token) {
   const result = spawnSync(command, [
     ...prefix, ...args,
-    ...(authDirectory ? ["--global-config", authDirectory] : []),
+    ...(token ? ["--token", token] : []),
   ], {
     cwd, env: { ...env, VERCEL_ORG_ID: requireValue("VERCEL_ORG_ID"), VERCEL_PROJECT_ID: project },
     encoding: "utf8", windowsHide: true, timeout: 12 * 60 * 1000,
@@ -51,11 +51,9 @@ function vercel(args, cwd, project, authDirectory) {
 }
 
 function authentication(tokenKey) {
-  if (localStaging) return undefined;
-  const directory = workspace();
-  fs.writeFileSync(path.join(directory, "auth.json"), JSON.stringify({ token: requireValue(tokenKey) }), { mode: 0o600 });
-  fs.writeFileSync(path.join(directory, "config.json"), JSON.stringify({ currentTeam: requireValue("VERCEL_ORG_ID") }));
-  return directory;
+  if (localStaging && !process.env[tokenKey]) return undefined;
+  // Native CLI 65 requires its explicit token option; no shell or command logging is used.
+  return requireValue(tokenKey);
 }
 
 function deploySource() {
@@ -102,6 +100,7 @@ async function main() {
   if (backendProject === frontendProject) throw new Error("Backend and frontend projects must be separate.");
 
   const backendSource = deploySource();
+  const frontendSource = deploySource();
   fs.copyFileSync(path.join(backendSource, "vercel.backend.json"), path.join(backendSource, "vercel.json"));
   const deployArgs = ["deploy", "--prod", "--yes", "--json", "--meta", `sourceCommit=${sha}`, "--meta", `sourceBranch=${branch}`];
   const backend = vercel([...deployArgs, "--project", backendProject], backendSource, backendProject, authentication("VERCEL_BACKEND_TOKEN"));
@@ -114,7 +113,6 @@ async function main() {
   });
   console.log("Backend is ready; database-backed session check passed.");
 
-  const frontendSource = deploySource();
   const frontend = vercel([...deployArgs, "--project", frontendProject], frontendSource, frontendProject, authentication("VERCEL_FRONTEND_TOKEN"));
   if (frontend.status === "error" || frontend.deployment?.readyState !== "READY") throw new Error("Frontend deployment did not become ready.");
   await check(publicOrigin, async r => r.ok && (branch === "main" || r.headers.get("x-robots-tag")?.includes("noindex")));

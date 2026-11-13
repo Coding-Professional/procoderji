@@ -54,8 +54,9 @@ and backend checks pass. PRs and fork workflows receive no deployment credential
 Environment variables: `VERCEL_ORG_ID`, `VERCEL_FRONTEND_PROJECT_ID`,
 `VERCEL_BACKEND_PROJECT_ID`, `PUBLIC_ORIGIN`, and `BACKEND_ORIGIN`.
 Environment secrets: `VERCEL_FRONTEND_TOKEN` and `VERCEL_BACKEND_TOKEN`. Scope each token to
-its project, give it an expiration date and rotate it before expiry. Tokens are never printed,
-passed in command arguments or committed; the deployment script uses temporary auth files.
+its project, give it an expiration date and rotate it before expiry. Tokens are never printed
+or committed. The script passes them directly to the CLI child process without a shell or
+command echo; it never dumps provider output into the workflow logs.
 Database and Google credentials stay in the appropriate Vercel project's secret settings.
 
 Staging uses a schema-only Neon branch and a fresh `procoderji_dev` database, with a separate
